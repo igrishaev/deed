@@ -10,4 +10,8 @@ public class Error {
         return new RuntimeException(String.format(template, args), e);
     }
 
+    public static RuntimeException error(final String template, final Object args) {
+        return new RuntimeException(String.format(template, args));
+    }
+
 }

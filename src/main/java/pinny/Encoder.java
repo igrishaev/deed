@@ -1,12 +1,12 @@
 package pinny;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.zip.GZIPOutputStream;
 
 import clojure.lang.Atom;
-import clojure.lang.LazySeq;
-import clojure.lang.PersistentVector;
-import clojure.core$vec;
+import clojure.lang.IPersistentVector;
+import clojure.lang.RT;
 
 public final class Encoder implements AutoCloseable {
 
@@ -32,6 +32,42 @@ public final class Encoder implements AutoCloseable {
             throw Error.error(e, "could not open object output stream");
         }
     }
+
+    private int writeInt(final int i) {
+        try {
+            objectOutputStream.writeInt(i);
+        } catch (IOException e) {
+            throw Error.error(e, "could not write integer %s", i);
+        }
+        return 4;
+    }
+
+    private int writeShort(final short s) {
+        try {
+            objectOutputStream.writeShort(s);
+        } catch (IOException e) {
+            throw Error.error(e, "could not write short %s", s);
+        }
+        return 2;
+    }
+
+    public int encode2(final Object x) {
+        if (x instanceof Integer i) {
+            return writeInt(OID.INT) + writeInt(i);
+        } else if (x instanceof Short s) {
+            return writeInt(OID.SHORT) + writeShort(s);
+        } else if (x instanceof IPersistentVector v) {
+            int sum = writeInt(OID.CLJ_VECTOR);
+            final Iterator<?> iter = RT.iter(v);
+            while (iter.hasNext()) {
+                sum += encode2(iter.next());
+            }
+            return sum;
+        } else {
+            throw Error.error("unsupported type: %s", x);
+        }
+    }
+
 
     public void encode(final Object x) {
 //        if (x instanceof LazySeq lz) {

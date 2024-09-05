@@ -10,6 +10,11 @@
 (def DATA
 
   (vec
+   (for [x (range 1000000)]
+     (int x)))
+
+  #_
+  (vec
    (for [_ (range 10000000)]
      {:foo 1}
      ))
@@ -28,7 +33,24 @@
      {:foo 1
       :bar 2})))
 
-(defn aaa []
+(comment
+
+  (time
+   (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+     (.encode2 ^pinny.Encoder e DATA)))
+
+  (quick-bench
+   (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+     (.encode2 ^pinny.Encoder e DATA)))
+
+  (quick-bench
+   (pinny/with-encoder [e (io/file "out.pinny")]
+     (.encode2 ^pinny.Encoder e DATA)))
+
+  (time (do (nippy/freeze DATA) nil))
+
+  (quick-bench
+      (nippy/freeze DATA))
 
   (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
     (quick-bench
