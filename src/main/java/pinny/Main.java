@@ -13,7 +13,7 @@ public class Main {
             encoder.encode(999);
             encoder.encode(true);
             encoder.encode("test");
-            encoder.encode_multi(List.of(1,2,3,4,5,6,7));
+            encoder.encodeMulti(List.of(1,2,3,4,5,6,7));
             encoder.encode("test");
         }
 

@@ -3,6 +3,11 @@ package pinny;
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
 
+import clojure.lang.Atom;
+import clojure.lang.LazySeq;
+import clojure.lang.PersistentVector;
+import clojure.core$vec;
+
 public final class Encoder implements AutoCloseable {
 
     private final ObjectOutputStream objectOutputStream;
@@ -17,23 +22,31 @@ public final class Encoder implements AutoCloseable {
             try {
                 destination = new GZIPOutputStream(destination);
             } catch (IOException e) {
-                throw new RuntimeException("could not open Gzip output stream", e);
+                throw Error.error(e, "could not open Gzip output stream");
             }
         }
         try {
             final BufferedOutputStream buf = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
             objectOutputStream = new ObjectOutputStream(buf);
         } catch (IOException e) {
-            throw new RuntimeException("could not open object output stream", e);
+            throw Error.error(e, "could not open object output stream");
         }
     }
 
     public void encode(final Object x) {
-        try {
-            objectOutputStream.writeObject(x);
-        } catch (IOException e) {
-            throw new RuntimeException("could not write an object", e);
+//        if (x instanceof LazySeq lz) {
+//            encode(core$vec.invokeStatic(lz));
+//        } else
+        if (x instanceof Atom a) {
+            encode(a.deref());
+        } else {
+            try {
+                objectOutputStream.writeObject(x);
+            } catch (IOException e) {
+                throw Error.error(e, "could not write an object: %s", x);
+            }
         }
+
     }
 
     @SuppressWarnings("unused")
@@ -48,7 +61,7 @@ public final class Encoder implements AutoCloseable {
         try {
             objectOutputStream.flush();
         } catch (IOException e) {
-            throw new RuntimeException("could not flush the stream", e);
+            throw Error.error(e, "could not flush the stream");
         }
     }
 
@@ -57,7 +70,7 @@ public final class Encoder implements AutoCloseable {
         try {
             objectOutputStream.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "could not close the stream");
         }
     }
 }

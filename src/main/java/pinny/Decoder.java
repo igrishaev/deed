@@ -23,14 +23,14 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             try {
                 source = new GZIPInputStream(inputStream);
             } catch (IOException e) {
-                throw new RuntimeException("could not open a Gzip input stream", e);
+                throw Error.error(e, "could not open a Gzip input stream");
             }
         }
         try {
             bufferedInputStream = new BufferedInputStream(source, Const.IN_BUF_SIZE);
             objectInputStream = new ObjectInputStream(bufferedInputStream);
         } catch (IOException e) {
-            throw new RuntimeException("could not open object input stream", e);
+            throw Error.error(e, "could not open object input stream");
         }
         EOF = new EOF();
     }
@@ -43,7 +43,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             r = bufferedInputStream.read();
             bufferedInputStream.reset();
         } catch (IOException e) {
-            throw new RuntimeException("could not read() from the input stream", e);
+            throw Error.error(e, "could not read() from the input stream");
         }
 
         if (r == -1) {
@@ -53,9 +53,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         try {
             return objectInputStream.readObject();
         } catch (IOException e) {
-            throw new RuntimeException("could not read object from the stream", e);
+            throw Error.error(e, "could not read object from the stream");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Class not found", e);
+            throw Error.error(e, "Class not found");
         }
     }
 
@@ -83,7 +83,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         try {
             objectInputStream.close();
         } catch (IOException e) {
-            throw new RuntimeException("could not close the stream", e);
+            throw Error.error(e, "could not close the stream");
         }
     }
 }
