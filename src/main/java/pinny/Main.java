@@ -20,7 +20,7 @@ public class Main {
 
             System.out.println(map.invoke(inc, PersistentVector.create(1, 2, 3)));
 
-            encoder.encode2(map.invoke(inc, PersistentVector.create(1, 2, 3, 4)));
+            encoder.encode(map.invoke(inc, PersistentVector.create(1, 2, 3, 4)));
 
             // encoder.encode(999);
 //            encoder.encode(true);
