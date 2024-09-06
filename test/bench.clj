@@ -76,3 +76,6 @@
 
 ;; ObjectOutputStream
 ;; Execution time mean : 11.566030 ms
+
+;; DataOutputStream
+;; Execution time mean : 34.584300 ms

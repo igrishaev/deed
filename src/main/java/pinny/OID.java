@@ -3,6 +3,7 @@ package pinny;
 public class OID {
 
     public static final short NIL             = 0x0000;
+    public static final short SERIALIZABLE    = 0x0001;
 
     public static final short INT             = 0x0010;
     public static final short INT_ZERO        = 0x0011;
@@ -38,5 +39,7 @@ public class OID {
 
     public static final short JVM_MAP         = 0x00a0;
     public static final short JVM_MAP_EMPTY   = 0x00a1;
+
+    public static final short UUID            = 0x00b0;
 
 }

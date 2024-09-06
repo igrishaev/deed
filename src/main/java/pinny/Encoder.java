@@ -5,7 +5,7 @@ import clojure.lang.PersistentHashSet;
 import clojure.lang.PersistentVector;
 
 import java.io.*;
-import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
@@ -13,16 +13,12 @@ import java.util.zip.GZIPOutputStream;
 public final class Encoder implements AutoCloseable {
 
     private final ObjectOutputStream objectOutputStream;
-    // private final byte[] buf;
-    // private final ByteBuffer bb;
 
     public Encoder(final OutputStream outputStream) {
         this(outputStream, Options.standard());
     }
 
     public Encoder(final OutputStream outputStream, final Options options) {
-        // buf = new byte[8];
-        // bb = ByteBuffer.wrap(buf);
         OutputStream destination = outputStream;
         if (options.useGzip()) {
             try {
@@ -39,170 +35,174 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-//    private int writeBuf(final int len) {
-//        try {
-//            outputStream.write(buf, 0, len);
-//        } catch (IOException e) {
-//            throw Error.error(e, "cannot write buffer, len: %s", len);
-//        }
-//        return len;
-//    }
-
-    public int writeInt(final int i) {
+    public void writeInt(final int i) {
         try {
             objectOutputStream.writeInt(i);
-            return 4;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write int: %s", i);
         }
     }
 
-    public int writeOID(final short oid) {
+    public void writeOID(final short oid) {
         try {
             objectOutputStream.writeShort(oid);
-            return 2;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write OID: 0x%04X", oid);
         }
     }
 
-    public int writeShort(final short s) {
+    public void writeShort(final short s) {
         try {
             objectOutputStream.writeShort(s);
-            return 2;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write short: %s", s);
         }
     }
 
-    public int writeLong(final long l) {
+    public void writeLong(final long l) {
         try {
             objectOutputStream.writeLong(l);
-            return 8;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write long: %s", l);
         }
     }
 
-    public int writeFloat(final float f) {
+    @SuppressWarnings("unused")
+    public void writeFloat(final float f) {
         try {
             objectOutputStream.writeFloat(f);
-            return 4;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write float: %s", f);
         }
     }
 
-    public int writeDouble(final double d) {
+    @SuppressWarnings("unused")
+    public void writeDouble(final double d) {
         try {
             objectOutputStream.writeDouble(d);
-            return 8;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write double: %s", d);
         }
     }
 
-    public int writeBytes(final byte[] bytes) {
+    public void writeBytes(final byte[] bytes) {
         try {
             objectOutputStream.write(bytes);
-            return 8;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write bytes, length: %s", bytes.length);
         }
     }
 
-    public int writeBoolean(final boolean bool) {
+    public void writeBoolean(final boolean bool) {
         try {
             objectOutputStream.writeBoolean(bool);
-            return 1;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Error.error(e, "cannot write boolean: %s", bool);
         }
     }
 
     // todo: OPTIMIZE true/false
-    public long encodeBoolean(final boolean b) {
-        return writeOID(OID.BOOL) + writeBoolean(b);
+    @SuppressWarnings("unused")
+    public void encodeBoolean(final boolean b) {
+        writeOID(OID.BOOL);
+        writeBoolean(b);
     }
 
     // todo: optimize -1, 0, 1
-    public long encodeInteger(final Integer i) {
-        return writeOID(OID.INT) + writeInt(i);
+    public void encodeInteger(final Integer i) {
+        writeOID(OID.INT);
+        writeInt(i);
     }
 
-    public long encodeLong(final Long l) {
-        return writeOID(OID.LONG) + writeLong(l);
+    public void encodeLong(final Long l) {
+        writeOID(OID.LONG);
+        writeLong(l);
     }
 
-    public long encodeShort(final Short s) {
-        return writeOID(OID.INT) + writeShort(s);
+    public void encodeShort(final Short s) {
+        writeOID(OID.INT);
+        writeShort(s);
     }
 
-    private long encodeChunk(final Object[] chunk) {
-        long sum = writeInt(chunk.length);
+    private void encodeChunk(final Object[] chunk) {
+        writeInt(chunk.length);
         for (Object x: chunk) {
-            sum += encode(x);
+            encode(x);
         }
-        return sum;
     }
 
-    private long encodeChunk(final Object[] chunk, final int pos) {
-        long sum = writeInt(pos);
+    private void encodeChunk(final Object[] chunk, final int pos) {
+        writeInt(pos);
         for (int i = 0; i < pos; i++) {
-            sum += encode(chunk[i]);
+            encode(chunk[i]);
         }
-        return sum;
     }
 
-    public long encodeString(final String s) {
+    public void encodeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-        long sum = writeOID(OID.STRING);
-        sum += writeInt(bytes.length);
+        writeOID(OID.STRING);
+        writeInt(bytes.length);
         writeBytes(bytes);
-        sum += bytes.length;
-        return sum;
     }
 
-    public long encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
-        long sum = writeInt(oid) + writeInt(len);
+    public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
+        writeOID(oid);
+        writeInt(len);
         for (Object x : iterable) {
-            sum += encode(x);
+            encode(x);
         }
-        return sum + writeInt(0);
     }
 
-    public long encodeMulti(final Iterable<Object> xs) {
-        long sum = 0;
+    public void encodeUUID(final UUID u) {
+        writeOID(OID.UUID);
+        writeLong(u.getMostSignificantBits());
+        writeLong(u.getLeastSignificantBits());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeMulti(final Iterable<?> xs) {
         for (Object x: xs) {
-            sum += encode(x);
+            encode(x);
         }
-        return sum;
     }
 
-    public long encode(final Object x) {
+    public void encodeSerializable(final Object x) {
+        writeOID(OID.SERIALIZABLE);
+        try {
+            objectOutputStream.writeObject(x);
+        } catch (IOException e) {
+            throw Error.error(e, "cannot serialize object: %s %s", x.getClass(), x);
+        }
+    }
+
+    public void encode(final Object x) {
         if (x instanceof Integer i) {
-            return encodeInteger(i);
+            encodeInteger(i);
         } else if (x instanceof Long l) {
-            return encodeLong(l);
+            encodeLong(l);
         } else if (x instanceof Short s) {
-            return encodeShort(s);
+            encodeShort(s);
         } else if (x instanceof PersistentVector v) {
-            return encodeCountable(OID.CLJ_VEC, v.count(), v);
+            encodeCountable(OID.CLJ_VEC, v.count(), v);
         } else if (x instanceof PersistentHashSet s) {
-            return encodeCountable(OID.CLJ_SET, s.count(), s);
+            encodeCountable(OID.CLJ_SET, s.count(), s);
         } else if (x instanceof Map<?,?> m) {
-            return encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
+            encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
         } else if (x instanceof LazySeq lz) {
-            return encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+            encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+        } else if (x instanceof UUID u) {
+            encodeUUID(u);
         } else if (x instanceof String s) {
-            return encodeString(s);
+            encodeString(s);
+        } else if (x instanceof Serializable) {
+            encodeSerializable(x);
         } else {
             throw Error.error("unsupported type: %s %s", x.getClass(), x);
         }
     }
 
-    public long encodeUncountable(final short oid, final Iterable<?> iterable) {
-        long sum = writeOID(oid);
+    public void encodeUncountable(final short oid, final Iterable<?> iterable) {
+        writeOID(oid);
         final int limit = Const.OBJ_CHUNK_SIZE;
         final Object[] chunk = new Object[limit];
         int pos = 0;
@@ -211,16 +211,16 @@ public final class Encoder implements AutoCloseable {
             pos++;
             if (pos == limit) {
                 pos = 0;
-                sum += encodeChunk(chunk);
+                encodeChunk(chunk);
             }
         }
         if (pos > 0) {
-            sum += encodeChunk(chunk, pos);
+            encodeChunk(chunk, pos);
         }
-        return sum + writeInt(0);
+        writeInt(0);
     }
 
-
+    @SuppressWarnings("unused")
     public void flush() {
         try {
             objectOutputStream.flush();

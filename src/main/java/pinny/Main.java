@@ -15,7 +15,7 @@ public class Main {
         IFn map = Clojure.var("clojure.core", "map");
 
         try(final FileOutputStream out = new FileOutputStream("test.pinny");
-            final EncoderOld encoder = new EncoderOld(out)) {
+            final Encoder encoder = new Encoder(out)) {
 
             System.out.println(map.invoke(inc, PersistentVector.create(1, 2, 3)));
 
