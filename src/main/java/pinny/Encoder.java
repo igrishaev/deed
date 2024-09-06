@@ -1,7 +1,6 @@
 package pinny;
 
 import clojure.lang.LazySeq;
-import clojure.lang.MultiFn;
 import clojure.lang.PersistentHashSet;
 import clojure.lang.PersistentVector;
 
@@ -13,17 +12,17 @@ import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
 
-    private final OutputStream outputStream;
-    private final byte[] buf;
-    private final ByteBuffer bb;
+    private final ObjectOutputStream objectOutputStream;
+    // private final byte[] buf;
+    // private final ByteBuffer bb;
 
     public Encoder(final OutputStream outputStream) {
         this(outputStream, Options.standard());
     }
 
     public Encoder(final OutputStream outputStream, final Options options) {
-        buf = new byte[8];
-        bb = ByteBuffer.wrap(buf);
+        // buf = new byte[8];
+        // bb = ByteBuffer.wrap(buf);
         OutputStream destination = outputStream;
         if (options.useGzip()) {
             try {
@@ -32,52 +31,93 @@ public final class Encoder implements AutoCloseable {
                 throw Error.error(e, "could not open Gzip output stream");
             }
         }
-        this.outputStream = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
+        destination = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
+        try {
+            objectOutputStream = new ObjectOutputStream(destination);
+        } catch (IOException e) {
+            throw Error.error(e, "could not open ObjectOutputStream");
+        }
     }
 
-    private int writeBuf(final int len) {
-        try {
-            outputStream.write(buf, 0, len);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write buffer, len: %s", len);
-        }
-        return len;
-    }
+//    private int writeBuf(final int len) {
+//        try {
+//            outputStream.write(buf, 0, len);
+//        } catch (IOException e) {
+//            throw Error.error(e, "cannot write buffer, len: %s", len);
+//        }
+//        return len;
+//    }
 
     public int writeInt(final int i) {
-        bb.putInt(0, i);
-        return writeBuf(Const.INT_SIZE);
+        try {
+            objectOutputStream.writeInt(i);
+            return 4;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeOID(final short oid) {
-        bb.putShort(0, oid);
-        return writeBuf(Const.OID_SIZE);
+        try {
+            objectOutputStream.writeShort(oid);
+            return 2;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeShort(final short s) {
-        bb.putShort(0, s);
-        return writeBuf(Const.SHORT_SIZE);
+        try {
+            objectOutputStream.writeShort(s);
+            return 2;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeLong(final long l) {
-        bb.putLong(0, l);
-        return writeBuf(Const.LONG_SIZE);
+        try {
+            objectOutputStream.writeLong(l);
+            return 8;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeFloat(final float f) {
-        bb.putFloat(0, f);
-        return writeBuf(Const.FLOAT_SIZE);
+        try {
+            objectOutputStream.writeFloat(f);
+            return 4;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeDouble(final double d) {
-        bb.putDouble(0, d);
-        return writeBuf(Const.DOUBLE_SIZE);
+        try {
+            objectOutputStream.writeDouble(d);
+            return 8;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int writeBytes(final byte[] bytes) {
+        try {
+            objectOutputStream.write(bytes);
+            return 8;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int writeBoolean(final boolean bool) {
-        final byte b = bool ? (byte)1 : (byte)0;
-        bb.put(b);
-        return writeBuf(Const.BYTE_SIZE);
+        try {
+            objectOutputStream.writeBoolean(bool);
+            return 1;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // todo: OPTIMIZE true/false
@@ -118,11 +158,7 @@ public final class Encoder implements AutoCloseable {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         long sum = writeOID(OID.STRING);
         sum += writeInt(bytes.length);
-        try {
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            throw Error.error(e, "count not write bytes, string: %s", s);
-        }
+        writeBytes(bytes);
         sum += bytes.length;
         return sum;
     }
@@ -187,7 +223,7 @@ public final class Encoder implements AutoCloseable {
 
     public void flush() {
         try {
-            outputStream.flush();
+            objectOutputStream.flush();
         } catch (IOException e) {
             throw Error.error(e, "could not flush the stream");
         }
@@ -196,7 +232,7 @@ public final class Encoder implements AutoCloseable {
     @Override
     public void close() {
         try {
-            outputStream.close();
+            objectOutputStream.close();
         } catch (IOException e) {
             throw Error.error(e, "could not close the stream");
         }
