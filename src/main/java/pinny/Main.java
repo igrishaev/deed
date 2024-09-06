@@ -4,7 +4,6 @@ import clojure.lang.IFn;
 import clojure.lang.PersistentVector;
 
 import java.io.*;
-import java.util.List;
 
 import clojure.java.api.Clojure;
 
@@ -16,7 +15,7 @@ public class Main {
         IFn map = Clojure.var("clojure.core", "map");
 
         try(final FileOutputStream out = new FileOutputStream("test.pinny");
-            final Encoder encoder = new Encoder(out)) {
+            final EncoderOld encoder = new EncoderOld(out)) {
 
             System.out.println(map.invoke(inc, PersistentVector.create(1, 2, 3)));
 

@@ -36,15 +36,15 @@
 
   (time
    (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-     (.encode ^pinny.Encoder e DATA)))
+     (.encode ^pinny.EncoderOld e DATA)))
 
   (quick-bench
    (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-     (.encode ^pinny.Encoder e DATA)))
+     (.encode ^pinny.EncoderOld e DATA)))
 
   (quick-bench
    (pinny/with-encoder [e (io/file "out.pinny")]
-     (.encode ^pinny.Encoder e DATA)))
+     (.encode ^pinny.EncoderOld e DATA)))
 
   (time (do (nippy/freeze DATA) nil))
 
