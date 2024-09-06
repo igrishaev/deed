@@ -8,9 +8,9 @@
   (:use criterium.core))
 
 (def DATA
-  (doall
+  (vec
    (for [x (range 1000000)]
-     (int x)))
+     x))
 
   #_
   (vec
@@ -36,15 +36,15 @@
 
   (time
    (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-     (.encode ^pinny.EncoderOld e DATA)))
+     (pinny/encode e DATA)))
 
   (quick-bench
-   (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-     (.encode ^pinny.EncoderOld e DATA)))
+      (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+        (pinny/encode e DATA)))
 
   (quick-bench
-   (pinny/with-encoder [e (io/file "out.pinny")]
-     (.encode ^pinny.EncoderOld e DATA)))
+      (pinny/with-encoder [e (io/file "out.pinny")]
+        (pinny/encode e DATA)))
 
   (time (do (nippy/freeze DATA) nil))
 

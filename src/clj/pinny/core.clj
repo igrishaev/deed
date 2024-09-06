@@ -17,64 +17,6 @@
   (fn [decoder oid]
     oid))
 
-(defn -encode-countable [^Encoder encoder oid len coll]
-  (let [sum
-        (+ (.writeOID encoder oid)
-           (.writeInt encoder len))
-
-        sum
-        (reduce
-         (fn [acc item]
-           (+ acc (-enc encoder item)))
-         sum
-         coll)]
-
-    (+ sum (.writeInt encoder 0))))
-
-(defn -encode-chunk
-  ([encoder ^objects chunk]
-   (-encode-chunk encoder chunk (alength chunk)))
-
-  ([^Encoder encoder ^objects chunk pos]
-   (loop [i 0
-          sum 0]
-     (if (< i pos)
-       (let [obj (aget chunk i)
-             len (-enc encoder obj)]
-         (reduce (unchecked-inc-int i)
-                 (+ sum len)))
-       sum))))
-
-(defn -encode-uncountable [^Encoder encoder oid coll]
-  (let [sum
-        (.writeOID encoder oid)
-
-        limit
-        0xFF
-
-        chunk
-        (object-array limit)
-
-        iter
-        (clojure.lang.RT/iter coll)]
-
-    (loop [pos 0
-           sum 0]
-      (if (.hasNext iter)
-        (let [obj (.next iter)]
-          (aset chunk pos obj)
-
-          )
-
-        1
-        sum))
-
-
-
-    #_
-    (+ sum (.writeInt encoder 0))))
-
-
 ;;
 ;; Extension, encoding
 ;;
@@ -88,22 +30,20 @@
 (defmethod -enc Long [^Encoder encoder ^Long value ]
   (.encodeLong encoder value))
 
-#_
 (defmethod -enc Boolean [^Encoder encoder ^Boolean value ]
   (.encodeBoolean encoder value))
 
-#_
 (defmethod -enc IPersistentVector [^Encoder encoder value]
-  (-encode-countable encoder OID/CLJ_VEC (count value) value))
+  (.encodeCountable encoder OID/CLJ_VEC (count value) value))
 
 (defmethod -enc IPersistentSet [^Encoder encoder value]
-  (-encode-countable encoder OID/CLJ_SET (count value) value))
+  (.encodeCountable encoder OID/CLJ_SET (count value) value))
 
 (defmethod -enc IPersistentList [^Encoder encoder value]
-  (-encode-countable encoder OID/CLJ_SET (count value) value))
+  (.encodeCountable encoder OID/CLJ_SET (count value) value))
 
 (defmethod -enc LazySeq [^Encoder encoder value]
-  (-encode-uncountable encoder OID/CLJ_LAZY_SEQ value))
+  (.encodeUncountable encoder OID/CLJ_LAZY_SEQ value))
 
 
 ;;
@@ -111,18 +51,14 @@
 ;;
 
 (defn encode-multi ^Long [^Encoder encoder coll]
-  (reduce
-   (fn [acc item]
-     (+ acc (-enc encoder item)))
-   0
-   coll))
+  (.encodeMulti encoder coll))
 
-(defn encode ^Long [^Encoder encoder coll]
-  (-enc encoder coll))
+(defn encode ^Long [^Encoder encoder x]
+  (.encode encoder x))
 
 (defmacro with-encoder [[bind dest] & body]
   `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder input#)]
+               ~bind (new Encoder -enc input#)]
      ~@body))
 
 (defn eof? [x]
@@ -145,13 +81,13 @@
 
 (comment
 
-  (with-encoder2 [e (io/file "test.aaa")]
-    (-enc e 1)
-    (-enc e 2)
-    (-enc e 3))
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e 1)
+    (encode e 2)
+    (encode e 3))
 
-  (with-encoder2 [e (io/file "test.aaa")]
-    (-encode-multi e [1 2 3]))
+  (with-encoder [e (io/file "test.aaa")]
+    (encode-multi e [1 2 3]))
 
   )
 

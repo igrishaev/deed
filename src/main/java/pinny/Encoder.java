@@ -1,5 +1,7 @@
 package pinny;
 
+import clojure.lang.MultiFn;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -10,12 +12,14 @@ public final class Encoder implements AutoCloseable {
     private final OutputStream outputStream;
     private final byte[] buf;
     private final ByteBuffer bb;
+    private final MultiFn encode;
 
-    public Encoder(final OutputStream outputStream) {
-        this(outputStream, Options.standard());
+    public Encoder(final MultiFn encode, final OutputStream outputStream) {
+        this(encode, outputStream, Options.standard());
     }
 
-    public Encoder(final OutputStream outputStream, final Options options) {
+    public Encoder(final MultiFn encode, final OutputStream outputStream, final Options options) {
+        this.encode = encode;
         buf = new byte[8];
         bb = ByteBuffer.wrap(buf);
         OutputStream destination = outputStream;
@@ -92,6 +96,22 @@ public final class Encoder implements AutoCloseable {
         return writeOID(OID.INT) + writeShort(s);
     }
 
+    private long encodeChunk(final Object[] chunk) {
+        long sum = writeInt(chunk.length);
+        for (Object x: chunk) {
+            sum += (long) encode.invoke(this, x);
+        }
+        return sum;
+    }
+
+    private long encodeChunk(final Object[] chunk, final int pos) {
+        long sum = writeInt(pos);
+        for (int i = 0; i < pos; i++) {
+            sum += (long) encode.invoke(this, chunk[i]);
+        }
+        return sum;
+    }
+
     public long encodeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         long sum = writeOID(OID.STRING);
@@ -104,6 +124,46 @@ public final class Encoder implements AutoCloseable {
         sum += bytes.length;
         return sum;
     }
+
+    public long encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
+        long sum = writeInt(oid) + writeInt(len);
+        for (Object x : iterable) {
+            sum += (long) encode.invoke(this, x);
+        }
+        return sum + writeInt(0);
+    }
+
+    public long encodeMulti(final Iterable<Object> xs) {
+        long sum = 0;
+        for (Object x: xs) {
+            sum += (long) encode.invoke(this, x);
+        }
+        return sum;
+    }
+
+    public long encode(final Object x) {
+        return (long) encode.invoke(this, x);
+    }
+
+    public long encodeUncountable(final short oid, final Iterable<?> iterable) {
+        long sum = writeOID(oid);
+        final int limit = Const.OBJ_CHUNK_SIZE;
+        final Object[] chunk = new Object[limit];
+        int pos = 0;
+        for (Object x: iterable) {
+            chunk[pos] = x;
+            pos++;
+            if (pos == limit) {
+                pos = 0;
+                sum += encodeChunk(chunk);
+            }
+        }
+        if (pos > 0) {
+            sum += encodeChunk(chunk, pos);
+        }
+        return sum + writeInt(0);
+    }
+
 
     public void flush() {
         try {
