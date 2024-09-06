@@ -69,3 +69,6 @@
 
 
   )
+
+;; Execution time mean : 112.500529 ms multi-method
+;; Execution time mean : 38.444453 ms  switch

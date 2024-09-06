@@ -58,7 +58,7 @@
 
 (defmacro with-encoder [[bind dest] & body]
   `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder -enc input#)]
+               ~bind (new Encoder input#)]
      ~@body))
 
 (defn eof? [x]

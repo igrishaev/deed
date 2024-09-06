@@ -1,10 +1,14 @@
 package pinny;
 
+import clojure.lang.LazySeq;
 import clojure.lang.MultiFn;
+import clojure.lang.PersistentHashSet;
+import clojure.lang.PersistentVector;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
@@ -12,14 +16,12 @@ public final class Encoder implements AutoCloseable {
     private final OutputStream outputStream;
     private final byte[] buf;
     private final ByteBuffer bb;
-    private final MultiFn encode;
 
-    public Encoder(final MultiFn encode, final OutputStream outputStream) {
-        this(encode, outputStream, Options.standard());
+    public Encoder(final OutputStream outputStream) {
+        this(outputStream, Options.standard());
     }
 
-    public Encoder(final MultiFn encode, final OutputStream outputStream, final Options options) {
-        this.encode = encode;
+    public Encoder(final OutputStream outputStream, final Options options) {
         buf = new byte[8];
         bb = ByteBuffer.wrap(buf);
         OutputStream destination = outputStream;
@@ -99,7 +101,7 @@ public final class Encoder implements AutoCloseable {
     private long encodeChunk(final Object[] chunk) {
         long sum = writeInt(chunk.length);
         for (Object x: chunk) {
-            sum += (long) encode.invoke(this, x);
+            sum += encode(x);
         }
         return sum;
     }
@@ -107,7 +109,7 @@ public final class Encoder implements AutoCloseable {
     private long encodeChunk(final Object[] chunk, final int pos) {
         long sum = writeInt(pos);
         for (int i = 0; i < pos; i++) {
-            sum += (long) encode.invoke(this, chunk[i]);
+            sum += encode(chunk[i]);
         }
         return sum;
     }
@@ -128,7 +130,7 @@ public final class Encoder implements AutoCloseable {
     public long encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
         long sum = writeInt(oid) + writeInt(len);
         for (Object x : iterable) {
-            sum += (long) encode.invoke(this, x);
+            sum += encode(x);
         }
         return sum + writeInt(0);
     }
@@ -136,13 +138,31 @@ public final class Encoder implements AutoCloseable {
     public long encodeMulti(final Iterable<Object> xs) {
         long sum = 0;
         for (Object x: xs) {
-            sum += (long) encode.invoke(this, x);
+            sum += encode(x);
         }
         return sum;
     }
 
     public long encode(final Object x) {
-        return (long) encode.invoke(this, x);
+        if (x instanceof Integer i) {
+            return encodeInteger(i);
+        } else if (x instanceof Long l) {
+            return encodeLong(l);
+        } else if (x instanceof Short s) {
+            return encodeShort(s);
+        } else if (x instanceof PersistentVector v) {
+            return encodeCountable(OID.CLJ_VEC, v.count(), v);
+        } else if (x instanceof PersistentHashSet s) {
+            return encodeCountable(OID.CLJ_SET, s.count(), s);
+        } else if (x instanceof Map<?,?> m) {
+            return encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
+        } else if (x instanceof LazySeq lz) {
+            return encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+        } else if (x instanceof String s) {
+            return encodeString(s);
+        } else {
+            throw Error.error("unsupported type: %s %s", x.getClass(), x);
+        }
     }
 
     public long encodeUncountable(final short oid, final Iterable<?> iterable) {
