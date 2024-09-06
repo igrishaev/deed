@@ -1,10 +1,15 @@
 package pinny;
 
-import clojure.lang.LazySeq;
-import clojure.lang.PersistentHashSet;
-import clojure.lang.PersistentVector;
+import clojure.lang.*;
 
 import java.io.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.Temporal;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -13,12 +18,16 @@ import java.util.zip.GZIPOutputStream;
 public final class Encoder implements AutoCloseable {
 
     private final ObjectOutputStream objectOutputStream;
+    private final Options options;
+    private final MultiFn mmEncode;
 
-    public Encoder(final OutputStream outputStream) {
-        this(outputStream, Options.standard());
+    public Encoder(final MultiFn mmEncode, final OutputStream outputStream) {
+        this(mmEncode, outputStream, Options.standard());
     }
 
-    public Encoder(final OutputStream outputStream, final Options options) {
+    public Encoder(final MultiFn mmEncode, final OutputStream outputStream, final Options options) {
+        this.options = options;
+        this.mmEncode = mmEncode;
         OutputStream destination = outputStream;
         if (options.useGzip()) {
             try {
@@ -101,6 +110,12 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    public void writeString(final String s) {
+        final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+        writeInt(bytes.length);
+        writeBytes(bytes);
+    }
+
     // todo: OPTIMIZE true/false
     @SuppressWarnings("unused")
     public void encodeBoolean(final boolean b) {
@@ -108,10 +123,16 @@ public final class Encoder implements AutoCloseable {
         writeBoolean(b);
     }
 
-    // todo: optimize -1, 0, 1
     public void encodeInteger(final Integer i) {
-        writeOID(OID.INT);
-        writeInt(i);
+        switch (i) {
+            case -1 -> writeOID(OID.INT_MINUS_ONE);
+            case 0 -> writeOID(OID.INT_ZERO);
+            case 1 -> writeOID(OID.INT_ONE);
+            default -> {
+                writeOID(OID.INT);
+                writeInt(i);
+            }
+        }
     }
 
     public void encodeLong(final Long l) {
@@ -120,7 +141,7 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void encodeShort(final Short s) {
-        writeOID(OID.INT);
+        writeOID(OID.SHORT);
         writeShort(s);
     }
 
@@ -139,10 +160,8 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void encodeString(final String s) {
-        final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         writeOID(OID.STRING);
-        writeInt(bytes.length);
-        writeBytes(bytes);
+        writeString(s);
     }
 
     public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
@@ -175,30 +194,158 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void encode(final Object x) {
-        if (x instanceof Integer i) {
-            encodeInteger(i);
-        } else if (x instanceof Long l) {
+    public void encodeKeyword(final Keyword kw) {
+        writeOID(OID.CLJ_KEYWORD);
+        writeString(kw.toString().substring(1));
+    }
+
+    public void encodeSymbol(final Symbol s) {
+        writeOID(OID.CLJ_SYMBOL);
+        writeString(s.toString());
+    }
+
+    public void encodeLocalDate(final LocalDate ld) {
+        writeOID(OID.DT_LOCAL_DATE);
+        final long days = ld.getLong(ChronoField.EPOCH_DAY);
+        writeLong(days);
+    }
+
+    public void encodeLocalTime(final LocalTime lt) {
+        writeOID(OID.DT_LOCAL_TIME);
+        final long nanos = lt.getLong(ChronoField.NANO_OF_DAY);
+        writeLong(nanos);
+    }
+
+    public void encodeInstant(final Instant i) {
+        encodeAsInstant(OID.DT_INSTANT, i);
+    }
+
+    public void encodeAsInstant(final short oid, final Instant i) {
+        writeOID(oid);
+        final long secs = i.getLong(ChronoField.INSTANT_SECONDS);
+        final long nanos = i.getLong(ChronoField.NANO_OF_SECOND);
+        writeLong(secs);
+        writeLong(nanos);
+    }
+
+    public void encodeDate(final Date d) {
+        encodeAsInstant(OID.DT_DATE, d.toInstant());
+    }
+
+    public void encodeMapEntry(final Map.Entry<?,?> me) {
+        writeOID(OID.JVM_MAP_EMPTY);
+        encode(me.getKey());
+        encode(me.getValue());
+    }
+
+    public boolean encodeNumber(final Number n) {
+        if (n instanceof Long l) {
             encodeLong(l);
-        } else if (x instanceof Short s) {
-            encodeShort(s);
-        } else if (x instanceof PersistentVector v) {
-            encodeCountable(OID.CLJ_VEC, v.count(), v);
-        } else if (x instanceof PersistentHashSet s) {
-            encodeCountable(OID.CLJ_SET, s.count(), s);
-        } else if (x instanceof Map<?,?> m) {
-            encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
-        } else if (x instanceof LazySeq lz) {
-            encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
-        } else if (x instanceof UUID u) {
-            encodeUUID(u);
-        } else if (x instanceof String s) {
-            encodeString(s);
-        } else if (x instanceof Serializable) {
-            encodeSerializable(x);
-        } else {
-            throw Error.error("unsupported type: %s %s", x.getClass(), x);
+            return true;
         }
+        if (n instanceof Integer i) {
+            encodeInteger(i);
+            return true;
+        }
+        if (n instanceof Short s) {
+            encodeShort(s);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean encodeTemporal(final Temporal t) {
+        if (t instanceof LocalDate ld) {
+            encodeLocalDate(ld);
+            return true;
+        }
+        if (t instanceof Instant i) {
+            encodeInstant(i);
+            return true;
+        }
+        if (t instanceof LocalTime lt) {
+            encodeLocalTime(lt);
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean encodeStandard(final Object x) {
+        if (x instanceof Number n) {
+            return encodeNumber(n);
+        }
+        if (x instanceof Keyword kw) {
+            encodeKeyword(kw);
+            return true;
+        }
+        if (x instanceof Symbol s) {
+            encodeSymbol(s);
+            return true;
+        }
+        if (x instanceof APersistentVector v) {
+            encodeCountable(OID.CLJ_VEC, v.count(), v);
+            return true;
+        }
+        if (x instanceof APersistentMap m) {
+            encodeCountable(OID.CLJ_MAP, m.size(), m);
+            return true;
+        }
+        if (x instanceof Map.Entry<?,?> me) {
+            encodeMapEntry(me);
+            return true;
+        }
+        if (x instanceof APersistentSet s) {
+            encodeCountable(OID.CLJ_SET, s.count(), s);
+            return true;
+        }
+        if (x instanceof PersistentList l) {
+            encodeCountable(OID.CLJ_LIST, l.count(), l);
+            return true;
+        }
+        if (x instanceof LazySeq lz) {
+            encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+            return true;
+        }
+        if (x instanceof Map<?,?> m) {
+            encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
+            return true;
+        }
+        if (x instanceof List<?> l) {
+            encodeCountable(OID.JVM_LIST, l.size(), l);
+            return true;
+        }
+        if (x instanceof UUID u) {
+            encodeUUID(u);
+            return true;
+        }
+        if (x instanceof String s) {
+            encodeString(s);
+            return true;
+        }
+        if (x instanceof Temporal t) {
+            return encodeTemporal(t);
+        }
+        if (x instanceof Date d) {
+            encodeDate(d);
+            return true;
+        }
+        return false;
+    }
+
+    public void encode(final Object x) {
+        if (encodeStandard(x)) {
+            return;
+        }
+        Object mmResult = mmEncode.invoke(this, x);
+        if (mmResult != Const.NONE) {
+            return;
+        }
+        if (options.allowSerializable() && x instanceof Serializable) {
+            encodeSerializable(x);
+            return;
+        }
+        throw Error.error("unsupported type: %s %s", x.getClass(), x);
     }
 
     public void encodeUncountable(final short oid, final Iterable<?> iterable) {

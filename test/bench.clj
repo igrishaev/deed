@@ -79,3 +79,9 @@
 
 ;; DataOutputStream
 ;; Execution time mean : 34.584300 ms
+
+;; long switch/case
+;; Execution time mean : 14.566030 ms
+
+;; cascading switch case
+;; Execution time mean : 13.762154 ms

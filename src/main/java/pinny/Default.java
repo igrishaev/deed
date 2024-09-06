@@ -1,9 +1,8 @@
 package pinny;
 
-public class EOF {
-
+public class Default {
     @Override
     public String toString() {
-        return "<EOF>";
+        return "<DEFAULT>";
     }
 }

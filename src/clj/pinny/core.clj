@@ -21,29 +21,29 @@
 ;; Extension, encoding
 ;;
 
-(defmethod -enc String [^Encoder encoder ^String value]
-  (.encodeString encoder value))
+;; (defmethod -enc String [^Encoder encoder ^String value]
+;;   (.encodeString encoder value))
 
-(defmethod -enc Integer [^Encoder encoder ^Integer value]
-  (.encodeInteger encoder value))
+;; (defmethod -enc Integer [^Encoder encoder ^Integer value]
+;;   (.encodeInteger encoder value))
 
-(defmethod -enc Long [^Encoder encoder ^Long value ]
-  (.encodeLong encoder value))
+;; (defmethod -enc Long [^Encoder encoder ^Long value ]
+;;   (.encodeLong encoder value))
 
-(defmethod -enc Boolean [^Encoder encoder ^Boolean value ]
-  (.encodeBoolean encoder value))
+;; (defmethod -enc Boolean [^Encoder encoder ^Boolean value ]
+;;   (.encodeBoolean encoder value))
 
-(defmethod -enc IPersistentVector [^Encoder encoder value]
-  (.encodeCountable encoder OID/CLJ_VEC (count value) value))
+;; (defmethod -enc IPersistentVector [^Encoder encoder value]
+;;   (.encodeCountable encoder OID/CLJ_VEC (count value) value))
 
-(defmethod -enc IPersistentSet [^Encoder encoder value]
-  (.encodeCountable encoder OID/CLJ_SET (count value) value))
+;; (defmethod -enc IPersistentSet [^Encoder encoder value]
+;;   (.encodeCountable encoder OID/CLJ_SET (count value) value))
 
-(defmethod -enc IPersistentList [^Encoder encoder value]
-  (.encodeCountable encoder OID/CLJ_SET (count value) value))
+;; (defmethod -enc IPersistentList [^Encoder encoder value]
+;;   (.encodeCountable encoder OID/CLJ_SET (count value) value))
 
-(defmethod -enc LazySeq [^Encoder encoder value]
-  (.encodeUncountable encoder OID/CLJ_LAZY_SEQ value))
+;; (defmethod -enc LazySeq [^Encoder encoder value]
+;;   (.encodeUncountable encoder OID/CLJ_LAZY_SEQ value))
 
 
 ;;
@@ -58,7 +58,7 @@
 
 (defmacro with-encoder [[bind dest] & body]
   `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder input#)]
+               ~bind (new Encoder -enc input#)]
      ~@body))
 
 (defn eof? [x]
@@ -71,12 +71,6 @@
 
 ;; (defmethod -dec OID/LONG [_ decoder]
 ;;   (.readLong decoder))
-
-#_
-(defmacro with-encoder2 [[bind dest] & body]
-  `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder input#)]
-     ~@body))
 
 
 (comment
