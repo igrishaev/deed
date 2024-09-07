@@ -88,3 +88,6 @@
 
 ;; cascading switch case
 ;; Execution time mean : 13.762154 ms
+
+;; BB + output stream
+;; Execution time mean : 41.929175 ms

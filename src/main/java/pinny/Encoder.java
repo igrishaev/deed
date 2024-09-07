@@ -3,6 +3,7 @@ package pinny;
 import clojure.lang.*;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -17,7 +18,9 @@ import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
 
-    private final ObjectOutputStream objectOutputStream;
+    private final OutputStream outputStream;
+    private final byte[] buf;
+    private final ByteBuffer bb;
     private final Options options;
     private final MultiFn mmEncode;
 
@@ -28,6 +31,8 @@ public final class Encoder implements AutoCloseable {
     public Encoder(final MultiFn mmEncode, final OutputStream outputStream, final Options options) {
         this.options = options;
         this.mmEncode = mmEncode;
+        this.buf = new byte[8];
+        this.bb = ByteBuffer.wrap(this.buf);
         OutputStream destination = outputStream;
         if (options.useGzip()) {
             try {
@@ -36,77 +41,64 @@ public final class Encoder implements AutoCloseable {
                 throw Error.error(e, "could not open Gzip output stream");
             }
         }
-        destination = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
+        this.outputStream = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
+
+    }
+
+    private void sendBuf(final int len) {
         try {
-            objectOutputStream = new ObjectOutputStream(destination);
+            outputStream.write(buf, 0, len);
         } catch (IOException e) {
-            throw Error.error(e, "could not open ObjectOutputStream");
+            throw Error.error(e, "could not send bytes, len: %s", len);
         }
     }
 
     public void writeInt(final int i) {
-        try {
-            objectOutputStream.writeInt(i);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write int: %s", i);
-        }
+        bb.putInt(0, i);
+        sendBuf(4);
     }
 
     public void writeOID(final short oid) {
-        try {
-            objectOutputStream.writeShort(oid);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write OID: 0x%04X", oid);
-        }
+        bb.putShort(0, oid);
+        sendBuf(2);
     }
 
     public void writeShort(final short s) {
-        try {
-            objectOutputStream.writeShort(s);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write short: %s", s);
-        }
+        bb.putShort(0, s);
+        sendBuf(2);
     }
 
     public void writeLong(final long l) {
-        try {
-            objectOutputStream.writeLong(l);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write long: %s", l);
-        }
+        bb.putLong(0, l);
+        sendBuf(8);
     }
 
     @SuppressWarnings("unused")
     public void writeFloat(final float f) {
-        try {
-            objectOutputStream.writeFloat(f);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write float: %s", f);
-        }
+        bb.putFloat(0, f);
+        sendBuf(4);
     }
 
     @SuppressWarnings("unused")
     public void writeDouble(final double d) {
-        try {
-            objectOutputStream.writeDouble(d);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot write double: %s", d);
-        }
+        bb.putDouble(0, d);
+        sendBuf(8);
     }
 
     public void writeBytes(final byte[] bytes) {
         try {
-            objectOutputStream.write(bytes);
+            outputStream.write(bytes);
         } catch (IOException e) {
-            throw Error.error(e, "cannot write bytes, length: %s", bytes.length);
+            throw Error.error(e, "could not send bytes, length: %s", bytes.length);
         }
     }
 
     public void writeBoolean(final boolean bool) {
+        final byte b = bool ? (byte)1 : (byte)2;
         try {
-            objectOutputStream.writeBoolean(bool);
+            outputStream.write(b);
         } catch (IOException e) {
-            throw Error.error(e, "cannot write boolean: %s", bool);
+            throw Error.error(e, "could not send boolean");
         }
     }
 
@@ -182,15 +174,6 @@ public final class Encoder implements AutoCloseable {
     public void encodeMulti(final Iterable<?> xs) {
         for (Object x: xs) {
             encode(x);
-        }
-    }
-
-    public void encodeSerializable(final Object x) {
-        writeOID(OID.SERIALIZABLE);
-        try {
-            objectOutputStream.writeObject(x);
-        } catch (IOException e) {
-            throw Error.error(e, "cannot serialize object: %s %s", x.getClass(), x);
         }
     }
 
@@ -341,10 +324,6 @@ public final class Encoder implements AutoCloseable {
         if (mmResult != Const.NONE) {
             return;
         }
-        if (options.allowSerializable() && x instanceof Serializable) {
-            encodeSerializable(x);
-            return;
-        }
         throw Error.error("unsupported type: %s %s", x.getClass(), x);
     }
 
@@ -370,7 +349,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void flush() {
         try {
-            objectOutputStream.flush();
+            outputStream.flush();
         } catch (IOException e) {
             throw Error.error(e, "could not flush the stream");
         }
@@ -379,7 +358,7 @@ public final class Encoder implements AutoCloseable {
     @Override
     public void close() {
         try {
-            objectOutputStream.close();
+            outputStream.close();
         } catch (IOException e) {
             throw Error.error(e, "could not close the stream");
         }
