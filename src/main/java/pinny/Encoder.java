@@ -22,15 +22,15 @@ public final class Encoder implements AutoCloseable {
     private final byte[] buf;
     private final ByteBuffer bb;
     private final Options options;
-    private final MultiFn mmEncode;
+    private final IFn protoEncode;
 
-    public Encoder(final MultiFn mmEncode, final OutputStream outputStream) {
-        this(mmEncode, outputStream, Options.standard());
+    public Encoder(final IFn protoEncode, final OutputStream outputStream) {
+        this(protoEncode, outputStream, Options.standard());
     }
 
-    public Encoder(final MultiFn mmEncode, final OutputStream outputStream, final Options options) {
+    public Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
+        this.protoEncode = protoEncode;
         this.options = options;
-        this.mmEncode = mmEncode;
         this.buf = new byte[8];
         this.bb = ByteBuffer.wrap(this.buf);
         OutputStream destination = outputStream;
@@ -43,6 +43,10 @@ public final class Encoder implements AutoCloseable {
         }
         this.outputStream = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
 
+    }
+
+    public boolean useGzip() {
+        return options.useGzip();
     }
 
     private void sendBuf(final int len) {
@@ -317,14 +321,11 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void encode(final Object x) {
-        if (encodeStandard(x)) {
-            return;
-        }
-        Object mmResult = mmEncode.invoke(this, x);
-        if (mmResult != Const.NONE) {
-            return;
-        }
-        throw Error.error("unsupported type: %s %s", x.getClass(), x);
+        protoEncode.invoke(x, this);
+//        if (encodeStandard(x)) {
+//            return;
+//        }
+//        throw Error.error("unsupported type: %s %s", x.getClass(), x);
     }
 
     public void encodeUncountable(final short oid, final Iterable<?> iterable) {

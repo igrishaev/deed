@@ -3,19 +3,29 @@
    [clojure.java.io :as io])
   (:import
    (clojure.lang IPersistentVector
+                 PersistentVector
                  IPersistentSet
                  IPersistentList
                  LazySeq)
    (pinny Encoder Decoder EOF OID)))
 
 
-(defmulti -enc
-  (fn [encoder value]
-    (class value)))
+(defprotocol IEncode
+  (-encode [this ^Encoder encoder]))
 
-(defmulti -dec
-  (fn [decoder oid]
-    oid))
+(extend-protocol IEncode
+
+  Long
+  (-encode [this ^Encoder encoder]
+    (.encodeLong encoder this))
+
+  PersistentVector
+  (-encode [this ^Encoder encoder]
+    (.encodeCountable encoder OID/CLJ_VEC (count this) this))
+
+
+  )
+
 
 ;;
 ;; Extension, encoding
@@ -58,7 +68,7 @@
 
 (defmacro with-encoder [[bind dest] & body]
   `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder -enc input#)]
+               ~bind (new Encoder -encode input#)]
      ~@body))
 
 (defn eof? [x]

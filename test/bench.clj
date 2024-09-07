@@ -91,3 +91,6 @@
 
 ;; BB + output stream
 ;; Execution time mean : 41.929175 ms
+
+;; BB + Protocol
+;; Execution time mean : 41.836865 ms
