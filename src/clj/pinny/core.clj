@@ -205,6 +205,26 @@
   (instance? EOF x))
 
 
+(defmacro expand-encode [[type encoder] & body]
+  )
+
+(defmacro expand-decode [[oid decoder] & body]
+  )
+
+#_
+(expand-encode [clojure.foo.Test e]
+  (sdfadsf fsdf)
+  (sdfsdf sdf sf)
+  (sdfsdfg 3))
+
+#_
+(expand-decode [0x1323 d]
+  (sdfadsf fsdf)
+  (sdfsdf sdf sf)
+  (sdfsdfg 3))
+
+
+
 
 (comment
 

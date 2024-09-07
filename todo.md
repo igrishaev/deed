@@ -1,5 +1,6 @@
 
-- writeBytes: prepend with size
+- try arrays
+- encoder: encode/write naming?
 - empty string
 - fix runtime exceptions
 - better header
@@ -13,6 +14,8 @@
 - vectorz package
 - macro pass options
 - encode: skip unsupported?
+- encode expand macro
+- decode expand macro
 - tests
 
 - docs

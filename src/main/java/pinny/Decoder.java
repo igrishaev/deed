@@ -3,6 +3,7 @@ package pinny;
 import clojure.lang.*;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
@@ -96,8 +97,26 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return Symbol.intern(payload);
     }
 
-    public Ratio readRatio() {
+    public byte[] readBytes() {
+        final int size = readInteger();
+        final byte[] buf = new byte[size];
+        try {
+            dataInputStream.readFully(buf);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return buf;
+    }
 
+    public BigInteger readBigInteger() {
+        final byte[] buf = readBytes();
+        return new BigInteger(buf);
+    }
+
+    public Ratio readRatio() {
+        final BigInteger numerator = readBigInteger();
+        final BigInteger denominator = readBigInteger();
+        return new Ratio(numerator, denominator);
     }
 
     public Object decode() {
@@ -130,6 +149,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_KEYWORD -> readKeyword();
             case OID.CLJ_SYMBOL -> readSymbol();
             case OID.CLJ_RATIO -> readRatio();
+            case OID.JVM_BIG_INT -> readBigInteger();
             default -> mmDecode.invoke(oid, this);
         };
     }

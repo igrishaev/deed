@@ -114,6 +114,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeBytes(final byte[] bytes) {
         try {
+            dataOutputStream.writeInt(bytes.length);
             dataOutputStream.write(bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -130,13 +131,11 @@ public final class Encoder implements AutoCloseable {
 
     public void writeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-        writeInt(bytes.length);
         writeBytes(bytes);
     }
 
     public void writeBigInteger(final BigInteger bi) {
         final byte[] bytes = bi.toByteArray();
-        writeInt(bytes.length);
         writeBytes(bytes);
     }
 
@@ -321,6 +320,7 @@ public final class Encoder implements AutoCloseable {
         writeLong(nanos);
     }
 
+    @SuppressWarnings("unused")
     public void encodeDate(final Date d) {
         encodeAsInstant(OID.DT_DATE, d.toInstant());
     }
@@ -336,6 +336,7 @@ public final class Encoder implements AutoCloseable {
         encodeAsString(OID.REGEX, p.toString());
     }
 
+    // TODO: drop it
     public boolean encodeTemporal(final Temporal t) {
 
         if (t instanceof Instant i) {
@@ -350,6 +351,7 @@ public final class Encoder implements AutoCloseable {
 
     }
 
+    // TODO: drop it
     public boolean encodeStandard(final Object x) {
 
         if (x instanceof APersistentVector v) {

@@ -109,7 +109,7 @@ public class OID {
     public static final short JVM_BIG_DEC_ONE       = 0x010a;
     public static final short JVM_BIG_DEC_MINUS_ONE = 0x010b;
 
-    public static final short JVM_BIG_INT           = 0x0108; //
+    public static final short JVM_BIG_INT           = 0x1108; //
     public static final short JVM_BIG_INT_ZERO      = 0x0109;
     public static final short JVM_BIG_INT_ONE       = 0x010a;
     public static final short JVM_BIG_INT_MINUS_ONE = 0x010b;
