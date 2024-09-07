@@ -164,15 +164,15 @@
 
   Instant
   (-encode [this ^Encoder encoder]
-    (.encodeInstant encoder this))
+    (.encodeInstant encoder this)))
 
+(defmulti -decode
+  (fn [oid decoder]
+    oid))
 
-
-
-
-
-  )
-
+(defmethod -decode :default
+  [oid decoder]
+  (throw (ex-info "aaa" {})))
 
 
 ;;
@@ -186,9 +186,20 @@
   (.encode encoder x))
 
 (defmacro with-encoder [[bind dest] & body]
-  `(with-open [input# (io/output-stream ~dest)
-               ~bind (new Encoder -encode input#)]
+  `(with-open [output# (io/output-stream ~dest)
+               ~bind (new Encoder -encode output#)]
      ~@body))
+
+
+(defmacro with-decoder [[bind source] & body]
+  `(with-open [input# (io/input-stream ~source)
+               ~bind (new Decoder -decode input#)]
+     ~@body))
+
+
+(defn decode [^Decoder decoder]
+  (.decode decoder))
+
 
 (defn eof? [x]
   (instance? EOF x))
@@ -205,27 +216,7 @@
   (with-encoder [e (io/file "test.aaa")]
     (encode-multi e [1 2 3]))
 
-  )
-
-(comment
-
-  (with-encoder [enc (io/file "aaa.xxx")]
-    (-> enc
-        (encode 1)
-        (encode 2)
-        (encode-multi [1 2 3 3 4])
-        (encode 3))
-    )
-
-  (with-decoder [dec (io/file "aaa.xxx")]
-    (decode-vec dec)
-    (decode dec)
-    #_
-    (doseq [x dec]
-      (println x))
-    #_
-    [(decode dec)
-     (decode dec)]
-    )
+  (with-decoder [dec (io/file "test.aaa")]
+    (decode dec))
 
   )

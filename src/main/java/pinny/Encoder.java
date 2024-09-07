@@ -197,6 +197,7 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
     public void encodeString(final String s) {
         encodeAsString(OID.STRING, s);
     }

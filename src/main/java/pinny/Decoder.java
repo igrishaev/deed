@@ -1,23 +1,29 @@
 package pinny;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
+import clojure.lang.MultiFn;
+
+import java.io.*;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
+    final private DataInputStream dataInputStream;
     final private BufferedInputStream bufferedInputStream;
-    final private ObjectInputStream objectInputStream;
+    final private MultiFn mmDecode;
     final private EOF EOF;
 
-    public Decoder(final InputStream inputStream) {
-        this(inputStream, Options.standard());
+    public Decoder(final MultiFn mmDecode, final InputStream inputStream) {
+        this(mmDecode, inputStream, Options.standard());
     }
 
-    public Decoder(final InputStream inputStream, final Options options) {
+    private void readHeader() {
+        readShort();
+    }
+
+    public Decoder(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
+        EOF = new EOF();
+        this.mmDecode = mmDecode;
         InputStream source = inputStream;
         if (options.useGzip()) {
             try {
@@ -26,13 +32,41 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
                 throw Err.error(e, "could not open a Gzip input stream");
             }
         }
+        bufferedInputStream = new BufferedInputStream(source, Const.IN_BUF_SIZE);
+        dataInputStream = new DataInputStream(bufferedInputStream);
+        readHeader();
+    }
+
+    public short readShort() {
         try {
-            bufferedInputStream = new BufferedInputStream(source, Const.IN_BUF_SIZE);
-            objectInputStream = new ObjectInputStream(bufferedInputStream);
+            return dataInputStream.readShort();
         } catch (IOException e) {
-            throw Err.error(e, "could not open object input stream");
+            throw new RuntimeException(e);
         }
-        EOF = new EOF();
+    }
+
+    public long readLong() {
+        try {
+            return dataInputStream.readShort();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int readInteger() {
+        try {
+            return dataInputStream.readInt();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public float readFloat() {
+        try {
+            return dataInputStream.readFloat();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Object decode() {
@@ -50,13 +84,18 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             return EOF;
         }
 
-        try {
-            return objectInputStream.readObject();
-        } catch (IOException e) {
-            throw Err.error(e, "could not read object from the stream");
-        } catch (ClassNotFoundException e) {
-            throw Err.error(e, "Class not found");
-        }
+        final short oid = readShort();
+
+        return switch (oid) {
+            case OID.SHORT -> readShort();
+            case OID.INT -> readInteger();
+            case OID.INT_ONE -> 1;
+            case OID.INT_ZERO -> 0;
+            case OID.INT_MINUS_ONE -> -1;
+            case OID.LONG -> readLong();
+            case OID.FLOAT -> readFloat();
+            default -> mmDecode.invoke(oid, this);
+        };
     }
 
     @Override
@@ -81,7 +120,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     @Override
     public void close() {
         try {
-            objectInputStream.close();
+            dataInputStream.close();
         } catch (IOException e) {
             throw Err.error(e, "could not close the stream");
         }
