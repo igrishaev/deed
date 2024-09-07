@@ -70,9 +70,12 @@
 
   )
 
+;; nippy
+;; Execution time mean : 64.530873 ms
+
 ;; BB + output stream
 ;; Execution time mean : 112.500529 ms multi-method
-;; Execution time mean : 38.444453 ms  switch
+;; Execution time mean :  38.444453 ms switch
 
 ;; ObjectOutputStream
 ;; Execution time mean : 11.566030 ms
