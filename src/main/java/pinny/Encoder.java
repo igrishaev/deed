@@ -3,7 +3,8 @@ package pinny;
 import clojure.lang.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,9 +19,7 @@ import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
 
-    private final OutputStream outputStream;
-    private final byte[] buf;
-    private final ByteBuffer bb;
+    private final DataOutputStream dataOutputStream;
     private final Options options;
     private final IFn protoEncode;
 
@@ -28,81 +27,103 @@ public final class Encoder implements AutoCloseable {
         this(protoEncode, outputStream, Options.standard());
     }
 
+    private void initHeader() {
+        writeShort(Const.VERSION);
+    }
+
     public Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
         this.protoEncode = protoEncode;
         this.options = options;
-        this.buf = new byte[8];
-        this.bb = ByteBuffer.wrap(this.buf);
         OutputStream destination = outputStream;
+        destination = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
         if (options.useGzip()) {
             try {
                 destination = new GZIPOutputStream(destination);
             } catch (IOException e) {
-                throw Error.error(e, "could not open Gzip output stream");
+                throw Err.error(e, "could not open Gzip output stream");
             }
         }
-        this.outputStream = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
-
+        dataOutputStream = new DataOutputStream(destination);
+        initHeader();
     }
 
+    @SuppressWarnings("unused")
     public boolean useGzip() {
         return options.useGzip();
     }
 
-    private void sendBuf(final int len) {
+    public void writeInt(final int i) {
         try {
-            outputStream.write(buf, 0, len);
+            dataOutputStream.writeInt(i);
         } catch (IOException e) {
-            throw Error.error(e, "could not send bytes, len: %s", len);
+            throw new RuntimeException(e);
         }
     }
 
-    public void writeInt(final int i) {
-        bb.putInt(0, i);
-        sendBuf(4);
-    }
-
     public void writeOID(final short oid) {
-        bb.putShort(0, oid);
-        sendBuf(2);
+        try {
+            dataOutputStream.writeShort(oid);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeShort(final short s) {
-        bb.putShort(0, s);
-        sendBuf(2);
+        try {
+            dataOutputStream.writeShort(s);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeLong(final long l) {
-        bb.putLong(0, l);
-        sendBuf(8);
+        try {
+            dataOutputStream.writeLong(l);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unused")
     public void writeFloat(final float f) {
-        bb.putFloat(0, f);
-        sendBuf(4);
+        try {
+            dataOutputStream.writeFloat(f);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unused")
     public void writeDouble(final double d) {
-        bb.putDouble(0, d);
-        sendBuf(8);
+        try {
+            dataOutputStream.writeDouble(d);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void writeByte(final byte b) {
+        try {
+            dataOutputStream.write(b);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeBytes(final byte[] bytes) {
         try {
-            outputStream.write(bytes);
+            dataOutputStream.write(bytes);
         } catch (IOException e) {
-            throw Error.error(e, "could not send bytes, length: %s", bytes.length);
+            throw new RuntimeException(e);
         }
     }
 
     public void writeBoolean(final boolean bool) {
-        final byte b = bool ? (byte)1 : (byte)2;
         try {
-            outputStream.write(b);
+            dataOutputStream.writeBoolean(bool);
         } catch (IOException e) {
-            throw Error.error(e, "could not send boolean");
+            throw new RuntimeException(e);
         }
     }
 
@@ -112,14 +133,14 @@ public final class Encoder implements AutoCloseable {
         writeBytes(bytes);
     }
 
-    // todo: OPTIMIZE true/false
     @SuppressWarnings("unused")
     public void encodeBoolean(final boolean b) {
         writeOID(OID.BOOL);
         writeBoolean(b);
     }
 
-    public void encodeInteger(final Integer i) {
+    @SuppressWarnings("unused")
+    public void encodeInteger(final int i) {
         switch (i) {
             case -1 -> writeOID(OID.INT_MINUS_ONE);
             case 0 -> writeOID(OID.INT_ZERO);
@@ -131,11 +152,31 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void encodeLong(final Long l) {
+    @SuppressWarnings("unused")
+    public void encodeLong(final long l) {
         writeOID(OID.LONG);
         writeLong(l);
     }
 
+    @SuppressWarnings("unused")
+    public void encodeFloat(final float f) {
+        writeOID(OID.FLOAT);
+        writeFloat(f);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeDouble(final double d) {
+        writeOID(OID.DOUBLE);
+        writeDouble(d);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeByte(final byte b) {
+        writeOID(OID.BYTE);
+        writeByte(b);
+    }
+
+    @SuppressWarnings("unused")
     public void encodeShort(final Short s) {
         writeOID(OID.SHORT);
         writeShort(s);
@@ -156,9 +197,34 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void encodeString(final String s) {
-        writeOID(OID.STRING);
+        encodeAsString(OID.STRING, s);
+    }
+
+    public void encodeAsString(final short oid, final String s) {
+        writeOID(oid);
         writeString(s);
     }
+
+    public void encodeAsDeref(final short oid, final IDeref deref) {
+        writeOID(oid);
+        final Object content = deref.deref();
+        encode(content);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeAtom(final Atom a) {
+        encodeAsDeref(OID.CLJ_ATOM, a);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeRef(final Ref r) {
+        encodeAsDeref(OID.CLJ_REF, r);
+    }
+
+//    public void encodeCharacter(final Character c) {
+//        writeOID(OID.CHAR);
+//        dataOutputStream.write
+//    }
 
     public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
         writeOID(oid);
@@ -181,14 +247,48 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
     public void encodeKeyword(final Keyword kw) {
-        writeOID(OID.CLJ_KEYWORD);
-        writeString(kw.toString().substring(1));
+        encodeAsString(OID.CLJ_KEYWORD, kw.toString().substring(1));
     }
 
+    @SuppressWarnings("unused")
     public void encodeSymbol(final Symbol s) {
-        writeOID(OID.CLJ_SYMBOL);
-        writeString(s.toString());
+        encodeAsString(OID.CLJ_SYMBOL, s.toString());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeBigInteger(final BigInteger bi) {
+        writeOID(OID.JVM_BIG_INT);
+        final byte[] bytes = bi.toByteArray();
+        writeInt(bytes.length);
+        writeBytes(bytes);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeRatio(final Ratio r) {
+        writeOID(OID.CLJ_RATIO);
+        encodeBigInteger(r.numerator);
+        encodeBigInteger(r.denominator);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeBigInt(final BigInt bi) {
+        writeOID(OID.CLJ_BIG_INT);
+        encodeLong(bi.lpart);
+        encodeBigInteger(bi.bipart);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeBigDecimal(final BigDecimal bd) {
+        writeOID(OID.JVM_BIG_DEC);
+        encodeLong(bd.scale());
+        encodeBigInteger(bd.unscaledValue());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeNULL() {
+        writeOID(OID.NULL);
     }
 
     public void encodeLocalDate(final LocalDate ld) {
@@ -225,22 +325,6 @@ public final class Encoder implements AutoCloseable {
         encode(me.getValue());
     }
 
-    public boolean encodeNumber(final Number n) {
-        if (n instanceof Long l) {
-            encodeLong(l);
-            return true;
-        }
-        if (n instanceof Integer i) {
-            encodeInteger(i);
-            return true;
-        }
-        if (n instanceof Short s) {
-            encodeShort(s);
-            return true;
-        }
-        return false;
-    }
-
     public boolean encodeTemporal(final Temporal t) {
         if (t instanceof LocalDate ld) {
             encodeLocalDate(ld);
@@ -259,17 +343,7 @@ public final class Encoder implements AutoCloseable {
     }
 
     public boolean encodeStandard(final Object x) {
-        if (x instanceof Number n) {
-            return encodeNumber(n);
-        }
-        if (x instanceof Keyword kw) {
-            encodeKeyword(kw);
-            return true;
-        }
-        if (x instanceof Symbol s) {
-            encodeSymbol(s);
-            return true;
-        }
+
         if (x instanceof APersistentVector v) {
             encodeCountable(OID.CLJ_VEC, v.count(), v);
             return true;
@@ -350,18 +424,18 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void flush() {
         try {
-            outputStream.flush();
+            dataOutputStream.flush();
         } catch (IOException e) {
-            throw Error.error(e, "could not flush the stream");
+            throw Err.error(e, "could not flush the stream");
         }
     }
 
     @Override
     public void close() {
         try {
-            outputStream.close();
+            dataOutputStream.close();
         } catch (IOException e) {
-            throw Error.error(e, "could not close the stream");
+            throw Err.error(e, "could not close the stream");
         }
     }
 }

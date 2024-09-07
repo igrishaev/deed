@@ -2,22 +2,136 @@
   (:require
    [clojure.java.io :as io])
   (:import
+   (java.util UUID)
+   (java.math BigInteger
+              BigDecimal)
    (clojure.lang IPersistentVector
                  PersistentVector
                  IPersistentSet
                  IPersistentList
+                 Keyword
+                 Symbol
+                 Ratio
+                 Atom
+                 BigInt
+                 Ref
                  LazySeq)
-   (pinny Encoder Decoder EOF OID)))
+   (pinny Encoder Decoder Err EOF OID)))
 
+(set! *warn-on-reflection* true)
 
 (defprotocol IEncode
   (-encode [this ^Encoder encoder]))
 
 (extend-protocol IEncode
 
+  ;;
+  ;; Defaults
+  ;;
+
+  nil
+  (-encode [this ^Encoder encoder]
+    (.encodeNULL encoder))
+
+  Object
+  (-encode [this ^Encoder encoder]
+    (throw (Err/error "don't know how to encode: %s %s" (type this) this)))
+
+  ;;
+  ;; Numbers
+  ;;
+
+  Byte
+  (-encode [this ^Encoder encoder]
+    (.encodeByte encoder this))
+
+  Short
+  (-encode [this ^Encoder encoder]
+    (.encodeShort encoder this))
+
+  Integer
+  (-encode [this ^Encoder encoder]
+    (.encodeInteger encoder this))
+
+  Float
+  (-encode [this ^Encoder encoder]
+    (.encodeFloat encoder this))
+
+  Double
+  (-encode [this ^Encoder encoder]
+    (.encodeDouble encoder this))
+
   Long
   (-encode [this ^Encoder encoder]
     (.encodeLong encoder this))
+
+  BigInteger
+  (-encode [this ^Encoder encoder]
+    (.encodeBigInteger encoder this))
+
+  BigDecimal
+  (-encode [this ^Encoder encoder]
+    (.encodeBigDecimal encoder this))
+
+  BigInt
+  (-encode [this ^Encoder encoder]
+    (.encodeBigInt encoder this))
+
+  Ratio
+  (-encode [this ^Encoder encoder]
+    (.encodeRatio encoder this))
+
+  ;;
+  ;; String
+  ;;
+
+  String
+  (-encode [this ^Encoder encoder]
+    (.encodeString encoder this))
+
+  ;; Character
+  ;; (-encode [this ^Encoder encoder]
+  ;;   (.encodeCharacter encoder this))
+
+  ;;
+  ;; Misc
+  ;;
+
+  Boolean
+  (-encode [this ^Encoder encoder]
+    (.encodeBoolean encoder this))
+
+  UUID
+  (-encode [this ^Encoder encoder]
+    (.encodeUUID encoder this))
+
+  ;;
+  ;; Keyword/Symbol
+  ;;
+
+  Keyword
+  (-encode [this ^Encoder encoder]
+    (.encodeKeyword encoder this))
+
+  Keyword
+  (-encode [this ^Encoder encoder]
+    (.encodeSymbol encoder this))
+
+  ;;
+  ;; Deref
+  ;;
+
+  Atom
+  (-encode [this ^Encoder encoder]
+    (.encodeAtom encoder this))
+
+  Ref
+  (-encode [this ^Encoder encoder]
+    (.encodeRef encoder this))
+
+  ;;
+  ;; Clojure collections
+  ;;
 
   PersistentVector
   (-encode [this ^Encoder encoder]

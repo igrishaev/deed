@@ -1,6 +1,6 @@
 package pinny;
 
-public class Error {
+public class Err {
 
     public static RuntimeException error(final Throwable e, final String message) {
         return new RuntimeException(message, e);

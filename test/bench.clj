@@ -34,16 +34,24 @@
 
 (comment
 
+  ;; time
   (time
    (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
      (pinny/encode e DATA)))
 
+  ;; mem
   (quick-bench
       (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
         (pinny/encode e DATA)))
 
+  ;; file
   (quick-bench
       (pinny/with-encoder [e (io/file "out.pinny")]
+        (pinny/encode e DATA)))
+
+  ;; write
+  (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+    (quick-bench
         (pinny/encode e DATA)))
 
   (time (do (nippy/freeze DATA) nil))
@@ -51,9 +59,7 @@
   (quick-bench
       (nippy/freeze DATA))
 
-  (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-    (quick-bench
-        (pinny/encode e DATA)))
+
 
   (quick-bench
       (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
@@ -94,3 +100,18 @@
 
 ;; BB + Protocol
 ;; Execution time mean : 41.836865 ms
+
+;; DataOutputStream + Protocol
+;; Execution time mean : 38.514992 ms
+
+;; DataOutputStream + Protocol more types
+;; Execution time mean : 42.603235 ms
+
+;; Nippy
+;; Execution time mean : 64.002942 ms
+
+;; Nippy file
+;; Execution time mean : 75.161894 ms
+
+;; Pinny file
+;; Execution time mean : 51.339890 ms
