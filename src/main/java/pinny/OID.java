@@ -32,7 +32,7 @@ public class OID {
 //    ARR_OBJ
 //    ARR_LONG
 
-//    REGEX
+ public static final short REGEX  = 1;               //
 //    CLJ_SORTED_SET
 //    CLJ_SORTED_MAP
 //    URI
@@ -77,17 +77,17 @@ public class OID {
     public static final short CLJ_KEYWORD     = 0x00d0; //
     public static final short CLJ_SYMBOL      = 0x00d1; //
 
-    public static final short DT_DATE         = 0x00e2;
+    public static final short DT_DATE         = 0x00e2; //
     public static final short DT_SQL_DATE     = 0x00e2;
-    public static final short DT_LOCAL_DATE   = 0x00e0;
-    public static final short DT_LOCAL_TIME   = 0x00e1;
+    public static final short DT_LOCAL_DATE   = 0x00e0;  //
+    public static final short DT_LOCAL_TIME   = 0x00e1;  //
     public static final short DT_LOCAL_DATETIME   = 0x00e1;
     public static final short DT_OFFSET_DATETIME   = 0x00e1;
     public static final short DT_OFFSET_TIME   = 0x00e1;
     public static final short DT_DURATION   = 0x00e1;
     public static final short DT_ZONED_DATETIME   = 0x00e1;
     public static final short DT_ZONE_ID       = 0x00e1;
-    public static final short DT_INSTANT      = 0x00e3;
+    public static final short DT_INSTANT      = 0x00e3;   //
 
     public static final short BYTE            = 0x00f0; //
     public static final short BYTE_ZERO       = 0x00f1;

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
@@ -325,11 +326,13 @@ public final class Encoder implements AutoCloseable {
         encode(me.getValue());
     }
 
+    @SuppressWarnings("unused")
+    public void encodePattern(final Pattern p) {
+        encodeAsString(OID.REGEX, p.toString());
+    }
+
     public boolean encodeTemporal(final Temporal t) {
-        if (t instanceof LocalDate ld) {
-            encodeLocalDate(ld);
-            return true;
-        }
+
         if (t instanceof Instant i) {
             encodeInstant(i);
             return true;
@@ -376,30 +379,15 @@ public final class Encoder implements AutoCloseable {
             encodeCountable(OID.JVM_LIST, l.size(), l);
             return true;
         }
-        if (x instanceof UUID u) {
-            encodeUUID(u);
-            return true;
-        }
-        if (x instanceof String s) {
-            encodeString(s);
-            return true;
-        }
         if (x instanceof Temporal t) {
             return encodeTemporal(t);
         }
-        if (x instanceof Date d) {
-            encodeDate(d);
-            return true;
-        }
+
         return false;
     }
 
     public void encode(final Object x) {
         protoEncode.invoke(x, this);
-//        if (encodeStandard(x)) {
-//            return;
-//        }
-//        throw Error.error("unsupported type: %s %s", x.getClass(), x);
     }
 
     public void encodeUncountable(final short oid, final Iterable<?> iterable) {

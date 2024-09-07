@@ -2,7 +2,12 @@
   (:require
    [clojure.java.io :as io])
   (:import
-   (java.util UUID)
+   (java.util.regex Pattern)
+   (java.time LocalDate
+              LocalTime
+              Instant)
+   (java.util UUID
+              Date)
    (java.math BigInteger
               BigDecimal)
    (clojure.lang IPersistentVector
@@ -105,6 +110,10 @@
   (-encode [this ^Encoder encoder]
     (.encodeUUID encoder this))
 
+  Pattern
+  (-encode [this ^Encoder encoder]
+    (.encodePattern encoder this))
+
   ;;
   ;; Keyword/Symbol
   ;;
@@ -137,37 +146,33 @@
   (-encode [this ^Encoder encoder]
     (.encodeCountable encoder OID/CLJ_VEC (count this) this))
 
+  ;;
+  ;; Date & time
+  ;;
+
+  Date
+  (-encode [this ^Encoder encoder]
+    (.encodeDate encoder this))
+
+  LocalDate
+  (-encode [this ^Encoder encoder]
+    (.encodeLocalDate encoder this))
+
+  LocalTime
+  (-encode [this ^Encoder encoder]
+    (.encodeLocalTime encoder this))
+
+  Instant
+  (-encode [this ^Encoder encoder]
+    (.encodeInstant encoder this))
+
+
+
+
+
 
   )
 
-
-;;
-;; Extension, encoding
-;;
-
-;; (defmethod -enc String [^Encoder encoder ^String value]
-;;   (.encodeString encoder value))
-
-;; (defmethod -enc Integer [^Encoder encoder ^Integer value]
-;;   (.encodeInteger encoder value))
-
-;; (defmethod -enc Long [^Encoder encoder ^Long value ]
-;;   (.encodeLong encoder value))
-
-;; (defmethod -enc Boolean [^Encoder encoder ^Boolean value ]
-;;   (.encodeBoolean encoder value))
-
-;; (defmethod -enc IPersistentVector [^Encoder encoder value]
-;;   (.encodeCountable encoder OID/CLJ_VEC (count value) value))
-
-;; (defmethod -enc IPersistentSet [^Encoder encoder value]
-;;   (.encodeCountable encoder OID/CLJ_SET (count value) value))
-
-;; (defmethod -enc IPersistentList [^Encoder encoder value]
-;;   (.encodeCountable encoder OID/CLJ_SET (count value) value))
-
-;; (defmethod -enc LazySeq [^Encoder encoder value]
-;;   (.encodeUncountable encoder OID/CLJ_LAZY_SEQ value))
 
 
 ;;
@@ -190,13 +195,6 @@
 
 
 
-;; (defmethod -dec OID/INT [_ decoder]
-;;   (.readInt decoder))
-
-;; (defmethod -dec OID/LONG [_ decoder]
-;;   (.readLong decoder))
-
-
 (comment
 
   (with-encoder [e (io/file "test.aaa")]
@@ -208,36 +206,6 @@
     (encode-multi e [1 2 3]))
 
   )
-
-
-;; (defmacro with-encoder [[bind dest] & body]
-;;   `(with-open [input# (io/output-stream ~dest)
-;;                ~bind (new Encoder input#)]
-;;      ~@body))
-
-;; (defn encode ^Encoder [^Encoder encoder x]
-;;   (.encode encoder x)
-;;   encoder)
-
-;; (defn encode-multi ^Encoder [^Encoder encoder xs]
-;;   (.encodeMulti encoder xs)
-;;   encoder)
-
-;; (defmacro with-decoder [[bind source] & body]
-;;   `(with-open [input# (io/input-stream ~source)
-;;                ~bind (new Decoder input#)]
-;;      ~@body))
-
-;; (defn decode [^Decoder decoder]
-;;   (.decode decoder))
-
-;; (defn decode-seq [^Decoder decoder]
-;;   (iterator-seq decoder))
-
-;; (defn decode-vec [^Decoder decoder]
-;;   (into [] decoder))
-
-
 
 (comment
 
