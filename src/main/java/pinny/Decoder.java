@@ -1,6 +1,8 @@
 package pinny;
 
+import clojure.lang.ISeq;
 import clojure.lang.MultiFn;
+import clojure.lang.RT;
 
 import java.io.*;
 import java.util.Iterator;
@@ -47,7 +49,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public long readLong() {
         try {
-            return dataInputStream.readShort();
+            return dataInputStream.readLong();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -96,6 +98,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.FLOAT -> readFloat();
             default -> mmDecode.invoke(oid, this);
         };
+    }
+
+    @SuppressWarnings("unused")
+    public ISeq decodeSeq() {
+        return RT.chunkIteratorSeq(this.iterator());
     }
 
     @Override

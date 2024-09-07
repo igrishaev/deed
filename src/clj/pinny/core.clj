@@ -217,6 +217,10 @@
     (encode-multi e [1 2 3]))
 
   (with-decoder [dec (io/file "test.aaa")]
-    (decode dec))
+
+    [(decode dec)
+     (decode dec)
+     (decode dec)
+     ])
 
   )
