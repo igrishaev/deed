@@ -115,3 +115,6 @@
 
 ;; Pinny file
 ;; Execution time mean : 51.339890 ms
+
+;; i5 nippy Execution time mean : 126.351367 ms
+;; i5 pinny Execution time mean : 65.736057 ms

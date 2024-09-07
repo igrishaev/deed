@@ -8,6 +8,7 @@
 - track OID enc/dec
 - main package
 - contrib package
+- vectorz package
 - macro pass options
 - encode: skip unsupported?
 - tests
