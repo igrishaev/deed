@@ -1,5 +1,7 @@
 
-
+- writeBytes: prepend with size
+- empty string
+- fix runtime exceptions
 - better header
 - header fixed size
 - decoder parse header

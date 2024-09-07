@@ -134,6 +134,12 @@ public final class Encoder implements AutoCloseable {
         writeBytes(bytes);
     }
 
+    public void writeBigInteger(final BigInteger bi) {
+        final byte[] bytes = bi.toByteArray();
+        writeInt(bytes.length);
+        writeBytes(bytes);
+    }
+
     @SuppressWarnings("unused")
     public void encodeBoolean(final boolean b) {
         writeOID(OID.BOOL);
@@ -262,30 +268,28 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeBigInteger(final BigInteger bi) {
         writeOID(OID.JVM_BIG_INT);
-        final byte[] bytes = bi.toByteArray();
-        writeInt(bytes.length);
-        writeBytes(bytes);
+        writeBigInteger(bi);
     }
 
     @SuppressWarnings("unused")
     public void encodeRatio(final Ratio r) {
         writeOID(OID.CLJ_RATIO);
-        encodeBigInteger(r.numerator);
-        encodeBigInteger(r.denominator);
+        writeBigInteger(r.numerator);
+        writeBigInteger(r.denominator);
     }
 
     @SuppressWarnings("unused")
     public void encodeBigInt(final BigInt bi) {
         writeOID(OID.CLJ_BIG_INT);
-        encodeLong(bi.lpart);
-        encodeBigInteger(bi.bipart);
+        writeLong(bi.lpart);
+        writeBigInteger(bi.bipart);
     }
 
     @SuppressWarnings("unused")
     public void encodeBigDecimal(final BigDecimal bd) {
         writeOID(OID.JVM_BIG_DEC);
-        encodeLong(bd.scale());
-        encodeBigInteger(bd.unscaledValue());
+        writeLong(bd.scale());
+        writeBigInteger(bd.unscaledValue());
     }
 
     @SuppressWarnings("unused")

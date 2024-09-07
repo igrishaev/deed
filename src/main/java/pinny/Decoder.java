@@ -1,10 +1,9 @@
 package pinny;
 
-import clojure.lang.ISeq;
-import clojure.lang.MultiFn;
-import clojure.lang.RT;
+import clojure.lang.*;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
@@ -71,6 +70,36 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
     }
 
+    public Atom readAtom() {
+        final Object content = decode();
+        return new Atom(content);
+    }
+
+    public String readString() {
+        final int len = readInteger();
+        final byte[] buf = new byte[len];
+        try {
+            dataInputStream.readFully(buf);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new String(buf, StandardCharsets.UTF_8);
+    }
+
+    public Keyword readKeyword() {
+        final String payload = readString();
+        return Keyword.intern(payload);
+    }
+
+    public Symbol readSymbol() {
+        final String payload = readString();
+        return Symbol.intern(payload);
+    }
+
+    public Ratio readRatio() {
+
+    }
+
     public Object decode() {
         int r;
 
@@ -96,6 +125,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.INT_MINUS_ONE -> -1;
             case OID.LONG -> readLong();
             case OID.FLOAT -> readFloat();
+            case OID.CLJ_ATOM -> readAtom();
+            case OID.STRING -> readString();
+            case OID.CLJ_KEYWORD -> readKeyword();
+            case OID.CLJ_SYMBOL -> readSymbol();
+            case OID.CLJ_RATIO -> readRatio();
             default -> mmDecode.invoke(oid, this);
         };
     }
