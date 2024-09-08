@@ -57,7 +57,8 @@
   (time (do (nippy/freeze DATA) nil))
 
   (quick-bench
-      (nippy/freeze DATA))
+      (nippy/freeze DATA {:compressor nil
+                          :encryptor nil}))
 
 
 
