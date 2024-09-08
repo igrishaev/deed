@@ -12,8 +12,12 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
+import java.net.URL;
+import java.net.URI;
 import java.util.UUID;
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
@@ -241,6 +245,7 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
     public void encodeUUID(final UUID u) {
         writeOID(OID.UUID);
         writeLong(u.getMostSignificantBits());
@@ -296,6 +301,17 @@ public final class Encoder implements AutoCloseable {
         writeOID(OID.NULL);
     }
 
+    @SuppressWarnings("unused")
+    public void encodeURL(final URL url) {
+        encodeAsString(OID.URL, url.toString());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeURI(final URI uri) {
+        encodeAsString(OID.URI, uri.toString());
+    }
+
+    @SuppressWarnings("unused")
     public void encodeLocalDate(final LocalDate ld) {
         writeOID(OID.DT_LOCAL_DATE);
         final long days = ld.getLong(ChronoField.EPOCH_DAY);
@@ -314,15 +330,29 @@ public final class Encoder implements AutoCloseable {
 
     public void encodeAsInstant(final short oid, final Instant i) {
         writeOID(oid);
-        final long secs = i.getLong(ChronoField.INSTANT_SECONDS);
-        final long nanos = i.getLong(ChronoField.NANO_OF_SECOND);
+        final long secs = i.getEpochSecond();
+        final int nanos = i.getNano();
         writeLong(secs);
-        writeLong(nanos);
+        writeInt(nanos);
     }
 
     @SuppressWarnings("unused")
     public void encodeDate(final Date d) {
         encodeAsInstant(OID.DT_DATE, d.toInstant());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeTime(final Time t) {
+        writeOID(OID.SQL_TIME);
+        final long time = t.getTime();
+        writeLong(time);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeTimestamp(final Timestamp ts) {
+        writeOID(OID.SQL_TIMESTAMP);
+        final long time = ts.getTime();
+        writeLong(time);
     }
 
     public void encodeMapEntry(final Map.Entry<?,?> me) {

@@ -2,6 +2,8 @@
   (:require
    [clojure.java.io :as io])
   (:import
+   (java.net URL URI)
+   (java.sql Time Timestamp)
    (java.util.regex Pattern)
    (java.time LocalDate
               LocalTime
@@ -115,6 +117,18 @@
     (.encodePattern encoder this))
 
   ;;
+  ;; Net
+  ;;
+
+  URL
+  (-encode [this ^Encoder encoder]
+    (.encodeURL encoder this))
+
+  URI
+  (-encode [this ^Encoder encoder]
+    (.encodeURI encoder this))
+
+  ;;
   ;; Keyword/Symbol
   ;;
 
@@ -149,6 +163,14 @@
   ;;
   ;; Date & time
   ;;
+
+  Timestamp
+  (-encode [this ^Encoder encoder]
+    (.encodeTimestamp encoder this))
+
+  Time
+  (-encode [this ^Encoder encoder]
+    (.encodeTime encoder this))
 
   Date
   (-encode [this ^Encoder encoder]

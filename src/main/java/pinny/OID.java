@@ -35,8 +35,8 @@ public class OID {
  public static final short REGEX  = 1;               //
 //    CLJ_SORTED_SET
 //    CLJ_SORTED_MAP
-//    URI
-//    URL
+    public static final short URI =  -1;       //
+    public static final short URL = -2;        //
 //    EXCEPTION
 //    THROWABLE
 //    EX_INFO
@@ -88,6 +88,10 @@ public class OID {
     public static final short DT_ZONED_DATETIME   = 0x00e1;
     public static final short DT_ZONE_ID       = 0x00e1;
     public static final short DT_INSTANT      = 0x00e3;   //
+
+    public static final short SQL_TIMESTAMP   = 0x10e3; //
+    public static final short SQL_TIME   = 0x13e3;     //
+
 
     public static final short BYTE            = 0x00f0; //
     public static final short BYTE_ZERO       = 0x00f1;
