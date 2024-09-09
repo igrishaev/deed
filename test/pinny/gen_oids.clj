@@ -55,7 +55,7 @@
     CLJ_MAP                               ;; +
     CLJ_MAP_EMPTY                         ;; +
     CLJ_MAP_ENTRY
-    CLJ_RECORD
+    CLJ_RECORD                            ;; +
     JVM_MAP
     JVM_MAP_ENTRY
     UUID                                  ;; +

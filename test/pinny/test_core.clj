@@ -59,9 +59,11 @@
 (defn LocalTime? [x]
   (instance? LocalTime x))
 
+(defrecord Foo [a b c])
 
-(defrecord Test1 [a b c])
+(defrecord Bar [x y])
 
+(p/handle-record 999 Bar)
 
 (deftest test-general-ok
 
@@ -255,13 +257,17 @@
       (is (= #{#{1 2 3}} (enc-dec #{x}))))
     (is (= #{} (enc-dec #{}))))
 
-  #_
   (testing "unknown record"
-    (let [t1 (new Test1 1 2 3)
-          t2 (enc-dec t1)]
-      (is (= "java.util.HashMap" (-> t2 class .getName)))
-      (is (= {:c 3, :a 1, :b 2} t2))
-      )
+    (let [r1 (new Foo 1 2 3)
+          r2 (enc-dec r1)]
+      (is (= "clojure.lang.PersistentArrayMap" (-> r2 class .getName)))
+      (is (= {:c 3, :a 1, :b 2} r2))))
+
+  (testing "known record"
+    (let [r1 (new Bar "a" "b")
+          r2 (enc-dec r1)]
+      (is (= "pinny.test_core.Bar" (-> r2 class .getName)))
+      (is (= r1 r2)))
 
     )
 

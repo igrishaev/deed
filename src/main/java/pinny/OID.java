@@ -56,6 +56,7 @@ public class OID {
     public static final short JVM_MAP                   = 0x0033;
     public static final short JVM_MAP_ENTRY             = 0x0034;
     public static final short CLJ_MAP_ENTRY             = -123;
+    public static final short CLJ_RECORD                = -124;
     public static final short UUID                      = 0x0035;
     public static final short JVM_LIST                  = 0x0036;
     public static final short CLJ_KEYWORD               = 0x0037;

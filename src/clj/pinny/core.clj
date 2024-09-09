@@ -160,7 +160,7 @@
     (.encodeRef encoder this))
 
   ;;
-  ;; Collections
+  ;; Clojure collections
   ;;
 
   APersistentVector
@@ -174,6 +174,14 @@
   APersistentSet
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentSet encoder this))
+
+  ;;
+  ;; Clojure records
+  ;;
+
+  IRecord
+  (-encode [this ^Encoder encoder]
+    (.encodeRecord encoder this))
 
   ;;
   ;; Java Collections
@@ -325,18 +333,20 @@
 
 
 
-#_
 (defmacro handle-record [OID RecordClass]
   (let [create
         (symbol (str RecordClass "/create"))]
     `(do
+
        (extend-protocol IEncode
          ~RecordClass
          (-encode [this# ^Encoder encoder#]
            (.encodeAsMap encoder# ~OID this#)))
+
        (defmethod -decode ~OID
          [_# ^Decoder decoder#]
          (~create (.readClojureMap decoder#)))
+
        nil)))
 
 

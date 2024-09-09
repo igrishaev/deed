@@ -1,6 +1,4 @@
 
-- records: read as clojure
-- macro for records
 - fix runtime exceptions
 - better header
 - header fixed size

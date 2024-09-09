@@ -266,6 +266,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.CLJ_RECORD -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
             case OID.CLJ_SET -> readClojureSet();
             case OID.DT_LOCAL_DATE -> readLocalDate();
