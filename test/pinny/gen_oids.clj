@@ -64,6 +64,7 @@
     JVM_ITERABLE
     JVM_ITERATOR
     JVM_STREAM
+    JVM_COLLECTION
     CLJ_KEYWORD                           ;; +
     CLJ_SYMBOL                            ;; +
     UTIL_DATE                             ;; +
@@ -72,9 +73,10 @@
     DT_LOCAL_DATETIME
     DT_OFFSET_DATETIME
     DT_OFFSET_TIME
-    DT_DURATION
+    DT_DURATION                           ;; +
+    DT_PERIOD                             ;; +
     DT_ZONED_DATETIME
-    DT_ZONE_ID
+    DT_ZONE_ID                            ;; +
     DT_INSTANT                            ;; +
     SQL_TIMESTAMP
     SQL_TIME

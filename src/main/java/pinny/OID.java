@@ -69,6 +69,7 @@ public class OID {
     public static final short DT_OFFSET_DATETIME        = 0x003D;
     public static final short DT_OFFSET_TIME            = 0x003E;
     public static final short DT_DURATION               = 0x003F;
+    public static final short DT_PERIOD                 = 0x103F;
     public static final short DT_ZONED_DATETIME         = 0x0040;
     public static final short DT_ZONE_ID                = 0x0041;
     public static final short DT_INSTANT                = 0x0042;

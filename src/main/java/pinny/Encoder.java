@@ -5,9 +5,7 @@ import clojure.lang.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.List;
@@ -453,6 +451,31 @@ public final class Encoder implements AutoCloseable {
         writeOID(OID.DT_LOCAL_DATE);
         final long days = ld.getLong(ChronoField.EPOCH_DAY);
         writeLong(days);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeDuration(final Duration d) {
+        writeOID(OID.DT_DURATION);
+        final long seconds = d.getSeconds();
+        final int nanos = d.getNano();
+        writeLong(seconds);
+        writeInt(nanos);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodePeriod(final Period p) {
+        writeOID(OID.DT_PERIOD);
+        final int years = p.getYears();
+        final int month = p.getMonths();
+        final int days = p.getDays();
+        writeInt(years);
+        writeInt(month);
+        writeInt(days);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeZoneId(final ZoneId zoneId) {
+        encodeAsString(OID.DT_ZONE_ID, zoneId.getId());
     }
 
     @SuppressWarnings("unused")

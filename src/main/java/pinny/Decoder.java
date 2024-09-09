@@ -5,9 +5,7 @@ import clojure.lang.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.io.*;
 import java.math.BigInteger;
@@ -320,6 +318,24 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return Instant.ofEpochSecond(secs, nanos);
     }
 
+    public Duration readDuration() {
+        final long seconds = readLong();
+        final int nanos = readInteger();
+        return Duration.ofSeconds(seconds, nanos);
+    }
+
+    public Period readPeriod() {
+        final int years = readInteger();
+        final int months = readInteger();
+        final int days = readInteger();
+        return Period.of(years, months, days);
+    }
+
+    public ZoneId readZoneId() {
+        final String id = readString();
+        return ZoneId.of(id);
+    }
+
     public LocalTime readLocalTime() {
         final long nanos = readLong();
         return LocalTime.ofNanoOfDay(nanos);
@@ -348,6 +364,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.DT_DURATION -> readDuration();
+            case OID.DT_PERIOD -> readPeriod();
+            case OID.DT_ZONE_ID -> readZoneId();
             case OID.CLJ_RECORD, OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
             case OID.CLJ_SET -> readClojureSet();

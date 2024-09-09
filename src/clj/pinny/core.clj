@@ -26,7 +26,10 @@
              Timestamp)
    (java.time LocalDate
               LocalTime
-              Instant)
+              Instant
+              Duration
+              Period
+              ZoneId)
    (java.util UUID
               Map
               Date)
@@ -111,14 +114,6 @@
     (.encodeCharacter encoder this))
 
   ;;
-  ;; Concurrent
-  ;;
-
-  Future
-  (-encode [this ^Encoder encoder]
-    (.encodeFuture encoder this))
-
-  ;;
   ;; Misc
   ;;
 
@@ -169,6 +164,10 @@
   Ref
   (-encode [this ^Encoder encoder]
     (.encodeRef encoder this))
+
+  Future
+  (-encode [this ^Encoder encoder]
+    (.encodeFuture encoder this))
 
   ;;
   ;; Clojure collections
@@ -229,6 +228,20 @@
   Instant
   (-encode [this ^Encoder encoder]
     (.encodeInstant encoder this))
+
+  Duration
+  (-encode [this ^Encoder encoder]
+    (.encodeDuration encoder this))
+
+  Period
+  (-encode [this ^Encoder encoder]
+    (.encodePeriod encoder this))
+
+  ZoneId
+  (-encode [this ^Encoder encoder]
+    (.encodeZoneId encoder this))
+
+
 
 )
 

@@ -1,8 +1,11 @@
 (ns pinny.test-core
   (:import
-   (java.time Instant
-              LocalDate
-              LocalTime)
+   (java.time LocalDate
+              LocalTime
+              Instant
+              Duration
+              Period
+              ZoneId)
    (java.util Date)
    (java.net URL URI)
    (clojure.lang Atom Ref Ratio)
@@ -58,6 +61,9 @@
 
 (defn LocalTime? [x]
   (instance? LocalTime x))
+
+(defn ZoneId? [x]
+  (instance? ZoneId x))
 
 (defrecord Foo [a b c])
 
@@ -263,6 +269,24 @@
       (is (Instant? b))
       (is (= a b))))
 
+  (testing "Duration"
+    (let [a (Duration/ofSeconds 123456789 123456789)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= "PT34293H33M9.123456789S" (str b)))))
+
+  (testing "Period"
+    (let [a (Period/of 2022 11 9)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= "P2022Y11M9D" (str b)))))
+
+  (testing "ZoneId"
+    (let [a (ZoneId/of "Asia/Dhaka")
+          b (enc-dec a)]
+      (is (= a b))
+      (is (ZoneId? b))))
+
   (testing "LocalDate"
     (let [a (LocalDate/now)
           b (enc-dec a)]
@@ -310,6 +334,7 @@
           r2 (enc-dec r1)]
       (is (= "pinny.test_core.Bar" (-> r2 class .getName)))
       (is (= r1 r2))))
+
 
   )
 
