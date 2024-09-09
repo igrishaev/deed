@@ -34,6 +34,12 @@
 
 (comment
 
+  (def -m1 (new java.util.HashMap))
+  (.put -m1 1 2)
+  (.put -m1 3 4)
+  (.put -m1 "aaa" -m1)
+
+
   ;; time
   (time
    (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
@@ -59,7 +65,6 @@
   (quick-bench
       (nippy/freeze DATA {:compressor nil
                           :encryptor nil}))
-
 
 
   (quick-bench

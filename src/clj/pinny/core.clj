@@ -2,19 +2,6 @@
   (:require
    [clojure.java.io :as io])
   (:import
-   (java.net URL
-             URI)
-   (java.sql Time
-             Timestamp)
-   (java.util.regex Pattern)
-   (java.time LocalDate
-              LocalTime
-              Instant)
-   (java.util UUID
-              Map
-              Date)
-   (java.math BigInteger
-              BigDecimal)
    (clojure.lang IPersistentVector
                  PersistentVector
                  IPersistentSet
@@ -27,6 +14,19 @@
                  BigInt
                  Ref
                  LazySeq)
+   (java.math BigInteger
+              BigDecimal)
+   (java.net URL
+             URI)
+   (java.sql Time
+             Timestamp)
+   (java.time LocalDate
+              LocalTime
+              Instant)
+   (java.util UUID
+              Map
+              Date)
+   (java.util.regex Pattern)
    (pinny Encoder Decoder Err EOF OID)))
 
 (set! *warn-on-reflection* true)
@@ -100,9 +100,9 @@
   (-encode [this ^Encoder encoder]
     (.encodeString encoder this))
 
-  ;; Character
-  ;; (-encode [this ^Encoder encoder]
-  ;;   (.encodeCharacter encoder this))
+  Character
+  (-encode [this ^Encoder encoder]
+    (.encodeCharacter encoder this))
 
   ;;
   ;; Misc
@@ -199,6 +199,57 @@
   Instant
   (-encode [this ^Encoder encoder]
     (.encodeInstant encoder this)))
+
+
+;;
+;; Arrays (these forms don't work when merged with the previous form)
+;;
+
+(extend-protocol IEncode
+  (Class/forName "[B") ;; byte
+  (-encode [this ^Encoder encoder]
+    (.encodeByteArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[S") ;; short
+  (-encode [this ^Encoder encoder]
+    (.encodeShortArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[I") ;; int
+  (-encode [this ^Encoder encoder]
+    (.encodeIntArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[J") ;; long
+  (-encode [this ^Encoder encoder]
+    (.encodeLongArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[F") ;; float
+  (-encode [this ^Encoder encoder]
+    (.encodeFloatArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[D") ;; double
+  (-encode [this ^Encoder encoder]
+    (.encodeDoubleArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[Z") ;; bool
+  (-encode [this ^Encoder encoder]
+    (.encodeBoolArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[C") ;; char
+  (-encode [this ^Encoder encoder]
+    (.encodeCharArray encoder this)))
+
+(extend-protocol IEncode
+  (Class/forName "[Ljava.lang.Object;") ;; object
+  (-encode [this ^Encoder encoder]
+    (.encodeObjectArray encoder this)))
+
 
 (defmulti -decode
   (fn [oid decoder]

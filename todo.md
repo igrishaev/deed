@@ -21,3 +21,5 @@
 - docs
 - spec
 - benchmarks
+
+(System/identityHashCode ?)

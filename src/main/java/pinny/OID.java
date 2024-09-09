@@ -2,123 +2,99 @@ package pinny;
 
 public class OID {
 
-    public static final short NULL            = 0x0000; //
-    public static final short SERIALIZABLE    = 0x0001;
-
-    public static final short INT             = 0x0010; // +
-    public static final short INT_ZERO        = 0x0011; // +
-    public static final short INT_ONE         = 0x0012; // +
-    public static final short INT_MINUS_ONE   = 0x0013; // +
-
-    public static final short SHORT           = 0x0020; // +
-    public static final short SHORT_ZERO      = 0x0021; // +
-    public static final short SHORT_ONE       = 0x0022; // +
-    public static final short SHORT_MINUS_ONE = 0x0023; // +
-
-    public static final short LONG            = 0x0030; // +
-    public static final short LONG_ZERO       = 0x0031; // +
-    public static final short LONG_ONE        = 0x0032; // +
-    public static final short LONG_MINUS_ONE  = 0x0033; // +
-
-//    INPUT_STREAM
-//    READER
-
-//    ARR_BYTE
-//    ARR_INT
-//    ARR_SHORT
-//    ARR_BOOL
-//    ARR_FLOAT
-//    ARR_DOUBLE
-//    ARR_OBJ
-//    ARR_LONG
-
- public static final short REGEX  = 1;               //
-//    CLJ_SORTED_SET
-//    CLJ_SORTED_MAP
-    public static final short URI =  -1;       //
-    public static final short URL = -2;        //
-//    EXCEPTION
-//    THROWABLE
-//    EX_INFO
-
-    public static final short BOOL_TRUE       = 0x0041; //
-    public static final short BOOL_FALSE      = 0x0042; //
-
-    public static final short STRING          = 0x0050; //
-    public static final short CHAR            = 0x0050;
-
-    public static final short CLJ_VEC         = 0x0060; //
-    public static final short CLJ_VEC_EMPTY   = 0x0061;
-
-    public static final short CLJ_ATOM   = 0x0061; //
-    public static final short CLJ_REF   = 0x0061; //
-    public static final short CLJ_FUTURE   = 0x0061;
-
-    public static final short CLJ_SET         = 0x0070;
-    public static final short CLJ_SET_EMPTY   = 0x0071;
-
-    public static final short CLJ_LAZY_SEQ    = 0x0080;
-    public static final short CLJ_SEQ         = 0x0081;
-    public static final short CLJ_LIST        = 0x0082;
-    public static final short CLJ_QUEUE       = 0x0083;
-
-    public static final short CLJ_MAP         = 0x0090;
-    public static final short CLJ_MAP_EMPTY   = 0x0091;
-
-    public static final short JVM_MAP         = 0x00a0;
-    public static final short JVM_MAP_EMPTY   = 0x00a1;
-
-    public static final short UUID            = 0x00b0; //
-
-    public static final short JVM_LIST        = 0x00c0;
-
-    public static final short CLJ_KEYWORD     = 0x00d0; // +
-    public static final short CLJ_SYMBOL      = 0x00d1; // +
-
-    public static final short DT_DATE         = 0x00e2; //
-    public static final short DT_LOCAL_DATE   = 0x00e0;  //
-    public static final short DT_LOCAL_TIME   = 0x00e1;  //
-    public static final short DT_LOCAL_DATETIME   = 0x00e1;
-    public static final short DT_OFFSET_DATETIME   = 0x00e1;
-    public static final short DT_OFFSET_TIME   = 0x00e1;
-    public static final short DT_DURATION   = 0x00e1;
-    public static final short DT_ZONED_DATETIME   = 0x00e1;
-    public static final short DT_ZONE_ID       = 0x00e1;
-    public static final short DT_INSTANT      = 0x00e3;   //
-    public static final short SQL_TIMESTAMP   = 0x10e3; //
-    public static final short SQL_TIME   = 0x13e3;     //
-
-
-    public static final short BYTE            = 0x00f0; //
-    public static final short BYTE_ZERO       = 0x00f1;
-    public static final short BYTE_ONE        = 0x00f2;
-    public static final short BYTE_MINUS_ONE  = 0x00f2;
-
-    public static final short FLOAT           = 0x0100; //
-    public static final short FLOAT_ZERO      = 0x0101;
-    public static final short FLOAT_ONE       = 0x0102;
-    public static final short FLOAT_MINUS_ONE = 0x0103;
-
-    public static final short DOUBLE           = 0x0104; //
-    public static final short DOUBLE_ZERO      = 0x0105;
-    public static final short DOUBLE_ONE       = 0x0106;
-    public static final short DOUBLE_MINUS_ONE = 0x0107;
-
-    public static final short JVM_BIG_DEC           = 0x0108; //
-    public static final short JVM_BIG_DEC_ZERO      = 0x0109;
-    public static final short JVM_BIG_DEC_ONE       = 0x010a;
-    public static final short JVM_BIG_DEC_MINUS_ONE = 0x010b;
-
-    public static final short JVM_BIG_INT           = 0x1108; //
-    public static final short JVM_BIG_INT_ZERO      = 0x0109;
-    public static final short JVM_BIG_INT_ONE       = 0x010a;
-    public static final short JVM_BIG_INT_MINUS_ONE = 0x010b;
-
-    public static final short CLJ_BIG_INT           = 0x0108; //
-    public static final short CLJ_BIG_INT_ZERO      = 0x0109;
-    public static final short CLJ_BIG_INT_ONE       = 0x010a;
-    public static final short CLJ_BIG_INT_MINUS_ONE = 0x010b;
-
-    public static final short CLJ_RATIO           = 0x0108; //
+    public static final short NULL                      = 0x0000;
+    public static final short SERIALIZABLE              = 0x0001;
+    public static final short INT                       = 0x0002;
+    public static final short INT_ZERO                  = 0x0003;
+    public static final short INT_ONE                   = 0x0004;
+    public static final short INT_MINUS_ONE             = 0x0005;
+    public static final short SHORT                     = 0x0006;
+    public static final short SHORT_ZERO                = 0x0007;
+    public static final short SHORT_ONE                 = 0x0008;
+    public static final short SHORT_MINUS_ONE           = 0x0009;
+    public static final short LONG                      = 0x000A;
+    public static final short LONG_ZERO                 = 0x000B;
+    public static final short LONG_ONE                  = 0x000C;
+    public static final short LONG_MINUS_ONE            = 0x000D;
+    public static final short IO_INPUT_STREAM           = 0x000E;
+    public static final short IO_READER                 = 0x000F;
+    public static final short IO_FILE                   = 0x0010;
+    public static final short ARR_BYTE                  = 0x0011;
+    public static final short ARR_INT                   = 0x0012;
+    public static final short ARR_SHORT                 = 0x0013;
+    public static final short ARR_BOOL                  = 0x0014;
+    public static final short ARR_FLOAT                 = 0x0015;
+    public static final short ARR_DOUBLE                = 0x0016;
+    public static final short ARR_OBJ                   = 0x0017;
+    public static final short ARR_LONG                  = 0x0018;
+    public static final short REGEX                     = 0x0019;
+    public static final short CLJ_SORTED_SET            = 0x001A;
+    public static final short CLJ_SORTED_MAP            = 0x001B;
+    public static final short URI                       = 0x001C;
+    public static final short URL                       = 0x001D;
+    public static final short EXCEPTION                 = 0x001E;
+    public static final short THROWABLE                 = 0x001F;
+    public static final short EX_INFO                   = 0x0020;
+    public static final short BOOL_TRUE                 = 0x0021;
+    public static final short BOOL_FALSE                = 0x0022;
+    public static final short STRING                    = 0x0023;
+    public static final short STRING_EMPTY              = 0x0024;
+    public static final short CHAR                      = 0x0025;
+    public static final short CLJ_VEC                   = 0x0026;
+    public static final short CLJ_VEC_EMPTY             = 0x0027;
+    public static final short CLJ_ATOM                  = 0x0028;
+    public static final short CLJ_REF                   = 0x0029;
+    public static final short CLJ_FUTURE                = 0x002A;
+    public static final short CLJ_SET                   = 0x002B;
+    public static final short CLJ_SET_EMPTY             = 0x002C;
+    public static final short CLJ_LAZY_SEQ              = 0x002D;
+    public static final short CLJ_SEQ                   = 0x002E;
+    public static final short CLJ_LIST                  = 0x002F;
+    public static final short CLJ_QUEUE                 = 0x0030;
+    public static final short CLJ_MAP                   = 0x0031;
+    public static final short CLJ_MAP_EMPTY             = 0x0032;
+    public static final short JVM_MAP                   = 0x0033;
+    public static final short JVM_MAP_EMPTY             = 0x0034;
+    public static final short UUID                      = 0x0035;
+    public static final short JVM_LIST                  = 0x0036;
+    public static final short CLJ_KEYWORD               = 0x0037;
+    public static final short CLJ_SYMBOL                = 0x0038;
+    public static final short DT_DATE                   = 0x0039;
+    public static final short DT_LOCAL_DATE             = 0x003A;
+    public static final short DT_LOCAL_TIME             = 0x003B;
+    public static final short DT_LOCAL_DATETIME         = 0x003C;
+    public static final short DT_OFFSET_DATETIME        = 0x003D;
+    public static final short DT_OFFSET_TIME            = 0x003E;
+    public static final short DT_DURATION               = 0x003F;
+    public static final short DT_ZONED_DATETIME         = 0x0040;
+    public static final short DT_ZONE_ID                = 0x0041;
+    public static final short DT_INSTANT                = 0x0042;
+    public static final short SQL_TIMESTAMP             = 0x0043;
+    public static final short SQL_TIME                  = 0x0044;
+    public static final short BYTE                      = 0x0045;
+    public static final short BYTE_ZERO                 = 0x0046;
+    public static final short BYTE_ONE                  = 0x0047;
+    public static final short BYTE_MINUS_ONE            = 0x0048;
+    public static final short FLOAT                     = 0x0049;
+    public static final short FLOAT_ZERO                = 0x004A;
+    public static final short FLOAT_ONE                 = 0x004B;
+    public static final short FLOAT_MINUS_ONE           = 0x004C;
+    public static final short DOUBLE                    = 0x004D;
+    public static final short DOUBLE_ZERO               = 0x004E;
+    public static final short DOUBLE_ONE                = 0x004F;
+    public static final short DOUBLE_MINUS_ONE          = 0x0050;
+    public static final short JVM_BIG_DEC               = 0x0051;
+    public static final short JVM_BIG_DEC_ZERO          = 0x0052;
+    public static final short JVM_BIG_DEC_ONE           = 0x0053;
+    public static final short JVM_BIG_DEC_MINUS_ONE     = 0x0054;
+    public static final short JVM_BIG_INT               = 0x0055;
+    public static final short JVM_BIG_INT_ZERO          = 0x0056;
+    public static final short JVM_BIG_INT_ONE           = 0x0057;
+    public static final short JVM_BIG_INT_MINUS_ONE     = 0x0058;
+    public static final short CLJ_BIG_INT               = 0x0059;
+    public static final short CLJ_BIG_INT_ZERO          = 0x005A;
+    public static final short CLJ_BIG_INT_ONE           = 0x005B;
+    public static final short CLJ_BIG_INT_MINUS_ONE     = 0x005C;
+    public static final short CLJ_RATIO                 = 0x005D;
 
 }

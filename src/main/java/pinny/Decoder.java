@@ -2,12 +2,17 @@ package pinny;
 
 import clojure.lang.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 public final class Decoder implements Iterable<Object>, AutoCloseable {
@@ -65,6 +70,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
     }
 
+    public double readDouble() {
+        try {
+            return dataInputStream.readDouble();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     public float readFloat() {
         try {
             return dataInputStream.readFloat();
@@ -76,6 +91,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public Atom readAtom() {
         final Object content = decode();
         return new Atom(content);
+    }
+
+    public Ref readRef() {
+        final Object content = decode();
+        return new Ref(content);
     }
 
     public String readString() {
@@ -143,6 +163,50 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return m;
     }
 
+    public Pattern readRegex() {
+        final String payload = readString();
+        return Pattern.compile(payload);
+    }
+
+    public URL readURL() {
+        final String payload = readString();
+        try {
+            //noinspection deprecation
+            return new URL(payload);
+        } catch (MalformedURLException e) {
+            throw Err.error(e, "couldn't parse URL: %s", payload);
+        }
+    }
+
+    public URI readURI() {
+        final String payload = readString();
+        return URI.create(payload);
+    }
+
+    public char readCharacter() {
+        try {
+            return dataInputStream.readChar();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public UUID readUUID() {
+        final long hi = readLong();
+        final long lo = readLong();
+        return new UUID(hi, lo);
+    }
+
+    public Object[] readObjectArray() {
+        final int len = readInteger();
+        final Object[] array = new Object[len];
+        for (int i = 0; i < len; i++) {
+            final Object x = decode();
+            array[i] = x;
+        }
+        return array;
+    }
+
     public Object decode() {
         int r;
 
@@ -161,6 +225,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.DOUBLE -> readDouble();
+            case OID.DOUBLE_ONE -> (double)1;
+            case OID.DOUBLE_MINUS_ONE -> (double)-1;
+            case OID.DOUBLE_ZERO -> (double)0;
+            case OID.REGEX -> readRegex();
+            case OID.NULL -> null;
             case OID.BOOL_FALSE -> false;
             case OID.BOOL_TRUE -> true;
             case OID.SHORT_ONE -> (short)1;
@@ -172,15 +242,30 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.INT_ZERO -> 0;
             case OID.INT_MINUS_ONE -> -1;
             case OID.LONG -> readLong();
+            case OID.LONG_ONE -> (long)1;
+            case OID.LONG_MINUS_ONE -> (long)-1;
+            case OID.LONG_ZERO -> (long)0;
             case OID.FLOAT -> readFloat();
+            case OID.FLOAT_ONE -> (float)1;
+            case OID.FLOAT_MINUS_ONE -> (float)-1;
+            case OID.FLOAT_ZERO -> (float)0;
             case OID.CLJ_ATOM -> readAtom();
+            case OID.CLJ_REF -> readRef();
             case OID.STRING -> readString();
+            case OID.STRING_EMPTY -> "";
+            case OID.CHAR -> readCharacter();
+            case OID.URL -> readURL();
+            case OID.URI -> readURI();
+            case OID.UUID -> readUUID();
             case OID.CLJ_KEYWORD -> readKeyword();
             case OID.CLJ_SYMBOL -> readSymbol();
             case OID.CLJ_RATIO -> readRatio();
             case OID.JVM_BIG_INT -> readBigInteger();
             case OID.CLJ_MAP -> readClojureMap();
+            case OID.CLJ_MAP_EMPTY -> PersistentArrayMap.EMPTY;
             case OID.JVM_MAP -> readJavaMap();
+            case OID.ARR_BYTE -> readBytes();
+            case OID.ARR_OBJ -> readObjectArray();
             default -> mmDecode.invoke(oid, this);
         };
     }

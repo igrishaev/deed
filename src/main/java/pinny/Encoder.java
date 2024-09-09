@@ -125,14 +125,6 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void writeBoolean(final boolean bool) {
-        try {
-            dataOutputStream.writeBoolean(bool);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void writeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         writeBytes(bytes);
@@ -181,14 +173,30 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeFloat(final float f) {
-        writeOID(OID.FLOAT);
-        writeFloat(f);
+        if (f == (float)-1) {
+            writeOID(OID.FLOAT_MINUS_ONE);
+        } else if (f == (float)0) {
+            writeOID(OID.FLOAT_ZERO);
+        } else if (f == (float)1) {
+            writeOID(OID.FLOAT_ONE);
+        } else {
+            writeOID(OID.FLOAT);
+            writeFloat(f);
+        }
     }
 
     @SuppressWarnings("unused")
     public void encodeDouble(final double d) {
-        writeOID(OID.DOUBLE);
-        writeDouble(d);
+        if (d == (double)-1) {
+            writeOID(OID.DOUBLE_MINUS_ONE);
+        } else if (d == (double)0) {
+            writeOID(OID.DOUBLE_ZERO);
+        } else if (d == (double)1) {
+            writeOID(OID.DOUBLE_ONE);
+        } else {
+            writeOID(OID.DOUBLE);
+            writeDouble(d);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -212,7 +220,7 @@ public final class Encoder implements AutoCloseable {
 
     private void encodeChunk(final Object[] chunk) {
         writeInt(chunk.length);
-        for (Object x: chunk) {
+        for (final Object x: chunk) {
             encode(x);
         }
     }
@@ -226,7 +234,11 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeString(final String s) {
-        encodeAsString(OID.STRING, s);
+        if (s.isEmpty()) {
+            writeOID(OID.STRING_EMPTY);
+        } else {
+            encodeAsString(OID.STRING, s);
+        }
     }
 
     public void encodeAsString(final short oid, final String s) {
@@ -250,15 +262,28 @@ public final class Encoder implements AutoCloseable {
         encodeAsDeref(OID.CLJ_REF, r);
     }
 
-//    public void encodeCharacter(final Character c) {
-//        writeOID(OID.CHAR);
-//        dataOutputStream.write
-//    }
+    @SuppressWarnings("unused")
+    public void encodeCharacter(final char c) {
+        writeOID(OID.CHAR);
+        try {
+            dataOutputStream.writeChar(c);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void encodeObjectArray(final Object[] array) {
+        writeOID(OID.ARR_OBJ);
+        writeInt(array.length);
+        for (final Object x: array) {
+            encode(x);
+        }
+    }
 
     public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
         writeOID(oid);
         writeInt(len);
-        for (Object x : iterable) {
+        for (final Object x : iterable) {
             encode(x);
         }
     }
@@ -272,7 +297,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeMulti(final Iterable<?> xs) {
-        for (Object x: xs) {
+        for (final Object x: xs) {
             encode(x);
         }
     }
@@ -376,7 +401,7 @@ public final class Encoder implements AutoCloseable {
     public void encodeAsMap(final short oid, final Map<?,?> m) {
         writeOID(oid);
         writeInt(m.size());
-        for (Map.Entry<?,?> e: m.entrySet()) {
+        for (final Map.Entry<?,?> e: m.entrySet()) {
             encode(e.getKey());
             encode(e.getValue());
         }
@@ -389,13 +414,24 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeAPersistentMap(final APersistentMap m) {
-        encodeAsMap(OID.CLJ_MAP, m);
+        if (m.isEmpty()) {
+            writeOID(OID.CLJ_MAP_EMPTY);
+        } else {
+            encodeAsMap(OID.CLJ_MAP, m);
+        }
+
     }
 
     public void encodeMapEntry(final Map.Entry<?,?> me) {
         writeOID(OID.JVM_MAP_EMPTY);
         encode(me.getKey());
         encode(me.getValue());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeByteArray(final byte[] array) {
+        writeOID(OID.ARR_BYTE);
+        writeBytes(array);
     }
 
     @SuppressWarnings("unused")
@@ -469,7 +505,7 @@ public final class Encoder implements AutoCloseable {
         final int limit = Const.OBJ_CHUNK_SIZE;
         final Object[] chunk = new Object[limit];
         int pos = 0;
-        for (Object x: iterable) {
+        for (final Object x: iterable) {
             chunk[pos] = x;
             pos++;
             if (pos == limit) {
