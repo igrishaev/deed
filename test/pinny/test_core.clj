@@ -244,11 +244,6 @@
   (testing "clojure vector"
     (is (= [1 2 3] (enc-dec [1 2 3])))
     (let [x [1 2 3]]
-  (testing "clojure vector"
-    (is (= [1 2 3] (enc-dec [1 2 3])))
-    (let [x [1 2 3]]
-      (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
-    (is (= [] (enc-dec []))))
       (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
     (is (= [] (enc-dec []))))
 
@@ -257,6 +252,8 @@
     (let [x #{1 2 3}]
       (is (= #{#{1 2 3}} (enc-dec #{x}))))
     (is (= #{} (enc-dec #{}))))
+
+
 
 
   )

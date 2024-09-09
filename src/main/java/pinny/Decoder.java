@@ -272,12 +272,6 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.DT_LOCAL_TIME -> readLocalTime();
             case OID.UTIL_DATE -> readUtilDate();
             case OID.DT_INSTANT -> readInstant();
-            case OID.DT_LOCAL_DATE -> readLocalDate();
-            case OID.DT_LOCAL_TIME -> readLocalTime();
-            case OID.UTIL_DATE -> readUtilDate();
-            case OID.DT_INSTANT -> readInstant();
-            case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
-            case OID.CLJ_VEC -> readClojureVector();
             case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
             case OID.CLJ_VEC -> readClojureVector();
             case OID.DOUBLE -> readDouble();

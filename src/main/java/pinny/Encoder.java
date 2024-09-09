@@ -465,22 +465,19 @@ public final class Encoder implements AutoCloseable {
             writeOID(OID.CLJ_SET_EMPTY);
         } else {
             encodeCountable(OID.CLJ_SET, s.count(), s);
+        }
     }
 
 
     // TODO: drop it
+    @SuppressWarnings("unused")
     public boolean encodeStandard(final Object x) {
-
-
 
         if (x instanceof Map.Entry<?,?> me) {
             encodeJavaMapEntry(me);
             return true;
         }
-        if (x instanceof APersistentSet s) {
-            encodeCountable(OID.CLJ_SET, s.count(), s);
-            return true;
-        }
+
         if (x instanceof PersistentList l) {
             encodeCountable(OID.CLJ_LIST, l.count(), l);
             return true;
