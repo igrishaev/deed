@@ -272,6 +272,7 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
     public void encodeObjectArray(final Object[] array) {
         writeOID(OID.ARR_OBJ);
         writeInt(array.length);
@@ -381,7 +382,9 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeDate(final Date d) {
-        encodeAsInstant(OID.DT_DATE, d.toInstant());
+        writeOID(OID.UTIL_DATE);
+        final long time = d.getTime();
+        writeLong(time);
     }
 
     @SuppressWarnings("unused")
@@ -419,13 +422,29 @@ public final class Encoder implements AutoCloseable {
         } else {
             encodeAsMap(OID.CLJ_MAP, m);
         }
-
     }
 
-    public void encodeMapEntry(final Map.Entry<?,?> me) {
-        writeOID(OID.JVM_MAP_EMPTY);
+    @SuppressWarnings("unused")
+    public void encodeAPersistentVector(final APersistentVector v) {
+        if (v.isEmpty()) {
+            writeOID(OID.CLJ_VEC_EMPTY);
+        } else {
+            encodeCountable(OID.CLJ_VEC, v.count(), v);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeJavaMapEntry(final Map.Entry<?,?> me) {
+        writeOID(OID.JVM_MAP_ENTRY);
         encode(me.getKey());
         encode(me.getValue());
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeClojureMapEntry(final MapEntry me) {
+        writeOID(OID.CLJ_MAP_ENTRY);
+        encode(me.key());
+        encode(me.val());
     }
 
     @SuppressWarnings("unused")
@@ -442,10 +461,7 @@ public final class Encoder implements AutoCloseable {
     // TODO: drop it
     public boolean encodeTemporal(final Temporal t) {
 
-        if (t instanceof Instant i) {
-            encodeInstant(i);
-            return true;
-        }
+
         if (t instanceof LocalTime lt) {
             encodeLocalTime(lt);
             return true;
@@ -457,16 +473,10 @@ public final class Encoder implements AutoCloseable {
     // TODO: drop it
     public boolean encodeStandard(final Object x) {
 
-        if (x instanceof APersistentVector v) {
-            encodeCountable(OID.CLJ_VEC, v.count(), v);
-            return true;
-        }
-        if (x instanceof APersistentMap m) {
-            encodeCountable(OID.CLJ_MAP, m.size(), m);
-            return true;
-        }
+
+
         if (x instanceof Map.Entry<?,?> me) {
-            encodeMapEntry(me);
+            encodeJavaMapEntry(me);
             return true;
         }
         if (x instanceof APersistentSet s) {
@@ -479,10 +489,6 @@ public final class Encoder implements AutoCloseable {
         }
         if (x instanceof LazySeq lz) {
             encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
-            return true;
-        }
-        if (x instanceof Map<?,?> m) {
-            encodeCountable(OID.JVM_MAP, m.size(), m.entrySet());
             return true;
         }
         if (x instanceof List<?> l) {

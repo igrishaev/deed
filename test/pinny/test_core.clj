@@ -1,7 +1,11 @@
 (ns pinny.test-core
   (:import
+   (java.time Instant
+              LocalDate
+              LocalTime)
+   (java.util Date)
    (java.net URL URI)
-   (clojure.lang Atom Ref)
+   (clojure.lang Atom Ref Ratio)
    (java.util.regex Pattern)
    (java.io ByteArrayOutputStream))
   (:require
@@ -39,6 +43,21 @@
 
 (defn URI? [x]
   (instance? URI x))
+
+(defn Ratio? [x]
+  (instance? Ratio x))
+
+(defn Date? [x]
+  (instance? Date x))
+
+(defn Instant? [x]
+  (instance? Instant x))
+
+(defn LocalDate? [x]
+  (instance? LocalDate x))
+
+(defn LocalTime? [x]
+  (instance? LocalTime x))
 
 (deftest test-general-ok
 
@@ -184,11 +203,47 @@
     (is (= 'aaa/bbb (enc-dec 'aaa/bbb)))
     (is (= (symbol "") (enc-dec (symbol "")))))
 
+  (testing "util Date"
+    (let [a (new Date)
+          b (enc-dec a)]
+      (is (Date? b))
+      (is (= a b))))
+
+  (testing "Instant"
+    (let [a (Instant/now)
+          b (enc-dec a)]
+      (is (Instant? b))
+      (is (= a b))))
+
+  (testing "LocalDate"
+    (let [a (LocalDate/now)
+          b (enc-dec a)]
+      (is (LocalDate? b))
+      (is (= a b))))
+
+  (testing "LocalTime"
+    (let [a (LocalTime/now)
+          b (enc-dec a)]
+      (is (LocalTime? b))
+      (is (= a b))))
+
+  (testing "ratio"
+    (let [a (/ 10 3)
+          b (enc-dec a)]
+      (is (Ratio? b))
+      (is (= a b))))
+
   (testing "clojure map"
     (is (= {:aaa 1} (enc-dec {:aaa 1})))
     (is (= {} (enc-dec {})))
     (is (= {:foo {:bar {:baz true}}} (enc-dec {:foo {:bar {:baz true}}})))
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
+
+  (testing "clojure vector"
+    (is (= [1 2 3] (enc-dec [1 2 3])))
+    (let [x [1 2 3]]
+      (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
+    (is (= [] (enc-dec []))))
 
 
   )

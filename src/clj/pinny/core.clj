@@ -3,6 +3,7 @@
    [clojure.java.io :as io])
   (:import
    (clojure.lang IPersistentVector
+                 APersistentVector
                  PersistentVector
                  IPersistentSet
                  APersistentMap
@@ -160,9 +161,9 @@
   ;; Collections
   ;;
 
-  IPersistentVector
+  APersistentVector
   (-encode [this ^Encoder encoder]
-    (.encodeCountable encoder OID/CLJ_VEC (count this) this))
+    (.encodeAPersistentVector encoder this))
 
   APersistentMap
   (-encode [this ^Encoder encoder]
@@ -198,7 +199,11 @@
 
   Instant
   (-encode [this ^Encoder encoder]
-    (.encodeInstant encoder this)))
+    (.encodeInstant encoder this))
+
+)
+
+
 
 
 ;;
@@ -209,37 +214,37 @@
   (Class/forName "[B") ;; byte
   (-encode [this ^Encoder encoder]
     (.encodeByteArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[S") ;; short
   (-encode [this ^Encoder encoder]
     (.encodeShortArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[I") ;; int
   (-encode [this ^Encoder encoder]
     (.encodeIntArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[J") ;; long
   (-encode [this ^Encoder encoder]
     (.encodeLongArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[F") ;; float
   (-encode [this ^Encoder encoder]
     (.encodeFloatArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[D") ;; double
   (-encode [this ^Encoder encoder]
     (.encodeDoubleArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[Z") ;; bool
   (-encode [this ^Encoder encoder]
     (.encodeBoolArray encoder this)))
-
+#_
 (extend-protocol IEncode
   (Class/forName "[C") ;; char
   (-encode [this ^Encoder encoder]

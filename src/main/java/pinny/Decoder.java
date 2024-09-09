@@ -5,13 +5,13 @@ import clojure.lang.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
@@ -152,6 +152,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return m.persistent();
     }
 
+    public IPersistentCollection readClojureVector() {
+        final int len = readInteger();
+        ITransientCollection v = PersistentVector.EMPTY.asTransient();
+        for (int i = 0; i < len; i++) {
+            final Object x = decode();
+            v = v.conj(x);
+        }
+        return v.persistent();
+    }
+
     public Map<?,?> readJavaMap() {
         final int len = readInteger();
         HashMap<Object, Object> m = new HashMap<>(len);
@@ -207,6 +217,27 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return array;
     }
 
+    public Date readUtilDate(){
+        final long time = readLong();
+        return new Date(time);
+    }
+
+    public Instant readInstant() {
+        final long secs = readLong();
+        final int nanos = readInteger();
+        return Instant.ofEpochSecond(secs, nanos);
+    }
+
+    public LocalTime readLocalTime() {
+        final long nanos = readLong();
+        return LocalTime.ofNanoOfDay(nanos);
+    }
+
+    public LocalDate readLocalDate() {
+        final long days = readLong();
+        return LocalDate.ofEpochDay(days);
+    }
+
     public Object decode() {
         int r;
 
@@ -225,6 +256,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.DT_LOCAL_DATE -> readLocalDate();
+            case OID.DT_LOCAL_TIME -> readLocalTime();
+            case OID.UTIL_DATE -> readUtilDate();
+            case OID.DT_INSTANT -> readInstant();
+            case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
+            case OID.CLJ_VEC -> readClojureVector();
             case OID.DOUBLE -> readDouble();
             case OID.DOUBLE_ONE -> (double)1;
             case OID.DOUBLE_MINUS_ONE -> (double)-1;

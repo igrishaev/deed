@@ -40,8 +40,8 @@
     STRING                                ;; +
     STRING_EMPTY                          ;; +
     CHAR                                  ;; +
-    CLJ_VEC
-    CLJ_VEC_EMPTY
+    CLJ_VEC                               ;; +
+    CLJ_VEC_EMPTY                         ;; +
     CLJ_ATOM                              ;; +
     CLJ_REF                               ;; +
     CLJ_FUTURE
@@ -51,38 +51,39 @@
     CLJ_SEQ
     CLJ_LIST
     CLJ_QUEUE
-    CLJ_MAP            ;; +
-    CLJ_MAP_EMPTY      ;; +
+    CLJ_MAP                               ;; +
+    CLJ_MAP_EMPTY                         ;; +
+    CLJ_MAP_ENTRY
     JVM_MAP
-    JVM_MAP_EMPTY
-    UUID               ;; +
+    JVM_MAP_ENTRY
+    UUID                                  ;; +
     JVM_LIST
-    CLJ_KEYWORD        ;; +
-    CLJ_SYMBOL         ;; +
-    DT_DATE
-    DT_LOCAL_DATE
-    DT_LOCAL_TIME
+    CLJ_KEYWORD                           ;; +
+    CLJ_SYMBOL                            ;; +
+    UTIL_DATE                             ;; +
+    DT_LOCAL_DATE                         ;; +
+    DT_LOCAL_TIME                         ;; +
     DT_LOCAL_DATETIME
     DT_OFFSET_DATETIME
     DT_OFFSET_TIME
     DT_DURATION
     DT_ZONED_DATETIME
     DT_ZONE_ID
-    DT_INSTANT
+    DT_INSTANT                            ;; +
     SQL_TIMESTAMP
     SQL_TIME
     BYTE
     BYTE_ZERO
     BYTE_ONE
     BYTE_MINUS_ONE
-    FLOAT              ;; +
-    FLOAT_ZERO         ;; +
-    FLOAT_ONE          ;; +
-    FLOAT_MINUS_ONE    ;; +
-    DOUBLE             ;; +
-    DOUBLE_ZERO        ;; +
-    DOUBLE_ONE         ;; +
-    DOUBLE_MINUS_ONE   ;; +
+    FLOAT                                 ;; +
+    FLOAT_ZERO                            ;; +
+    FLOAT_ONE                             ;; +
+    FLOAT_MINUS_ONE                       ;; +
+    DOUBLE                                ;; +
+    DOUBLE_ZERO                           ;; +
+    DOUBLE_ONE                            ;; +
+    DOUBLE_MINUS_ONE                      ;; +
     JVM_BIG_DEC
     JVM_BIG_DEC_ZERO
     JVM_BIG_DEC_ONE
@@ -95,7 +96,7 @@
     CLJ_BIG_INT_ZERO
     CLJ_BIG_INT_ONE
     CLJ_BIG_INT_MINUS_ONE
-    CLJ_RATIO
+    CLJ_RATIO                             ;; +
     ])
 
 

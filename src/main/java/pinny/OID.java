@@ -54,12 +54,13 @@ public class OID {
     public static final short CLJ_MAP                   = 0x0031;
     public static final short CLJ_MAP_EMPTY             = 0x0032;
     public static final short JVM_MAP                   = 0x0033;
-    public static final short JVM_MAP_EMPTY             = 0x0034;
+    public static final short JVM_MAP_ENTRY             = 0x0034;
+    public static final short CLJ_MAP_ENTRY             = -123;
     public static final short UUID                      = 0x0035;
     public static final short JVM_LIST                  = 0x0036;
     public static final short CLJ_KEYWORD               = 0x0037;
     public static final short CLJ_SYMBOL                = 0x0038;
-    public static final short DT_DATE                   = 0x0039;
+    public static final short UTIL_DATE                 = 0x0039;
     public static final short DT_LOCAL_DATE             = 0x003A;
     public static final short DT_LOCAL_TIME             = 0x003B;
     public static final short DT_LOCAL_DATETIME         = 0x003C;
