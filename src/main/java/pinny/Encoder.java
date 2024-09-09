@@ -145,8 +145,11 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeBoolean(final boolean b) {
-        writeOID(OID.BOOL);
-        writeBoolean(b);
+        if (b) {
+            writeOID(OID.BOOL_TRUE);
+        } else {
+            writeOID(OID.BOOL_FALSE);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -164,8 +167,16 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeLong(final long l) {
-        writeOID(OID.LONG);
-        writeLong(l);
+        if (l == -1) {
+            writeOID(OID.LONG_MINUS_ONE);
+        } else if (l == 0) {
+            writeOID(OID.LONG_ZERO);
+        } else if (l == 1) {
+            writeOID(OID.LONG_ONE);
+        } else {
+            writeOID(OID.LONG);
+            writeLong(l);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -188,8 +199,15 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeShort(final Short s) {
-        writeOID(OID.SHORT);
-        writeShort(s);
+        switch (s) {
+            case -1 -> writeOID(OID.SHORT_MINUS_ONE);
+            case 0 -> writeOID(OID.SHORT_ZERO);
+            case 1 -> writeOID(OID.SHORT_ONE);
+            default -> {
+                writeOID(OID.SHORT);
+                writeShort(s);
+            }
+        }
     }
 
     private void encodeChunk(final Object[] chunk) {
@@ -353,6 +371,25 @@ public final class Encoder implements AutoCloseable {
         writeOID(OID.SQL_TIMESTAMP);
         final long time = ts.getTime();
         writeLong(time);
+    }
+
+    public void encodeAsMap(final short oid, final Map<?,?> m) {
+        writeOID(oid);
+        writeInt(m.size());
+        for (Map.Entry<?,?> e: m.entrySet()) {
+            encode(e.getKey());
+            encode(e.getValue());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeMap(final Map<?,?> m) {
+        encodeAsMap(OID.JVM_MAP, m);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeAPersistentMap(final APersistentMap m) {
+        encodeAsMap(OID.CLJ_MAP, m);
     }
 
     public void encodeMapEntry(final Map.Entry<?,?> me) {

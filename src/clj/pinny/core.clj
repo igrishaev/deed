@@ -2,19 +2,23 @@
   (:require
    [clojure.java.io :as io])
   (:import
-   (java.net URL URI)
-   (java.sql Time Timestamp)
+   (java.net URL
+             URI)
+   (java.sql Time
+             Timestamp)
    (java.util.regex Pattern)
    (java.time LocalDate
               LocalTime
               Instant)
    (java.util UUID
+              Map
               Date)
    (java.math BigInteger
               BigDecimal)
    (clojure.lang IPersistentVector
                  PersistentVector
                  IPersistentSet
+                 APersistentMap
                  IPersistentList
                  Keyword
                  Symbol
@@ -136,7 +140,7 @@
   (-encode [this ^Encoder encoder]
     (.encodeKeyword encoder this))
 
-  Keyword
+  Symbol
   (-encode [this ^Encoder encoder]
     (.encodeSymbol encoder this))
 
@@ -153,12 +157,20 @@
     (.encodeRef encoder this))
 
   ;;
-  ;; Clojure collections
+  ;; Collections
   ;;
 
-  PersistentVector
+  IPersistentVector
   (-encode [this ^Encoder encoder]
     (.encodeCountable encoder OID/CLJ_VEC (count this) this))
+
+  APersistentMap
+  (-encode [this ^Encoder encoder]
+    (.encodeAPersistentMap encoder this))
+
+  Map
+  (-encode [this ^Encoder encoder]
+    (.encodeMap encoder this))
 
   ;;
   ;; Date & time
@@ -249,6 +261,9 @@
 
 
 (comment
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e {:aaa 1}))
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e 1)

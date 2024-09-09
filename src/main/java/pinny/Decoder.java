@@ -2,6 +2,8 @@ package pinny;
 
 import clojure.lang.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -119,6 +121,28 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new Ratio(numerator, denominator);
     }
 
+    public IPersistentMap readClojureMap() {
+        final int len = readInteger();
+        ITransientMap m = PersistentArrayMap.EMPTY.asTransient();
+        for (int i = 0; i < len; i++) {
+            final Object key = decode();
+            final Object val = decode();
+            m = m.assoc(key, val);
+        }
+        return m.persistent();
+    }
+
+    public Map<?,?> readJavaMap() {
+        final int len = readInteger();
+        HashMap<Object, Object> m = new HashMap<>(len);
+        for (int i = 0; i < len; i++) {
+            final Object key = decode();
+            final Object val = decode();
+            m.put(key, val);
+        }
+        return m;
+    }
+
     public Object decode() {
         int r;
 
@@ -137,6 +161,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.BOOL_FALSE -> false;
+            case OID.BOOL_TRUE -> true;
+            case OID.SHORT_ONE -> (short)1;
+            case OID.SHORT_MINUS_ONE -> (short)-1;
+            case OID.SHORT_ZERO -> (short)0;
             case OID.SHORT -> readShort();
             case OID.INT -> readInteger();
             case OID.INT_ONE -> 1;
@@ -150,6 +179,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_SYMBOL -> readSymbol();
             case OID.CLJ_RATIO -> readRatio();
             case OID.JVM_BIG_INT -> readBigInteger();
+            case OID.CLJ_MAP -> readClojureMap();
+            case OID.JVM_MAP -> readJavaMap();
             default -> mmDecode.invoke(oid, this);
         };
     }
