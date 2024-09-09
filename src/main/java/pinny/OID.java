@@ -27,6 +27,7 @@ public class OID {
     public static final short ARR_DOUBLE                = 0x0016;
     public static final short ARR_OBJ                   = 0x0017;
     public static final short ARR_LONG                  = 0x0018;
+    public static final short ARR_CHAR                  = 0x1018;
     public static final short REGEX                     = 0x0019;
     public static final short CLJ_SORTED_SET            = 0x001A;
     public static final short CLJ_SORTED_MAP            = 0x001B;
@@ -44,7 +45,7 @@ public class OID {
     public static final short CLJ_VEC_EMPTY             = 0x0027;
     public static final short CLJ_ATOM                  = 0x0028;
     public static final short CLJ_REF                   = 0x0029;
-    public static final short CLJ_FUTURE                = 0x002A;
+    public static final short FUTURE                    = 0x002A;
     public static final short CLJ_SET                   = 0x002B;
     public static final short CLJ_SET_EMPTY             = 0x002C;
     public static final short CLJ_LAZY_SEQ              = 0x002D;

@@ -142,6 +142,48 @@
       (is (bytes? b))
       (is (= [1 2 3] (vec b)))))
 
+  (testing "int array"
+    (let [a (int-array [1 2 3])
+          b (enc-dec a)]
+      (is (= "[I" (-> b class .getName)))
+      (is (= [1 2 3] (vec b)))))
+
+  (testing "long array"
+    (let [a (long-array [1 2 3])
+          b (enc-dec a)]
+      (is (= "[J" (-> b class .getName)))
+      (is (= [1 2 3] (vec b)))))
+
+  (testing "short array"
+    (let [a (short-array [1 2 3])
+          b (enc-dec a)]
+      (is (= "[S" (-> b class .getName)))
+      (is (= [1 2 3] (vec b)))))
+
+  (testing "char array"
+    (let [a (char-array [\a \b \c])
+          b (enc-dec a)]
+      (is (= "[C" (-> b class .getName)))
+      (is (= [\a \b \c] (vec b)))))
+
+  (testing "bool array"
+    (let [a (boolean-array [true false true])
+          b (enc-dec a)]
+      (is (= "[Z" (-> b class .getName)))
+      (is (= [true false true] (vec b)))))
+
+  (testing "float array"
+    (let [a (float-array [1.1 2.2 3.3])
+          b (enc-dec a)]
+      (is (= "[F" (-> b class .getName)))
+      (is (= ["1.1" "2.2" "3.3"] (mapv str b)))))
+
+  (testing "double array"
+    (let [a (double-array [1.1 2.2 3.3])
+          b (enc-dec a)]
+      (is (= "[D" (-> b class .getName)))
+      (is (= ["1.1" "2.2" "3.3"] (mapv str b)))))
+
   (testing "object array"
     (let [a (object-array [1 nil :kek {"aaa" 1.0}])
           b (enc-dec a)]
@@ -267,13 +309,42 @@
     (let [r1 (new Bar "a" "b")
           r2 (enc-dec r1)]
       (is (= "pinny.test_core.Bar" (-> r2 class .getName)))
-      (is (= r1 r2)))
-
-    )
-
-  ;; records registered/not
-
-
-
+      (is (= r1 r2))))
 
   )
+
+(deftest test-future-cases
+
+  (testing "simple"
+    (let [f1 (future 42)
+          f2 (enc-dec f1)]
+      (is (future? f2))
+      (is (= 42 @f2))))
+
+  (testing "nested"
+    (let [f1 (future (future (future :lol)))
+          f2 (enc-dec f1)]
+      (is (future? f2))
+      (is (-> f2 deref deref deref (= :lol)))))
+
+  (testing "failed"
+    (let [f1 (future (/ 0 0))]
+      (try
+        (enc-dec f1)
+        (is false)
+        (catch Exception e
+          (is (= "future has failed: Divide by zero"
+                 (ex-message e)))))))
+
+  ;; TODO: timeout options
+
+  (testing "timeout"
+    (let [f1 (future
+               (Thread/sleep 6000))]
+
+      (try
+        (enc-dec f1)
+        (is false)
+        (catch Exception e
+          (is (= "future deref timeout (ms): 5000"
+                 (ex-message e))))))))

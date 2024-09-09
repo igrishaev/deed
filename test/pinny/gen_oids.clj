@@ -20,13 +20,14 @@
     IO_READER
     IO_FILE
     ARR_BYTE                              ;; +
-    ARR_INT
-    ARR_SHORT
-    ARR_BOOL
-    ARR_FLOAT
-    ARR_DOUBLE
+    ARR_INT                               ;; +
+    ARR_SHORT                             ;; +
+    ARR_BOOL                              ;; +
+    ARR_FLOAT                             ;; +
+    ARR_DOUBLE                            ;; +
     ARR_OBJ                               ;; +
-    ARR_LONG
+    ARR_LONG                              ;; +
+    ARR_CHAR                              ;; +
     REGEX                                 ;; +
     CLJ_SORTED_SET
     CLJ_SORTED_MAP
@@ -44,7 +45,7 @@
     CLJ_VEC_EMPTY                         ;; +
     CLJ_ATOM                              ;; +
     CLJ_REF                               ;; +
-    CLJ_FUTURE
+    FUTURE                                ;; +
     CLJ_SET                               ;; +
     CLJ_SET_EMPTY                         ;; +
     CLJ_LAZY_SEQ

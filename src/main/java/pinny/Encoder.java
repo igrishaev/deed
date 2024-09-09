@@ -18,6 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
@@ -106,10 +110,17 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    @SuppressWarnings("unused")
     public void writeByte(final byte b) {
         try {
             dataOutputStream.write(b);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void writeCharacter(final char c) {
+        try {
+            dataOutputStream.writeChar(c);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -127,6 +138,14 @@ public final class Encoder implements AutoCloseable {
     public void writeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         writeBytes(bytes);
+    }
+
+    public void writeBoolean(final boolean b) {
+        try {
+            dataOutputStream.writeBoolean(b);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeBigInteger(final BigInteger bi) {
@@ -264,11 +283,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeCharacter(final char c) {
         writeOID(OID.CHAR);
-        try {
-            dataOutputStream.writeChar(c);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        writeCharacter(c);
     }
 
     @SuppressWarnings("unused")
@@ -277,6 +292,85 @@ public final class Encoder implements AutoCloseable {
         writeInt(array.length);
         for (final Object x: array) {
             encode(x);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeIntArray(final int[] array) {
+        writeOID(OID.ARR_INT);
+        writeInt(array.length);
+        for (final int i: array) {
+            writeInt(i);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeShortArray(final short[] array) {
+        writeOID(OID.ARR_SHORT);
+        writeInt(array.length);
+        for (final short s: array) {
+            writeShort(s);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeBoolArray(final boolean[] array) {
+        writeOID(OID.ARR_BOOL);
+        writeInt(array.length);
+        for (final boolean b: array) {
+            writeBoolean(b);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeFloatArray(final float[] array) {
+        writeOID(OID.ARR_FLOAT);
+        writeInt(array.length);
+        for (final float f: array) {
+            writeFloat(f);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeDoubleArray(final double[] array) {
+        writeOID(OID.ARR_DOUBLE);
+        writeInt(array.length);
+        for (final double d: array) {
+            writeDouble(d);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeCharArray(final char[] array) {
+        writeOID(OID.ARR_CHAR);
+        writeInt(array.length);
+        for (final char c: array) {
+            writeCharacter(c);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeLongArray(final long[] array) {
+        writeOID(OID.ARR_LONG);
+        writeInt(array.length);
+        for (final long l: array) {
+            writeLong(l);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeFuture(final Future<?> f) {
+        final long timeout = options.futureGetTimeoutMs();
+        try {
+            final Object x = f.get(timeout, TimeUnit.MILLISECONDS);
+            writeOID(OID.FUTURE);
+            encode(x);
+        } catch (InterruptedException e) {
+            throw Err.error(e, "future was interrupted");
+        } catch (ExecutionException e) {
+            throw Err.error(e, "future has failed: %s", e.getCause().getMessage());
+        } catch (TimeoutException e) {
+            throw Err.error(e, "future deref timeout (ms): %s", timeout);
         }
     }
 

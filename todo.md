@@ -1,4 +1,6 @@
 
+- relax mode? strict mode?
+- cypher in/out
 - fix runtime exceptions
 - better header
 - header fixed size

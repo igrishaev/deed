@@ -12,6 +12,7 @@ import java.util.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
@@ -65,6 +66,14 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public int readInteger() {
         try {
             return dataInputStream.readInt();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean readBoolean() {
+        try {
+            return dataInputStream.readBoolean();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -142,42 +151,48 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public IPersistentMap readClojureMap() {
+        Object key;
+        Object val;
         final int len = readInteger();
         ITransientMap m = PersistentArrayMap.EMPTY.asTransient();
         for (int i = 0; i < len; i++) {
-            final Object key = decode();
-            final Object val = decode();
+            key = decode();
+            val = decode();
             m = m.assoc(key, val);
         }
         return m.persistent();
     }
 
     public IPersistentCollection readClojureSet() {
+        Object x;
         final int len = readInteger();
         ITransientCollection s = PersistentHashSet.EMPTY.asTransient();
         for (int i = 0; i < len; i++) {
-            final Object x = decode();
+            x = decode();
             s = s.conj(x);
         }
         return s.persistent();
     }
 
     public IPersistentCollection readClojureVector() {
+        Object x;
         final int len = readInteger();
         ITransientCollection v = PersistentVector.EMPTY.asTransient();
         for (int i = 0; i < len; i++) {
-            final Object x = decode();
+            x = decode();
             v = v.conj(x);
         }
         return v.persistent();
     }
 
     public Map<?,?> readJavaMap() {
+        Object key;
+        Object val;
         final int len = readInteger();
         HashMap<Object, Object> m = new HashMap<>(len);
         for (int i = 0; i < len; i++) {
-            final Object key = decode();
-            final Object val = decode();
+            key = decode();
+            val = decode();
             m.put(key, val);
         }
         return m;
@@ -221,10 +236,77 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final int len = readInteger();
         final Object[] array = new Object[len];
         for (int i = 0; i < len; i++) {
-            final Object x = decode();
-            array[i] = x;
+            array[i] = decode();
         }
         return array;
+    }
+
+    public int[] readIntArray() {
+        final int len = readInteger();
+        final int[] array = new int[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readInteger();
+        }
+        return array;
+    }
+
+    public short[] readShortArray() {
+        final int len = readInteger();
+        final short[] array = new short[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readShort();
+        }
+        return array;
+    }
+
+    public boolean[] readBoolArray() {
+        final int len = readInteger();
+        final boolean[] array = new boolean[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readBoolean();
+        }
+        return array;
+    }
+
+    public float[] readFloatArray() {
+        final int len = readInteger();
+        final float[] array = new float[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readFloat();
+        }
+        return array;
+    }
+
+    public double[] readDoubleArray() {
+        final int len = readInteger();
+        final double[] array = new double[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readDouble();
+        }
+        return array;
+    }
+
+    public long[] readLongArray() {
+        final int len = readInteger();
+        final long[] array = new long[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readLong();
+        }
+        return array;
+    }
+
+    public char[] readCharArray() {
+        final int len = readInteger();
+        final char[] array = new char[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = readCharacter();
+        }
+        return array;
+    }
+
+    public Future<?> readFuture() {
+        final Object payload = decode();
+        return CompletableFuture.completedFuture(payload);
     }
 
     public Date readUtilDate(){
@@ -266,7 +348,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
-            case OID.CLJ_RECORD -> readClojureMap();
+            case OID.CLJ_RECORD, OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
             case OID.CLJ_SET -> readClojureSet();
             case OID.DT_LOCAL_DATE -> readLocalDate();
@@ -311,11 +393,18 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_SYMBOL -> readSymbol();
             case OID.CLJ_RATIO -> readRatio();
             case OID.JVM_BIG_INT -> readBigInteger();
-            case OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_MAP_EMPTY -> PersistentArrayMap.EMPTY;
             case OID.JVM_MAP -> readJavaMap();
             case OID.ARR_BYTE -> readBytes();
             case OID.ARR_OBJ -> readObjectArray();
+            case OID.ARR_INT -> readIntArray();
+            case OID.ARR_SHORT -> readShortArray();
+            case OID.ARR_BOOL -> readBoolArray();
+            case OID.ARR_FLOAT -> readFloatArray();
+            case OID.ARR_DOUBLE -> readDoubleArray();
+            case OID.ARR_LONG -> readLongArray();
+            case OID.ARR_CHAR -> readCharArray();
+            case OID.FUTURE -> readFuture();
             default -> mmDecode.invoke(oid, this);
         };
     }

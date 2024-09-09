@@ -2,6 +2,7 @@
   (:require
    [clojure.java.io :as io])
   (:import
+   (java.util.concurrent Future)
    (clojure.lang IPersistentVector
                  APersistentVector
                  PersistentVector
@@ -49,7 +50,9 @@
 
   Object
   (-encode [this ^Encoder encoder]
-    (throw (Err/error "don't know how to encode: %s %s" (type this) this)))
+    (throw (Err/error nil
+                      "don't know how to encode: %s %s"
+                      (into-array Object [(type this) this]))))
 
   ;;
   ;; Numbers
@@ -106,6 +109,14 @@
   Character
   (-encode [this ^Encoder encoder]
     (.encodeCharacter encoder this))
+
+  ;;
+  ;; Concurrent
+  ;;
+
+  Future
+  (-encode [this ^Encoder encoder]
+    (.encodeFuture encoder this))
 
   ;;
   ;; Misc
@@ -232,37 +243,37 @@
   (Class/forName "[B") ;; byte
   (-encode [this ^Encoder encoder]
     (.encodeByteArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[S") ;; short
   (-encode [this ^Encoder encoder]
     (.encodeShortArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[I") ;; int
   (-encode [this ^Encoder encoder]
     (.encodeIntArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[J") ;; long
   (-encode [this ^Encoder encoder]
     (.encodeLongArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[F") ;; float
   (-encode [this ^Encoder encoder]
     (.encodeFloatArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[D") ;; double
   (-encode [this ^Encoder encoder]
     (.encodeDoubleArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[Z") ;; bool
   (-encode [this ^Encoder encoder]
     (.encodeBoolArray encoder this)))
-#_
+
 (extend-protocol IEncode
   (Class/forName "[C") ;; char
   (-encode [this ^Encoder encoder]
