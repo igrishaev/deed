@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
 import java.net.URL;
@@ -362,12 +361,14 @@ public final class Encoder implements AutoCloseable {
         writeLong(days);
     }
 
+    @SuppressWarnings("unused")
     public void encodeLocalTime(final LocalTime lt) {
         writeOID(OID.DT_LOCAL_TIME);
         final long nanos = lt.getLong(ChronoField.NANO_OF_DAY);
         writeLong(nanos);
     }
 
+    @SuppressWarnings("unused")
     public void encodeInstant(final Instant i) {
         encodeAsInstant(OID.DT_INSTANT, i);
     }
@@ -458,17 +459,14 @@ public final class Encoder implements AutoCloseable {
         encodeAsString(OID.REGEX, p.toString());
     }
 
-    // TODO: drop it
-    public boolean encodeTemporal(final Temporal t) {
-
-
-        if (t instanceof LocalTime lt) {
-            encodeLocalTime(lt);
-            return true;
-        }
-        return false;
-
+    @SuppressWarnings("unused")
+    public void encodeAPersistentSet(final APersistentSet s) {
+        if (s.isEmpty()) {
+            writeOID(OID.CLJ_SET_EMPTY);
+        } else {
+            encodeCountable(OID.CLJ_SET, s.count(), s);
     }
+
 
     // TODO: drop it
     public boolean encodeStandard(final Object x) {
@@ -495,9 +493,7 @@ public final class Encoder implements AutoCloseable {
             encodeCountable(OID.JVM_LIST, l.size(), l);
             return true;
         }
-        if (x instanceof Temporal t) {
-            return encodeTemporal(t);
-        }
+
 
         return false;
     }

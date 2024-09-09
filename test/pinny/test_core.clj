@@ -239,11 +239,24 @@
     (is (= {:foo {:bar {:baz true}}} (enc-dec {:foo {:bar {:baz true}}})))
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
 
+  ;; set
+
+  (testing "clojure vector"
+    (is (= [1 2 3] (enc-dec [1 2 3])))
+    (let [x [1 2 3]]
   (testing "clojure vector"
     (is (= [1 2 3] (enc-dec [1 2 3])))
     (let [x [1 2 3]]
       (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
     (is (= [] (enc-dec []))))
+      (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
+    (is (= [] (enc-dec []))))
+
+  (testing "clojure set"
+    (is (= #{1 2 3} (enc-dec #{1 2 3})))
+    (let [x #{1 2 3}]
+      (is (= #{#{1 2 3}} (enc-dec #{x}))))
+    (is (= #{} (enc-dec #{}))))
 
 
   )

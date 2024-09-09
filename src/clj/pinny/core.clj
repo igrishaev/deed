@@ -6,6 +6,7 @@
                  APersistentVector
                  PersistentVector
                  IPersistentSet
+                 APersistentSet
                  APersistentMap
                  IPersistentList
                  Keyword
@@ -168,6 +169,14 @@
   APersistentMap
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentMap encoder this))
+
+  APersistentSet
+  (-encode [this ^Encoder encoder]
+    (.encodeAPersistentSet encoder this))
+
+  ;;
+  ;; Java Collections
+  ;;
 
   Map
   (-encode [this ^Encoder encoder]

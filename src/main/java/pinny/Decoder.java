@@ -152,6 +152,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return m.persistent();
     }
 
+    public IPersistentCollection readClojureSet() {
+        final int len = readInteger();
+        ITransientCollection s = PersistentHashSet.EMPTY.asTransient();
+        for (int i = 0; i < len; i++) {
+            final Object x = decode();
+            s = s.conj(x);
+        }
+        return s.persistent();
+    }
+
     public IPersistentCollection readClojureVector() {
         final int len = readInteger();
         ITransientCollection v = PersistentVector.EMPTY.asTransient();
@@ -256,10 +266,18 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
+            case OID.CLJ_SET -> readClojureSet();
             case OID.DT_LOCAL_DATE -> readLocalDate();
             case OID.DT_LOCAL_TIME -> readLocalTime();
             case OID.UTIL_DATE -> readUtilDate();
             case OID.DT_INSTANT -> readInstant();
+            case OID.DT_LOCAL_DATE -> readLocalDate();
+            case OID.DT_LOCAL_TIME -> readLocalTime();
+            case OID.UTIL_DATE -> readUtilDate();
+            case OID.DT_INSTANT -> readInstant();
+            case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
+            case OID.CLJ_VEC -> readClojureVector();
             case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
             case OID.CLJ_VEC -> readClojureVector();
             case OID.DOUBLE -> readDouble();

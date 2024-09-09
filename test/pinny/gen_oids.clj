@@ -45,11 +45,12 @@
     CLJ_ATOM                              ;; +
     CLJ_REF                               ;; +
     CLJ_FUTURE
-    CLJ_SET
-    CLJ_SET_EMPTY
+    CLJ_SET                               ;; +
+    CLJ_SET_EMPTY                         ;; +
     CLJ_LAZY_SEQ
     CLJ_SEQ
     CLJ_LIST
+    CLJ_LIST_EMPTY
     CLJ_QUEUE
     CLJ_MAP                               ;; +
     CLJ_MAP_EMPTY                         ;; +
@@ -97,6 +98,10 @@
     CLJ_BIG_INT_ONE
     CLJ_BIG_INT_MINUS_ONE
     CLJ_RATIO                             ;; +
+    CLJ_TR_MAP
+    CLJ_TR_SET
+    CLJ_TR_VEC
+    CLJ_TR_LIST
     ])
 
 
