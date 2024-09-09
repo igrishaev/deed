@@ -1,7 +1,6 @@
 
-- try arrays
-- encoder: encode/write naming?
-- empty string
+- records: read as clojure
+- macro for records
 - fix runtime exceptions
 - better header
 - header fixed size

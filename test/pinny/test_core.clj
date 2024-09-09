@@ -59,6 +59,10 @@
 (defn LocalTime? [x]
   (instance? LocalTime x))
 
+
+(defrecord Test1 [a b c])
+
+
 (deftest test-general-ok
 
   (testing "nil"
@@ -239,8 +243,6 @@
     (is (= {:foo {:bar {:baz true}}} (enc-dec {:foo {:bar {:baz true}}})))
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
 
-  ;; set
-
   (testing "clojure vector"
     (is (= [1 2 3] (enc-dec [1 2 3])))
     (let [x [1 2 3]]
@@ -252,6 +254,18 @@
     (let [x #{1 2 3}]
       (is (= #{#{1 2 3}} (enc-dec #{x}))))
     (is (= #{} (enc-dec #{}))))
+
+  #_
+  (testing "unknown record"
+    (let [t1 (new Test1 1 2 3)
+          t2 (enc-dec t1)]
+      (is (= "java.util.HashMap" (-> t2 class .getName)))
+      (is (= {:c 3, :a 1, :b 2} t2))
+      )
+
+    )
+
+  ;; records registered/not
 
 
 

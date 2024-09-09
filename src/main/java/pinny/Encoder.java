@@ -459,6 +459,14 @@ public final class Encoder implements AutoCloseable {
         encodeAsString(OID.REGEX, p.toString());
     }
 
+//    public void encodeRecord(final short oid, final IRecord r) {
+//        // x.seq()
+//        // IPersistentMap
+//
+//        final Map<?,?> m = (Map<?, ?>) r;
+//        // encodeAsMap();
+//    }
+
     @SuppressWarnings("unused")
     public void encodeAPersistentSet(final APersistentSet s) {
         if (s.isEmpty()) {

@@ -55,10 +55,14 @@
     CLJ_MAP                               ;; +
     CLJ_MAP_EMPTY                         ;; +
     CLJ_MAP_ENTRY
+    CLJ_RECORD
     JVM_MAP
     JVM_MAP_ENTRY
     UUID                                  ;; +
     JVM_LIST
+    JVM_ITERABLE
+    JVM_ITERATOR
+    JVM_STREAM
     CLJ_KEYWORD                           ;; +
     CLJ_SYMBOL                            ;; +
     UTIL_DATE                             ;; +
@@ -73,6 +77,7 @@
     DT_INSTANT                            ;; +
     SQL_TIMESTAMP
     SQL_TIME
+    SQL_DATE
     BYTE
     BYTE_ZERO
     BYTE_ONE

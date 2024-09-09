@@ -9,6 +9,7 @@
                  APersistentSet
                  APersistentMap
                  IPersistentList
+                 IRecord
                  Keyword
                  Symbol
                  Ratio
@@ -324,8 +325,38 @@
 
 
 
+#_
+(defmacro handle-record [OID RecordClass]
+  (let [create
+        (symbol (str RecordClass "/create"))]
+    `(do
+       (extend-protocol IEncode
+         ~RecordClass
+         (-encode [this# ^Encoder encoder#]
+           (.encodeAsMap encoder# ~OID this#)))
+       (defmethod -decode ~OID
+         [_# ^Decoder decoder#]
+         (~create (.readClojureMap decoder#)))
+       nil)))
+
+
+#_
+(defrecord Foo [a b c])
+
+
+#_
+(handle-record 123 Foo)
+
 
 (comment
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (new Foo 1 2 3)))
+
+  (with-decoder [dec (io/file "test.aaa")]
+    (decode dec))
+
+
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e {:aaa 1}))
