@@ -1,5 +1,5 @@
 
-
+- set min java version
 - relax mode? strict mode?
 - cypher in/out
 - fix runtime exceptions
