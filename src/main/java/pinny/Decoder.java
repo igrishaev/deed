@@ -137,6 +137,14 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return buf;
     }
 
+    public byte readByte() {
+        try {
+            return dataInputStream.readByte();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public BigInteger readBigInteger() {
         final byte[] buf = readBytes();
         return new BigInteger(buf);
@@ -331,6 +339,19 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return Period.of(years, months, days);
     }
 
+    public LocalDateTime readLocalDateTime() {
+        final long seconds = readLong();
+        final int nanos = readInteger();
+        return LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
+    }
+
+    public OffsetDateTime readOffsetDateTime() {
+        final long seconds = readLong();
+        final int nanos = readInteger();
+        final Instant instant = Instant.ofEpochSecond(seconds, nanos);
+        return OffsetDateTime.ofInstant(instant, ZoneOffset.UTC);
+    }
+
     public ZoneId readZoneId() {
         final String id = readString();
         return ZoneId.of(id);
@@ -367,6 +388,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.DT_DURATION -> readDuration();
             case OID.DT_PERIOD -> readPeriod();
             case OID.DT_ZONE_ID -> readZoneId();
+            case OID.DT_OFFSET_DATETIME -> readOffsetDateTime();
+            case OID.DT_LOCAL_DATETIME -> readLocalDateTime();
             case OID.CLJ_RECORD, OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
             case OID.CLJ_SET -> readClojureSet();
@@ -414,6 +437,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.JVM_BIG_INT -> readBigInteger();
             case OID.CLJ_MAP_EMPTY -> PersistentArrayMap.EMPTY;
             case OID.JVM_MAP -> readJavaMap();
+            case OID.BYTE -> readByte();
+            case OID.BYTE_MINUS_ONE -> (byte)-1;
+            case OID.BYTE_ZERO -> (byte)0;
+            case OID.BYTE_ONE -> (byte)1;
             case OID.ARR_BYTE -> readBytes();
             case OID.ARR_OBJ -> readObjectArray();
             case OID.ARR_INT -> readIntArray();

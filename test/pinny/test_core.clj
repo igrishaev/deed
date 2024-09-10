@@ -361,6 +361,14 @@
           (is (= "future has failed: Divide by zero"
                  (ex-message e)))))))
 
+  ;; biginteger
+  ;; bigdecimal
+  ;; bigdec
+  ;; byte
+
+  ;; LocalDateTime
+  ;; OffsetDateTime
+
   ;; TODO: timeout options
 
   (testing "timeout"

@@ -94,17 +94,8 @@
     DOUBLE_ONE                            ;; +
     DOUBLE_MINUS_ONE                      ;; +
     JVM_BIG_DEC
-    JVM_BIG_DEC_ZERO
-    JVM_BIG_DEC_ONE
-    JVM_BIG_DEC_MINUS_ONE
     JVM_BIG_INT
-    JVM_BIG_INT_ZERO
-    JVM_BIG_INT_ONE
-    JVM_BIG_INT_MINUS_ONE
     CLJ_BIG_INT
-    CLJ_BIG_INT_ZERO
-    CLJ_BIG_INT_ONE
-    CLJ_BIG_INT_MINUS_ONE
     CLJ_RATIO                             ;; +
     CLJ_TR_MAP
     CLJ_TR_SET

@@ -88,17 +88,8 @@ public class OID {
     public static final short DOUBLE_ONE                = 0x004F;
     public static final short DOUBLE_MINUS_ONE          = 0x0050;
     public static final short JVM_BIG_DEC               = 0x0051;
-    public static final short JVM_BIG_DEC_ZERO          = 0x0052;
-    public static final short JVM_BIG_DEC_ONE           = 0x0053;
-    public static final short JVM_BIG_DEC_MINUS_ONE     = 0x0054;
     public static final short JVM_BIG_INT               = 0x0055;
-    public static final short JVM_BIG_INT_ZERO          = 0x0056;
-    public static final short JVM_BIG_INT_ONE           = 0x0057;
-    public static final short JVM_BIG_INT_MINUS_ONE     = 0x0058;
     public static final short CLJ_BIG_INT               = 0x0059;
-    public static final short CLJ_BIG_INT_ZERO          = 0x005A;
-    public static final short CLJ_BIG_INT_ONE           = 0x005B;
-    public static final short CLJ_BIG_INT_MINUS_ONE     = 0x005C;
     public static final short CLJ_RATIO                 = 0x005D;
 
 }

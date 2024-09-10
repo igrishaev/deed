@@ -7,15 +7,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.*;
 import java.time.temporal.ChronoField;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.net.URL;
 import java.net.URI;
-import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -217,8 +214,15 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeByte(final byte b) {
-        writeOID(OID.BYTE);
-        writeByte(b);
+        switch (b) {
+            case -1 -> writeOID(OID.BYTE_MINUS_ONE);
+            case 0 -> writeOID(OID.BYTE_ZERO);
+            case 1 -> writeOID(OID.BYTE_ONE);
+            default -> {
+                writeOID(OID.BYTE);
+                writeByte(b);
+            }
+        }
     }
 
     @SuppressWarnings("unused")
@@ -451,6 +455,24 @@ public final class Encoder implements AutoCloseable {
         writeOID(OID.DT_LOCAL_DATE);
         final long days = ld.getLong(ChronoField.EPOCH_DAY);
         writeLong(days);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeLocalDateTime(final LocalDateTime ldt) {
+        writeOID(OID.DT_LOCAL_DATETIME);
+        final long seconds = ldt.toEpochSecond(ZoneOffset.UTC);
+        final int nanos = ldt.getNano();
+        writeLong(seconds);
+        writeInt(nanos);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeOffsetDateTime(final OffsetDateTime odt) {
+        writeOID(OID.DT_OFFSET_DATETIME);
+        final long seconds = odt.toEpochSecond();
+        final int nanos = odt.getNano();
+        writeLong(seconds);
+        writeInt(nanos);
     }
 
     @SuppressWarnings("unused")
