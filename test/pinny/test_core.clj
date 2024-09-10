@@ -12,6 +12,8 @@
               Duration
               Period
               ZoneId)
+   (java.sql Time
+             Timestamp)
    (java.util Date)
    (java.net URL
              URI)
@@ -274,6 +276,24 @@
     (let [a (new Date)
           b (enc-dec a)]
       (is (Date? b))
+      (is (= a b))))
+
+  (testing "sql Time"
+    (let [a (new java.sql.Time 1725992698456)
+          b (enc-dec a)]
+      (is (instance? java.sql.Time b))
+      (is (= a b))))
+
+  (testing "sql Time"
+    (let [a (new java.sql.Date 1725992698456)
+          b (enc-dec a)]
+      (is (instance? java.sql.Date b))
+      (is (= a b))))
+
+  (testing "sql Timestamp"
+    (let [a (new java.sql.Timestamp 1725992698456)
+          b (enc-dec a)]
+      (is (instance? java.sql.Timestamp b))
       (is (= a b))))
 
   (testing "Instant"

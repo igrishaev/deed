@@ -10,6 +10,7 @@
                  APersistentSet
                  APersistentMap
                  IPersistentList
+                 PersistentTreeSet
                  IRecord
                  Keyword
                  Symbol
@@ -22,8 +23,6 @@
               BigDecimal)
    (java.net URL
              URI)
-   (java.sql Time
-             Timestamp)
    (java.time LocalDate
               LocalTime
               LocalDateTime
@@ -185,6 +184,10 @@
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentMap encoder this))
 
+  PersistentTreeSet
+  (-encode [this ^Encoder encoder]
+    (.encodeSortedSet encoder this))
+
   APersistentSet
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentSet encoder this))
@@ -206,16 +209,24 @@
     (.encodeMap encoder this))
 
   ;;
-  ;; Date & time
+  ;; SQL
   ;;
 
-  Timestamp
+  java.sql.Date
   (-encode [this ^Encoder encoder]
-    (.encodeTimestamp encoder this))
+    (.encodeSqlDate encoder this))
 
-  Time
+  java.sql.Timestamp
   (-encode [this ^Encoder encoder]
-    (.encodeTime encoder this))
+    (.encodeSqlTimestamp encoder this))
+
+  java.sql.Time
+  (-encode [this ^Encoder encoder]
+    (.encodeSqlTime encoder this))
+
+  ;;
+  ;; Date & time
+  ;;
 
   LocalDateTime
   (-encode [this ^Encoder encoder]
@@ -233,9 +244,9 @@
   (-encode [this ^Encoder encoder]
     (.encodeZonedDateTime encoder this))
 
-  Date
+  java.util.Date
   (-encode [this ^Encoder encoder]
-    (.encodeDate encoder this))
+    (.encodeUtilDate encoder this))
 
   LocalDate
   (-encode [this ^Encoder encoder]
@@ -259,11 +270,7 @@
 
   ZoneId
   (-encode [this ^Encoder encoder]
-    (.encodeZoneId encoder this))
-
-
-
-)
+    (.encodeZoneId encoder this)))
 
 
 

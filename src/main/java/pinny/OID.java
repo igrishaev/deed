@@ -30,6 +30,7 @@ public class OID {
     public static final short ARR_CHAR                  = 0x1018;
     public static final short REGEX                     = 0x0019;
     public static final short CLJ_SORTED_SET            = 0x001A;
+    public static final short CLJ_SORTED_SET_EMPTY      = 0x201A;
     public static final short CLJ_SORTED_MAP            = 0x001B;
     public static final short URI                       = 0x001C;
     public static final short URL                       = 0x001D;
@@ -75,6 +76,7 @@ public class OID {
     public static final short DT_INSTANT                = 0x0042;
     public static final short SQL_TIMESTAMP             = 0x0043;
     public static final short SQL_TIME                  = 0x0044;
+    public static final short SQL_DATE                  = 0x1044;
     public static final short BYTE                      = 0x0045;
     public static final short BYTE_ZERO                 = 0x0046;
     public static final short BYTE_ONE                  = 0x0047;

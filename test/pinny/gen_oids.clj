@@ -29,7 +29,8 @@
     ARR_LONG                              ;; +
     ARR_CHAR                              ;; +
     REGEX                                 ;; +
-    CLJ_SORTED_SET
+    CLJ_SORTED_SET                        ;;
+    CLJ_SORTED_SET_EMPTY                  ;;
     CLJ_SORTED_MAP
     URI                                   ;; +
     URL                                   ;; +
@@ -78,9 +79,9 @@
     DT_ZONED_DATETIME                     ;; +
     DT_ZONE_ID                            ;; +
     DT_INSTANT                            ;; +
-    SQL_TIMESTAMP
-    SQL_TIME
-    SQL_DATE
+    SQL_TIMESTAMP                         ;; +
+    SQL_TIME                              ;; +
+    SQL_DATE                              ;; +
     BYTE                                  ;; +
     BYTE_ZERO                             ;; +
     BYTE_ONE                              ;; +

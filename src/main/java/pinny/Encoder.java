@@ -11,8 +11,6 @@ import java.util.*;
 import java.net.URL;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -546,24 +544,30 @@ public final class Encoder implements AutoCloseable {
     }
 
     @SuppressWarnings("unused")
-    public void encodeDate(final Date d) {
-        writeOID(OID.UTIL_DATE);
+    public void encodeAsUtilDate(final short oid, final java.util.Date d) {
+        writeOID(oid);
         final long time = d.getTime();
         writeLong(time);
     }
 
     @SuppressWarnings("unused")
-    public void encodeTime(final Time t) {
-        writeOID(OID.SQL_TIME);
-        final long time = t.getTime();
-        writeLong(time);
+    public void encodeUtilDate(final java.util.Date d) {
+        encodeAsUtilDate(OID.UTIL_DATE, d);
     }
 
     @SuppressWarnings("unused")
-    public void encodeTimestamp(final Timestamp ts) {
-        writeOID(OID.SQL_TIMESTAMP);
-        final long time = ts.getTime();
-        writeLong(time);
+    public void encodeSqlTime(final java.sql.Time t) {
+        encodeAsUtilDate(OID.SQL_TIME, t);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeSqlDate(final java.sql.Date d) {
+        encodeAsUtilDate(OID.SQL_DATE, d);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeSqlTimestamp(final java.sql.Timestamp ts) {
+        encodeAsUtilDate(OID.SQL_TIMESTAMP, ts);
     }
 
     public void encodeAsMap(final short oid, final Map<?,?> m) {
@@ -637,6 +641,17 @@ public final class Encoder implements AutoCloseable {
             encodeCountable(OID.CLJ_SET, s.count(), s);
         }
     }
+
+    @SuppressWarnings("unused")
+    public void encodeSortedSet(final PersistentTreeSet s) {
+        if (s.isEmpty()) {
+            writeOID(OID.CLJ_SORTED_SET_EMPTY);
+        } else {
+            encodeCountable(OID.CLJ_SORTED_SET, s.count(), s);
+        }
+    }
+
+
 
 
     // TODO: drop it

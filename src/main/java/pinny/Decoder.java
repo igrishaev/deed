@@ -192,6 +192,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return s.persistent();
     }
 
+    public PersistentTreeSet readClojureSortedSet() {
+        return PersistentTreeSet.EMPTY;
+    }
+
     public IPersistentCollection readClojureVector() {
         Object x;
         final int len = readInteger();
@@ -332,6 +336,21 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new Date(time);
     }
 
+    public java.sql.Date readSqlDate() {
+        final long time = readLong();
+        return new java.sql.Date(time);
+    }
+
+    public java.sql.Time readSqlTime() {
+        final long time = readLong();
+        return new java.sql.Time(time);
+    }
+
+    public java.sql.Timestamp readSqlTimestamp() {
+        final long time = readLong();
+        return new java.sql.Timestamp(time);
+    }
+
     public Instant readInstant() {
         final long secs = readLong();
         final int nanos = readInteger();
@@ -416,6 +435,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.SQL_TIME -> readSqlTime();
+            case OID.SQL_DATE -> readSqlDate();
+            case OID.SQL_TIMESTAMP -> readSqlTimestamp();
             case OID.DT_DURATION -> readDuration();
             case OID.DT_PERIOD -> readPeriod();
             case OID.DT_ZONE_ID -> readZoneId();
@@ -426,6 +448,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_RECORD, OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
             case OID.CLJ_SET -> readClojureSet();
+            case OID.CLJ_SORTED_SET_EMPTY -> PersistentTreeSet.EMPTY;
+            case OID.CLJ_SORTED_SET -> readClojureSortedSet();
             case OID.DT_LOCAL_DATE -> readLocalDate();
             case OID.DT_LOCAL_TIME -> readLocalTime();
             case OID.UTIL_DATE -> readUtilDate();
