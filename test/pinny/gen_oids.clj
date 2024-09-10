@@ -70,21 +70,21 @@
     UTIL_DATE                             ;; +
     DT_LOCAL_DATE                         ;; +
     DT_LOCAL_TIME                         ;; +
-    DT_LOCAL_DATETIME
-    DT_OFFSET_DATETIME
-    DT_OFFSET_TIME
+    DT_LOCAL_DATETIME                     ;; +
+    DT_OFFSET_DATETIME                    ;; +
+    DT_OFFSET_TIME                        ;; +
     DT_DURATION                           ;; +
     DT_PERIOD                             ;; +
-    DT_ZONED_DATETIME
+    DT_ZONED_DATETIME                     ;; +
     DT_ZONE_ID                            ;; +
     DT_INSTANT                            ;; +
     SQL_TIMESTAMP
     SQL_TIME
     SQL_DATE
-    BYTE
-    BYTE_ZERO
-    BYTE_ONE
-    BYTE_MINUS_ONE
+    BYTE                                  ;; +
+    BYTE_ZERO                             ;; +
+    BYTE_ONE                              ;; +
+    BYTE_MINUS_ONE                        ;; +
     FLOAT                                 ;; +
     FLOAT_ZERO                            ;; +
     FLOAT_ONE                             ;; +
@@ -93,9 +93,9 @@
     DOUBLE_ZERO                           ;; +
     DOUBLE_ONE                            ;; +
     DOUBLE_MINUS_ONE                      ;; +
-    JVM_BIG_DEC
-    JVM_BIG_INT
-    CLJ_BIG_INT
+    JVM_BIG_DEC                           ;; +
+    JVM_BIG_INT                           ;; +
+    CLJ_BIG_INT                           ;; +
     CLJ_RATIO                             ;; +
     CLJ_TR_MAP
     CLJ_TR_SET

@@ -26,6 +26,10 @@
              Timestamp)
    (java.time LocalDate
               LocalTime
+              LocalDateTime
+              OffsetDateTime
+              ZonedDateTime
+              OffsetTime
               Instant
               Duration
               Period
@@ -212,6 +216,22 @@
   Time
   (-encode [this ^Encoder encoder]
     (.encodeTime encoder this))
+
+  LocalDateTime
+  (-encode [this ^Encoder encoder]
+    (.encodeLocalDateTime encoder this))
+
+  OffsetDateTime
+  (-encode [this ^Encoder encoder]
+    (.encodeOffsetDateTime encoder this))
+
+  OffsetTime
+  (-encode [this ^Encoder encoder]
+    (.encodeOffsetTime encoder this))
+
+  ZonedDateTime
+  (-encode [this ^Encoder encoder]
+    (.encodeZonedDateTime encoder this))
 
   Date
   (-encode [this ^Encoder encoder]

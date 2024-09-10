@@ -2,6 +2,7 @@ package pinny;
 
 import clojure.lang.*;
 
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -148,6 +149,17 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public BigInteger readBigInteger() {
         final byte[] buf = readBytes();
         return new BigInteger(buf);
+    }
+
+    public BigDecimal readBigDecimal() {
+        final int scale = readInteger();
+        final BigInteger unscaled = readBigInteger();
+        return new BigDecimal(unscaled, scale);
+    }
+
+    public BigInt readBigInt() {
+        final BigInteger bi = readBigInteger();
+        return BigInt.fromBigInteger(bi);
     }
 
     public Ratio readRatio() {
@@ -346,10 +358,29 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public OffsetDateTime readOffsetDateTime() {
-        final long seconds = readLong();
+        final long epoch = readLong();
         final int nanos = readInteger();
-        final Instant instant = Instant.ofEpochSecond(seconds, nanos);
-        return OffsetDateTime.ofInstant(instant, ZoneOffset.UTC);
+        final int offset = readInteger();
+        final LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(epoch, nanos, ZoneOffset.UTC);
+        final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(offset);
+        return OffsetDateTime.of(localDateTime, zoneOffset);
+    }
+
+    public ZonedDateTime readZonedDateTime() {
+        final long epoch = readLong();
+        final int nanos = readInteger();
+        final String zoneName = readString();
+        final LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(epoch, nanos, ZoneOffset.UTC);
+        final ZoneId zoneId = ZoneId.of(zoneName);
+        return ZonedDateTime.of(localDateTime, zoneId);
+    }
+
+    public OffsetTime readOffsetTime() {
+        final long nanos = readLong();
+        final int offset = readInteger();
+        final LocalTime localTime = LocalTime.ofNanoOfDay(nanos);
+        final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(offset);
+        return OffsetTime.of(localTime, zoneOffset);
     }
 
     public ZoneId readZoneId() {
@@ -388,7 +419,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.DT_DURATION -> readDuration();
             case OID.DT_PERIOD -> readPeriod();
             case OID.DT_ZONE_ID -> readZoneId();
+            case OID.DT_OFFSET_TIME -> readOffsetTime();
             case OID.DT_OFFSET_DATETIME -> readOffsetDateTime();
+            case OID.DT_ZONED_DATETIME -> readZonedDateTime();
             case OID.DT_LOCAL_DATETIME -> readLocalDateTime();
             case OID.CLJ_RECORD, OID.CLJ_MAP -> readClojureMap();
             case OID.CLJ_SET_EMPTY -> PersistentHashSet.EMPTY;
@@ -435,6 +468,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_SYMBOL -> readSymbol();
             case OID.CLJ_RATIO -> readRatio();
             case OID.JVM_BIG_INT -> readBigInteger();
+            case OID.JVM_BIG_DEC -> readBigDecimal();
+            case OID.CLJ_BIG_INT -> readBigInt();
             case OID.CLJ_MAP_EMPTY -> PersistentArrayMap.EMPTY;
             case OID.JVM_MAP -> readJavaMap();
             case OID.BYTE -> readByte();

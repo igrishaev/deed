@@ -424,14 +424,13 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeBigInt(final BigInt bi) {
         writeOID(OID.CLJ_BIG_INT);
-        writeLong(bi.lpart);
-        writeBigInteger(bi.bipart);
+        writeBigInteger(bi.toBigInteger());
     }
 
     @SuppressWarnings("unused")
     public void encodeBigDecimal(final BigDecimal bd) {
         writeOID(OID.JVM_BIG_DEC);
-        writeLong(bd.scale());
+        writeInt(bd.scale());
         writeBigInteger(bd.unscaledValue());
     }
 
@@ -460,19 +459,45 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeLocalDateTime(final LocalDateTime ldt) {
         writeOID(OID.DT_LOCAL_DATETIME);
-        final long seconds = ldt.toEpochSecond(ZoneOffset.UTC);
+        final long epoch = ldt.toEpochSecond(ZoneOffset.UTC);
         final int nanos = ldt.getNano();
-        writeLong(seconds);
+        writeLong(epoch);
         writeInt(nanos);
     }
 
     @SuppressWarnings("unused")
     public void encodeOffsetDateTime(final OffsetDateTime odt) {
         writeOID(OID.DT_OFFSET_DATETIME);
-        final long seconds = odt.toEpochSecond();
-        final int nanos = odt.getNano();
-        writeLong(seconds);
+        final LocalDateTime localDateTime = odt.toLocalDateTime();
+        final ZoneOffset zoneOffset = odt.getOffset();
+        final long epoch = localDateTime.toEpochSecond(ZoneOffset.UTC);
+        final int nanos = localDateTime.getNano();
+        final int offset = zoneOffset.getTotalSeconds();
+        writeLong(epoch);
         writeInt(nanos);
+        writeInt(offset);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeZonedDateTime(final ZonedDateTime zdt) {
+        writeOID(OID.DT_ZONED_DATETIME);
+        final LocalDateTime localDateTime = zdt.toLocalDateTime();
+        final ZoneOffset zoneOffset = zdt.getOffset();
+        final long epoch = localDateTime.toEpochSecond(ZoneOffset.UTC);
+        final int nanos = localDateTime.getNano();
+        final String zoneId = zdt.getZone().getId();
+        writeLong(epoch);
+        writeInt(nanos);
+        writeString(zoneId);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeOffsetTime(final OffsetTime offsetTime) {
+        writeOID(OID.DT_OFFSET_TIME);
+        final long nanos = offsetTime.getLong(ChronoField.NANO_OF_DAY);
+        final int offset = offsetTime.getOffset().getTotalSeconds();
+        writeLong(nanos);
+        writeInt(offset);
     }
 
     @SuppressWarnings("unused")

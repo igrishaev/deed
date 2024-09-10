@@ -1,14 +1,24 @@
 (ns pinny.test-core
   (:import
+   (java.math BigInteger
+              BigDecimal)
    (java.time LocalDate
+              LocalDateTime
+              OffsetDateTime
+              OffsetTime
+              ZonedDateTime
               LocalTime
               Instant
               Duration
               Period
               ZoneId)
    (java.util Date)
-   (java.net URL URI)
-   (clojure.lang Atom Ref Ratio)
+   (java.net URL
+             URI)
+   (clojure.lang Atom
+                 Ref
+                 BigInt
+                 Ratio)
    (java.util.regex Pattern)
    (java.io ByteArrayOutputStream))
   (:require
@@ -64,6 +74,9 @@
 
 (defn ZoneId? [x]
   (instance? ZoneId x))
+
+(defn BigInteger? [x]
+  (instance? BigInteger x))
 
 (defrecord Foo [a b c])
 
@@ -299,6 +312,30 @@
       (is (LocalTime? b))
       (is (= a b))))
 
+  (testing "LocalDateTime"
+    (let [a (LocalDateTime/now)
+          b (enc-dec a)]
+      (is (instance? LocalDateTime b))
+      (is (= a b))))
+
+  (testing "OffsetDateTime"
+    (let [a (OffsetDateTime/now)
+          b (enc-dec a)]
+      (is (instance? OffsetDateTime b))
+      (is (= a b))))
+
+  (testing "ZonedDateTime"
+    (let [a (ZonedDateTime/now)
+          b (enc-dec a)]
+      (is (instance? ZonedDateTime b))
+      (is (= a b))))
+
+  (testing "OffsetTime"
+    (let [a (OffsetTime/now)
+          b (enc-dec a)]
+      (is (instance? OffsetTime b))
+      (is (= a b))))
+
   (testing "ratio"
     (let [a (/ 10 3)
           b (enc-dec a)]
@@ -335,6 +372,46 @@
       (is (= "pinny.test_core.Bar" (-> r2 class .getName)))
       (is (= r1 r2))))
 
+  (testing "biginteger"
+    (let [b1 (new BigInteger "-123456")
+          b2 (enc-dec b1)]
+      (is (BigInteger? b2))
+      (is (= b1 b2))))
+
+  (testing "bigdecimal"
+    (let [b1 (new BigDecimal "-123.456")
+          b2 (enc-dec b1)]
+      (is (instance? BigDecimal b2))
+      (is (= b1 b2))))
+
+  (testing "bigint"
+    (let [b1 (bigint "-123456")
+          b2 (enc-dec b1)]
+      (is (instance? BigInt b2))
+      (is (= b1 b2))))
+
+  (testing "byte"
+    (let [b1 (byte -1)
+          b2 (enc-dec b1)]
+      (is (instance? Byte b2))
+      (is (= b1 b2)))
+    (let [b1 (byte 0)
+          b2 (enc-dec b1)]
+      (is (instance? Byte b2))
+      (is (= b1 b2)))
+    (let [b1 (byte 1)
+          b2 (enc-dec b1)]
+      (is (instance? Byte b2))
+      (is (= b1 b2)))
+    (let [b1 (byte 99)
+          b2 (enc-dec b1)]
+      (is (instance? Byte b2))
+      (is (= b1 b2))))
+
+  ;; unknown type
+  ;; custom deftype
+
+
 
   )
 
@@ -360,14 +437,6 @@
         (catch Exception e
           (is (= "future has failed: Divide by zero"
                  (ex-message e)))))))
-
-  ;; biginteger
-  ;; bigdecimal
-  ;; bigdec
-  ;; byte
-
-  ;; LocalDateTime
-  ;; OffsetDateTime
 
   ;; TODO: timeout options
 
