@@ -19,6 +19,7 @@
     IO_INPUT_STREAM
     IO_READER
     IO_FILE
+    BYTEBUFFER
     ARR_BYTE                              ;; +
     ARR_INT                               ;; +
     ARR_SHORT                             ;; +
