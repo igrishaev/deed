@@ -16,10 +16,25 @@ import java.util.zip.GZIPInputStream;
 
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
-    final private DataInputStream dataInputStream;
     final private BufferedInputStream bufferedInputStream;
     final private MultiFn mmDecode;
     final private EOF EOF;
+    final private ObjectInputStream objectInputStream;
+
+    final static HashSet<Class<?>> h = new HashSet<>();
+    static {
+        h.add(Integer.class);
+        h.add(Long.class);
+        h.add(Short.class);
+        h.add(Boolean.class);
+    }
+
+    public static ObjectInputFilter.Status filterObject(ObjectInputFilter.FilterInfo info) {
+        final Class<?> theClass = info.getClass();
+        return h.contains(theClass)
+                ? ObjectInputFilter.Status.ALLOWED
+                : ObjectInputFilter.Status.REJECTED;
+    }
 
     public Decoder(final MultiFn mmDecode, final InputStream inputStream) {
         this(mmDecode, inputStream, Options.standard());
@@ -41,13 +56,18 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             }
         }
         bufferedInputStream = new BufferedInputStream(source, Const.IN_BUF_SIZE);
-        dataInputStream = new DataInputStream(bufferedInputStream);
+        try {
+            objectInputStream = new ObjectInputStream(bufferedInputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        objectInputStream.setObjectInputFilter(Decoder::filterObject);
         readHeader();
     }
 
     public short readShort() {
         try {
-            return dataInputStream.readShort();
+            return objectInputStream.readShort();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +75,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public long readLong() {
         try {
-            return dataInputStream.readLong();
+            return objectInputStream.readLong();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +83,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public int readInteger() {
         try {
-            return dataInputStream.readInt();
+            return objectInputStream.readInt();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +91,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public boolean readBoolean() {
         try {
-            return dataInputStream.readBoolean();
+            return objectInputStream.readBoolean();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -79,17 +99,15 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public double readDouble() {
         try {
-            return dataInputStream.readDouble();
+            return objectInputStream.readDouble();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-
     public float readFloat() {
         try {
-            return dataInputStream.readFloat();
+            return objectInputStream.readFloat();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +127,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final int len = readInteger();
         final byte[] buf = new byte[len];
         try {
-            dataInputStream.readFully(buf);
+            objectInputStream.readFully(buf);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +148,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final int size = readInteger();
         final byte[] buf = new byte[size];
         try {
-            dataInputStream.readFully(buf);
+            objectInputStream.readFully(buf);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -218,7 +236,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public char readCharacter() {
         try {
-            return dataInputStream.readChar();
+            return objectInputStream.readChar();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -455,7 +473,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     @Override
     public void close() {
         try {
-            dataInputStream.close();
+            objectInputStream.close();
         } catch (IOException e) {
             throw Err.error(e, "could not close the stream");
         }

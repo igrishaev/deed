@@ -25,7 +25,7 @@ import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
 
-    private final DataOutputStream dataOutputStream;
+    private final ObjectOutputStream objectOutputStream;
     private final Options options;
     private final IFn protoEncode;
 
@@ -49,7 +49,11 @@ public final class Encoder implements AutoCloseable {
                 throw Err.error(e, "could not open Gzip output stream");
             }
         }
-        dataOutputStream = new DataOutputStream(destination);
+        try {
+            objectOutputStream = new ObjectOutputStream(destination);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         initHeader();
     }
 
@@ -60,7 +64,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeInt(final int i) {
         try {
-            dataOutputStream.writeInt(i);
+            objectOutputStream.writeInt(i);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +72,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeOID(final short oid) {
         try {
-            dataOutputStream.writeShort(oid);
+            objectOutputStream.writeShort(oid);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +80,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeShort(final short s) {
         try {
-            dataOutputStream.writeShort(s);
+            objectOutputStream.writeShort(s);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,7 +88,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeLong(final long l) {
         try {
-            dataOutputStream.writeLong(l);
+            objectOutputStream.writeLong(l);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +97,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void writeFloat(final float f) {
         try {
-            dataOutputStream.writeFloat(f);
+            objectOutputStream.writeFloat(f);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +106,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void writeDouble(final double d) {
         try {
-            dataOutputStream.writeDouble(d);
+            objectOutputStream.writeDouble(d);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -110,7 +114,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeByte(final byte b) {
         try {
-            dataOutputStream.write(b);
+            objectOutputStream.write(b);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,7 +122,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeCharacter(final char c) {
         try {
-            dataOutputStream.writeChar(c);
+            objectOutputStream.writeChar(c);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -126,8 +130,8 @@ public final class Encoder implements AutoCloseable {
 
     public void writeBytes(final byte[] bytes) {
         try {
-            dataOutputStream.writeInt(bytes.length);
-            dataOutputStream.write(bytes);
+            objectOutputStream.writeInt(bytes.length);
+            objectOutputStream.write(bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +144,7 @@ public final class Encoder implements AutoCloseable {
 
     public void writeBoolean(final boolean b) {
         try {
-            dataOutputStream.writeBoolean(b);
+            objectOutputStream.writeBoolean(b);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -644,7 +648,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void flush() {
         try {
-            dataOutputStream.flush();
+            objectOutputStream.flush();
         } catch (IOException e) {
             throw Err.error(e, "could not flush the stream");
         }
@@ -653,7 +657,7 @@ public final class Encoder implements AutoCloseable {
     @Override
     public void close() {
         try {
-            dataOutputStream.close();
+            objectOutputStream.close();
         } catch (IOException e) {
             throw Err.error(e, "could not close the stream");
         }
