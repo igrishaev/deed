@@ -380,6 +380,16 @@
       (is (= #{#{1 2 3}} (enc-dec #{x}))))
     (is (= #{} (enc-dec #{}))))
 
+  (testing "clojure sorted set"
+    (let [a (sorted-set 5 4 3 2 1)
+          b (enc-dec a)]
+      (is (= "clojure.lang.PersistentTreeSet" (-> b class .getName)))
+      (is (= a b)))
+    (let [a (sorted-set)
+          b (enc-dec a)]
+      (is (= "clojure.lang.PersistentTreeSet" (-> b class .getName)))
+      (is (= a b))))
+
   (testing "unknown record"
     (let [r1 (new Foo 1 2 3)
           r2 (enc-dec r1)]

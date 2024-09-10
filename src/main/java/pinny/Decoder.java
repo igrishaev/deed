@@ -192,8 +192,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return s.persistent();
     }
 
-    public PersistentTreeSet readClojureSortedSet() {
-        return PersistentTreeSet.EMPTY;
+    public IPersistentCollection readClojureSortedSet() {
+        Object x;
+        IPersistentCollection s = PersistentTreeSet.EMPTY;
+        final int len = readInteger();
+        for (int i = 0; i < len; i++) {
+            x = decode();
+            s.cons(x);
+            s = s.cons(x);
+        }
+        return s;
     }
 
     public IPersistentCollection readClojureVector() {

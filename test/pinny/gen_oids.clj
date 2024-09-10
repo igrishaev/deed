@@ -29,9 +29,10 @@
     ARR_LONG                              ;; +
     ARR_CHAR                              ;; +
     REGEX                                 ;; +
-    CLJ_SORTED_SET                        ;;
-    CLJ_SORTED_SET_EMPTY                  ;;
+    CLJ_SORTED_SET                        ;; +
+    CLJ_SORTED_SET_EMPTY                  ;; +
     CLJ_SORTED_MAP
+    CLJ_SORTED_MAP_EMPTY
     URI                                   ;; +
     URL                                   ;; +
     EXCEPTION
