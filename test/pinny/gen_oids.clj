@@ -59,12 +59,13 @@
     CLJ_QUEUE_EMPTY                       ;; +
     CLJ_MAP                               ;; +
     CLJ_MAP_EMPTY                         ;; +
-    CLJ_MAP_ENTRY                         ;;
+    CLJ_MAP_ENTRY                         ;; +
     CLJ_RECORD                            ;; +
     JVM_MAP                               ;;
     JVM_MAP_ENTRY                         ;;
     UUID                                  ;; +
     JVM_LIST
+    JVM_VECTOR
     JVM_ITERABLE
     JVM_ITERATOR
     JVM_STREAM

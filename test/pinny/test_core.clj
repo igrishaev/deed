@@ -369,6 +369,17 @@
     (is (= {:foo {:bar {:baz true}}} (enc-dec {:foo {:bar {:baz true}}})))
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
 
+  (testing "clojure map entry"
+    (let [a (first {:foo 1})
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= "clojure.lang.MapEntry" (-> b class .getName))))
+    (let [a (seq {:foo 1 :bar 2})
+          b (enc-dec a)]
+      (is (= [[:foo 1] [:bar 2]] (vec b)))
+      (is (= {:foo 1 :bar 2}
+             (into {} b)))))
+
   (testing "clojure vector"
     (let [a [1 2 3]
           b (enc-dec a)]
