@@ -670,6 +670,25 @@ public final class Encoder implements AutoCloseable {
         encodeUncountable(OID.CLJ_SEQ, seq);
     }
 
+    @SuppressWarnings("unused")
+    public void encodeClojureList(final PersistentList l) {
+        encodeCountable(OID.CLJ_LIST, l.count(), l);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeClojureEmptyList(final Object ignored) {
+        // A workaround with the private PersistentList.EmptyList class
+        writeOID(OID.CLJ_LIST_EMPTY);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeClojureQueue(final PersistentQueue q) {
+        if (q.isEmpty()) {
+            writeOID(OID.CLJ_QUEUE_EMPTY);
+        } else {
+            encodeCountable(OID.CLJ_QUEUE, q.count(), q);
+        }
+    }
 
     // TODO: drop it
     @SuppressWarnings("unused")

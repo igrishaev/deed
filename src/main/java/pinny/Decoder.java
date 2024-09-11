@@ -234,7 +234,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
         return v.persistent().seq();
     }
-    
+
     public IPersistentCollection readClojureVector() {
         Object x;
         final int len = readInteger();
@@ -244,6 +244,17 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             v = v.conj(x);
         }
         return v.persistent();
+    }
+
+    public PersistentQueue readClojureQueue() {
+        Object x;
+        final int len = readInteger();
+        PersistentQueue q = PersistentQueue.EMPTY;
+        for (int i = 0; i < len; i++) {
+            x = decode();
+            q = q.cons(x);
+        }
+        return q;
     }
 
     public Map<?,?> readJavaMap() {
@@ -456,6 +467,31 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return LocalDate.ofEpochDay(days);
     }
 
+    public MapEntry readClojureMapEntry() {
+        final Object key = decode();
+        final Object val = decode();
+        return MapEntry.create(key, val);
+    }
+
+    public Map.Entry<?,?> readJavaMapEntry() {
+        final Object key = decode();
+        final Object val = decode();
+        return new Map.Entry<>() {
+            @Override
+            public Object getKey() {
+                return key;
+            }
+            @Override
+            public Object getValue() {
+                return val;
+            }
+            @Override
+            public Object setValue(Object value) {
+                throw Err.error("cannot set value for entry, value: %s", value);
+            }
+        };
+    }
+
     public Object decode() {
         int r;
 
@@ -474,6 +510,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.JVM_MAP_ENTRY -> readJavaMapEntry();
+            case OID.CLJ_MAP_ENTRY -> readClojureMapEntry();
+            case OID.CLJ_QUEUE_EMPTY -> PersistentQueue.EMPTY;
+            case OID.CLJ_QUEUE -> readClojureQueue();
+            case OID.CLJ_LIST_EMPTY -> PersistentList.EMPTY;
+            case OID.CLJ_LIST, OID.CLJ_VEC -> readClojureVector();
             case OID.CLJ_SEQ, OID.CLJ_LAZY_SEQ -> readClojureSeq();
             case OID.SQL_TIME -> readSqlTime();
             case OID.SQL_DATE -> readSqlDate();
@@ -497,11 +539,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.UTIL_DATE -> readUtilDate();
             case OID.DT_INSTANT -> readInstant();
             case OID.CLJ_VEC_EMPTY -> PersistentVector.EMPTY;
-            case OID.CLJ_VEC -> readClojureVector();
             case OID.DOUBLE -> readDouble();
-            case OID.DOUBLE_ONE -> (double)1;
-            case OID.DOUBLE_MINUS_ONE -> (double)-1;
-            case OID.DOUBLE_ZERO -> (double)0;
+            case OID.DOUBLE_ONE -> Const.DOUBLE_ONE;
+            case OID.DOUBLE_MINUS_ONE -> Const.DOUBLE_MINUS_ONE;
+            case OID.DOUBLE_ZERO -> Const.DOUBLE_ZERO;
             case OID.REGEX -> readRegex();
             case OID.NULL -> null;
             case OID.BOOL_FALSE -> false;
@@ -539,9 +580,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_MAP_EMPTY -> PersistentArrayMap.EMPTY;
             case OID.JVM_MAP -> readJavaMap();
             case OID.BYTE -> readByte();
-            case OID.BYTE_MINUS_ONE -> (byte)-1;
-            case OID.BYTE_ZERO -> (byte)0;
-            case OID.BYTE_ONE -> (byte)1;
+            case OID.BYTE_MINUS_ONE -> Const.BYTE_MINUS_ONE;
+            case OID.BYTE_ZERO -> Const.BYTE_ZERO;
+            case OID.BYTE_ONE -> Const.BYTE_ONE;
             case OID.ARR_BYTE -> readBytes();
             case OID.ARR_OBJ -> readObjectArray();
             case OID.ARR_INT -> readIntArray();

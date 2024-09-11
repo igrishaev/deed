@@ -53,7 +53,9 @@ public class OID {
     public static final short CLJ_LAZY_SEQ              = 0x002D;
     public static final short CLJ_SEQ                   = 0x002E;
     public static final short CLJ_LIST                  = 0x002F;
+    public static final short CLJ_LIST_EMPTY            = 0x102F;
     public static final short CLJ_QUEUE                 = 0x0030;
+    public static final short CLJ_QUEUE_EMPTY           = 0x1030;
     public static final short CLJ_MAP                   = 0x0031;
     public static final short CLJ_MAP_EMPTY             = 0x0032;
     public static final short JVM_MAP                   = 0x0033;

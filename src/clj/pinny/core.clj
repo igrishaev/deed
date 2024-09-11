@@ -9,10 +9,13 @@
                  IPersistentSet
                  APersistentSet
                  APersistentMap
-                 IPersistentList
+                 PersistentList
+                 PersistentList$EmptyList
                  PersistentTreeSet
                  PersistentTreeMap
+                 PersistentQueue
                  IRecord
+                 MapEntry
                  ASeq
                  Keyword
                  Symbol
@@ -37,6 +40,7 @@
               ZoneId)
    (java.util UUID
               Map
+              Map$Entry
               Date)
    (java.util.regex Pattern)
    (pinny Encoder Decoder Err EOF OID)))
@@ -178,6 +182,22 @@
   ;; Clojure collections
   ;;
 
+  PersistentList
+  (-encode [this ^Encoder encoder]
+    (.encodeClojureList encoder this))
+
+  PersistentList$EmptyList
+  (-encode [this ^Encoder encoder]
+    (.encodeClojureEmptyList encoder this))
+
+  MapEntry
+  (-encode [this ^Encoder encoder]
+    (.encodeClojureMapEntry encoder this))
+
+  PersistentQueue
+  (-encode [this ^Encoder encoder]
+    (.encodeClojureQueue encoder this))
+
   APersistentVector
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentVector encoder this))
@@ -206,8 +226,6 @@
   (-encode [this ^Encoder encoder]
     (.encodeLazySeq encoder this))
 
-
-
   ;;
   ;; Clojure records
   ;;
@@ -223,6 +241,10 @@
   Map
   (-encode [this ^Encoder encoder]
     (.encodeMap encoder this))
+
+  Map$Entry
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaMapEntry encoder this))
 
   ;;
   ;; SQL

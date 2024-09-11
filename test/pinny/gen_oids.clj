@@ -53,15 +53,16 @@
     CLJ_SET_EMPTY                         ;; +
     CLJ_LAZY_SEQ                          ;; +
     CLJ_SEQ                               ;; +
-    CLJ_LIST
-    CLJ_LIST_EMPTY
-    CLJ_QUEUE
+    CLJ_LIST                              ;; +
+    CLJ_LIST_EMPTY                        ;; +
+    CLJ_QUEUE                             ;; +
+    CLJ_QUEUE_EMPTY                       ;; +
     CLJ_MAP                               ;; +
-    CLJ_MAP_EMPTY                         ;;
-    CLJ_MAP_ENTRY
+    CLJ_MAP_EMPTY                         ;; +
+    CLJ_MAP_ENTRY                         ;;
     CLJ_RECORD                            ;; +
-    JVM_MAP
-    JVM_MAP_ENTRY
+    JVM_MAP                               ;;
+    JVM_MAP_ENTRY                         ;;
     UUID                                  ;; +
     JVM_LIST
     JVM_ITERABLE

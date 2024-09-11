@@ -18,6 +18,7 @@
    (java.net URL
              URI)
    (clojure.lang Atom
+                 PersistentQueue
                  Ref
                  BigInt
                  Ratio)
@@ -369,10 +370,26 @@
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
 
   (testing "clojure vector"
-    (is (= [1 2 3] (enc-dec [1 2 3])))
-    (let [x [1 2 3]]
-      (is (= [[1 2 3] [1 2 3] [1 2 3]] (enc-dec [x x x]))))
-    (is (= [] (enc-dec []))))
+    (let [a [1 2 3]
+          b (enc-dec a)]
+      (is (= a b))
+      (is (vector? b)))
+    (let [a []
+          b (enc-dec a)]
+      (is (= a b))
+      (is (vector? b))))
+
+  (testing "clojure list"
+    (let [a (list 1 2 3)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= [1 2 3] b))
+      (is (vector? b)))
+    (let [a (list)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= () b))
+      (is (list? b))))
 
   (testing "clojure set"
     (is (= #{1 2 3} (enc-dec #{1 2 3})))
@@ -395,7 +412,7 @@
           b (enc-dec a)]
       (is (seq? b))
       (is (= a b)))
-    (let [a (seq (list 1 2 3))
+    (let [a (seq (set [1 2 3]))
           b (enc-dec a)]
       (is (seq? b))
       (is (= a b)))
@@ -403,6 +420,19 @@
           b (enc-dec a)]
       (is (nil? b))
       (is (= a b))))
+
+  (testing "clojure queue"
+    (let [a PersistentQueue/EMPTY
+          b (enc-dec a)]
+      (is (= a b))
+      (is (instance? PersistentQueue b)))
+    (let [a (-> PersistentQueue/EMPTY
+                (conj 1)
+                (conj 2)
+                (conj 3))
+          b (enc-dec a)]
+      (is (= [1 2 3] a b))
+      (is (instance? PersistentQueue b))))
 
   (testing "lazy seq"
     (testing "map"
