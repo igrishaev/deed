@@ -64,12 +64,14 @@
     JVM_MAP                               ;; +
     JVM_MAP_ENTRY                         ;; +
     UUID                                  ;; +
-    JVM_LIST
-    JVM_VECTOR
-    JVM_ITERABLE
-    JVM_ITERATOR
-    JVM_STREAM
-    JVM_COLLECTION
+    JVM_LIST                              ;;
+    JVM_LIST_EMPTY                        ;;
+    JVM_VECTOR                            ;;
+    JVM_VECTOR_EMPTY                      ;;
+    JVM_ITERABLE                          ;;
+    JVM_ITERATOR                          ;;
+    JVM_STREAM                            ;;
+    JVM_COLLECTION                        ;;
     CLJ_KEYWORD                           ;; +
     CLJ_SYMBOL                            ;; +
     UTIL_DATE                             ;; +

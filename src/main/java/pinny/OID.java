@@ -64,6 +64,13 @@ public class OID {
     public static final short CLJ_RECORD                = -124;
     public static final short UUID                      = 0x0035;
     public static final short JVM_LIST                  = 0x0036;
+    public static final short JVM_LIST_EMPTY            = 0x1036;
+    public static final short JVM_VECTOR                = 0x3036;
+    public static final short JVM_VECTOR_EMPTY          = 0x4036;
+    public static final short JVM_ITERABLE              = 0x4136;
+    public static final short JVM_ITERATOR              = 0x4236;
+    public static final short JVM_STREAM                = 0x4336;
+    public static final short JVM_COLLECTION            = 0x4436;
     public static final short CLJ_KEYWORD               = 0x0037;
     public static final short CLJ_SYMBOL                = 0x0038;
     public static final short UTIL_DATE                 = 0x0039;

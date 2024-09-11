@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
@@ -690,6 +691,44 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
+    public void encodeJavaList(final List<?> l) {
+        if (l.isEmpty()) {
+            writeOID(OID.JVM_LIST_EMPTY);
+        } else {
+            encodeCountable(OID.JVM_LIST, l.size(), l);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeJavaVector(final Vector<?> v) {
+        if (v.isEmpty()) {
+            writeOID(OID.JVM_VECTOR_EMPTY);
+        } else {
+            encodeCountable(OID.JVM_VECTOR_EMPTY, v.size(), v);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeJavaIterable(final Iterable<?> iterable) {
+        encodeUncountable(OID.JVM_ITERABLE, iterable);
+    }
+
+//    @SuppressWarnings("unused")
+//    public void encodeJavaIterator(final Iterator<?> iterator) {
+//        encodeUncountable(OID.JVM_ITERATOR, iterator.);
+//    }
+
+//    @SuppressWarnings("unused")
+//    public void encodeJavaStream(final Stream<?> stream) {
+//        encodeUncountable(OID.JVM_ITERABLE, stream);
+//    }
+
+    @SuppressWarnings("unused")
+    public void encodeJavaCollection(final Collection<?> collection) {
+        encodeUncountable(OID.JVM_COLLECTION, collection);
+    }
+
     // TODO: drop it
     @SuppressWarnings("unused")
     public boolean encodeStandard(final Object x) {
@@ -704,10 +743,10 @@ public final class Encoder implements AutoCloseable {
             return true;
         }
 
-        if (x instanceof List<?> l) {
-            encodeCountable(OID.JVM_LIST, l.size(), l);
-            return true;
-        }
+//        if (x instanceof List<?> l) {
+//            encodeCountable(OID.JVM_LIST, l.size(), l);
+//            return true;
+//        }
 
 
         return false;
