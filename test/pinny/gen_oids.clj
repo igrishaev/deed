@@ -32,8 +32,8 @@
     REGEX                                 ;; +
     CLJ_SORTED_SET                        ;; +
     CLJ_SORTED_SET_EMPTY                  ;; +
-    CLJ_SORTED_MAP
-    CLJ_SORTED_MAP_EMPTY
+    CLJ_SORTED_MAP                        ;; +
+    CLJ_SORTED_MAP_EMPTY                  ;; +
     URI                                   ;; +
     URL                                   ;; +
     EXCEPTION
@@ -51,13 +51,13 @@
     FUTURE                                ;; +
     CLJ_SET                               ;; +
     CLJ_SET_EMPTY                         ;; +
-    CLJ_LAZY_SEQ
-    CLJ_SEQ
+    CLJ_LAZY_SEQ                          ;; +
+    CLJ_SEQ                               ;; +
     CLJ_LIST
     CLJ_LIST_EMPTY
     CLJ_QUEUE
     CLJ_MAP                               ;; +
-    CLJ_MAP_EMPTY                         ;; +
+    CLJ_MAP_EMPTY                         ;;
     CLJ_MAP_ENTRY
     CLJ_RECORD                            ;; +
     JVM_MAP

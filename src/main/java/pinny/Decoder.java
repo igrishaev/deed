@@ -204,6 +204,37 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return s;
     }
 
+    public PersistentTreeMap readClojureSortedMap() {
+        Object key;
+        Object val;
+        PersistentTreeMap m = PersistentTreeMap.EMPTY;
+        final int len = readInteger();
+        for (int i = 0; i < len; i++) {
+            key = decode();
+            val = decode();
+            m = m.assoc(key, val);
+        }
+        return m;
+    }
+
+    public ISeq readClojureSeq() {
+        int limit;
+        Object x;
+        ITransientCollection v = PersistentVector.EMPTY.asTransient();
+        while (true) {
+            limit = readInteger();
+            if (limit == 0) {
+                break;
+            } else {
+                for (int i = 0; i < limit; i++) {
+                    x = decode();
+                    v = v.conj(x);
+                }
+            }
+        }
+        return v.persistent().seq();
+    }
+    
     public IPersistentCollection readClojureVector() {
         Object x;
         final int len = readInteger();
@@ -443,6 +474,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.CLJ_SEQ, OID.CLJ_LAZY_SEQ -> readClojureSeq();
             case OID.SQL_TIME -> readSqlTime();
             case OID.SQL_DATE -> readSqlDate();
             case OID.SQL_TIMESTAMP -> readSqlTimestamp();
@@ -458,6 +490,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_SET -> readClojureSet();
             case OID.CLJ_SORTED_SET_EMPTY -> PersistentTreeSet.EMPTY;
             case OID.CLJ_SORTED_SET -> readClojureSortedSet();
+            case OID.CLJ_SORTED_MAP_EMPTY -> PersistentTreeMap.EMPTY;
+            case OID.CLJ_SORTED_MAP -> readClojureSortedMap();
             case OID.DT_LOCAL_DATE -> readLocalDate();
             case OID.DT_LOCAL_TIME -> readLocalTime();
             case OID.UTIL_DATE -> readUtilDate();

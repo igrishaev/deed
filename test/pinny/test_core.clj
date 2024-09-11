@@ -390,6 +390,69 @@
       (is (= "clojure.lang.PersistentTreeSet" (-> b class .getName)))
       (is (= a b))))
 
+  (testing "clojure seq"
+    (let [a (seq [1 2 3])
+          b (enc-dec a)]
+      (is (seq? b))
+      (is (= a b)))
+    (let [a (seq (list 1 2 3))
+          b (enc-dec a)]
+      (is (seq? b))
+      (is (= a b)))
+    (let [a (seq [])
+          b (enc-dec a)]
+      (is (nil? b))
+      (is (= a b))))
+
+  (testing "lazy seq"
+    (testing "map"
+      (let [a (map inc [1 2 3])
+            b (enc-dec a)]
+        (is (seq? b))
+        (is (= a b))))
+
+    (testing "for"
+      (let [a (for [x [1 2 3]]
+                {x "hello"})
+            b (enc-dec a)]
+        (is (seq? b))
+        (is (= '({1 "hello"} {2 "hello"} {3 "hello"}) b))))
+
+    (testing "repeat"
+      (let [a (repeat 42 0)
+            b (enc-dec a)]
+        (is (seq? b))
+        (is (= 42 (count b)))
+        (is (= #{0} (set b)))))
+
+    (testing "->> combo"
+      (let [a (->> (range 999)
+                   (filter int?)
+                   (filter even?)
+                   (map inc)
+                   (map str)
+                   (take 16))
+            b (enc-dec a)]
+        (is (seq? b))
+        (is (= '("1" "3" "5" "7" "9" "11" "13" "15" "17" "19" "21" "23" "25" "27" "29" "31") b))))
+
+    (testing "repeat huge"
+      (let [a (repeat 0xFFFF :kek)
+            b (enc-dec a)]
+        (is (seq? b))
+        (is (= 0xFFFF (count b)))
+        (is (= #{:kek} (set b))))))
+
+  (testing "clojure sorted map"
+    (let [a (sorted-map 1 2 3 4)
+          b (enc-dec a)]
+      (is (= "clojure.lang.PersistentTreeMap" (-> b class .getName)))
+      (is (= a b)))
+    (let [a (sorted-map)
+          b (enc-dec a)]
+      (is (= "clojure.lang.PersistentTreeMap" (-> b class .getName)))
+      (is (= a b))))
+
   (testing "unknown record"
     (let [r1 (new Foo 1 2 3)
           r2 (enc-dec r1)]

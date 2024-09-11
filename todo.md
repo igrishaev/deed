@@ -20,7 +20,9 @@
 - tests
 - test future timeout options
 - rename
-- optiont: skip unsupported (enc/dec)
+- option: skip unsupported (enc/dec)
+- option: object chunk
+- option: uncountable max size
 
 - docs
 - spec

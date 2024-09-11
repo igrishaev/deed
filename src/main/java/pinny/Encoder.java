@@ -651,7 +651,24 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
+    public void encodeSortedMap(final PersistentTreeMap s) {
+        if (s.isEmpty()) {
+            writeOID(OID.CLJ_SORTED_MAP_EMPTY);
+        } else {
+            encodeAsMap(OID.CLJ_SORTED_MAP, s);
+        }
+    }
 
+    @SuppressWarnings("unused")
+    public void encodeLazySeq(final LazySeq lz) {
+        encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeClojureSeq(final ASeq seq) {
+        encodeUncountable(OID.CLJ_SEQ, seq);
+    }
 
 
     // TODO: drop it
@@ -667,10 +684,7 @@ public final class Encoder implements AutoCloseable {
             encodeCountable(OID.CLJ_LIST, l.count(), l);
             return true;
         }
-        if (x instanceof LazySeq lz) {
-            encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
-            return true;
-        }
+
         if (x instanceof List<?> l) {
             encodeCountable(OID.JVM_LIST, l.size(), l);
             return true;
@@ -689,7 +703,7 @@ public final class Encoder implements AutoCloseable {
         final int limit = Const.OBJ_CHUNK_SIZE;
         final Object[] chunk = new Object[limit];
         int pos = 0;
-        for (final Object x: iterable) {
+        for (Object x: iterable) {
             chunk[pos] = x;
             pos++;
             if (pos == limit) {

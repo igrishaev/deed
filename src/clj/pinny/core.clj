@@ -11,7 +11,9 @@
                  APersistentMap
                  IPersistentList
                  PersistentTreeSet
+                 PersistentTreeMap
                  IRecord
+                 ASeq
                  Keyword
                  Symbol
                  Ratio
@@ -188,9 +190,23 @@
   (-encode [this ^Encoder encoder]
     (.encodeSortedSet encoder this))
 
+  PersistentTreeMap
+  (-encode [this ^Encoder encoder]
+    (.encodeSortedMap encoder this))
+
   APersistentSet
   (-encode [this ^Encoder encoder]
     (.encodeAPersistentSet encoder this))
+
+  ASeq
+  (-encode [this ^Encoder encoder]
+    (.encodeClojureSeq encoder this))
+
+  LazySeq
+  (-encode [this ^Encoder encoder]
+    (.encodeLazySeq encoder this))
+
+
 
   ;;
   ;; Clojure records
