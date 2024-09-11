@@ -14,7 +14,8 @@
               ZoneId)
    (java.sql Time
              Timestamp)
-   (java.util Date)
+   (java.util Date
+              HashMap)
    (java.net URL
              URI)
    (clojure.lang Atom
@@ -368,6 +369,26 @@
     (is (= {} (enc-dec {})))
     (is (= {:foo {:bar {:baz true}}} (enc-dec {:foo {:bar {:baz true}}})))
     (is (= {{:id 1} "foo"} (enc-dec {{:id 1} "foo"}))))
+
+  (testing "java map"
+    (let [a (doto (new HashMap)
+              (.put 1 2)
+              (.put 3 4))
+          b (enc-dec a)]
+      (is (= {1 2 3 4} b))
+      (is (instance? HashMap b)))
+    (let [a (new HashMap)
+          b (enc-dec a)]
+      (is (= {} b))
+      (is (instance? HashMap b))))
+
+  (testing "java map entry"
+    (let [a (first
+             (doto (new HashMap)
+               (.put 1 2)
+               (.put 3 4)))
+          b (enc-dec a)]
+      (is (= "Map.Entry<1, 2>" (str b)))))
 
   (testing "clojure map entry"
     (let [a (first {:foo 1})

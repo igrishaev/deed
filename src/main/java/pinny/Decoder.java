@@ -489,6 +489,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             public Object setValue(Object value) {
                 throw Err.error("cannot set value for entry, value: %s", value);
             }
+            @Override
+            public String toString() {
+                return String.format("Map.Entry<%s, %s>", key, val);
+            }
         };
     }
 
