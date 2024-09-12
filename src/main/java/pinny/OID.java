@@ -70,7 +70,6 @@ public class OID {
     public static final short JVM_ITERABLE              = 0x4136;
     public static final short JVM_ITERATOR              = 0x4236;
     public static final short JVM_STREAM                = 0x4336;
-    public static final short JVM_COLLECTION            = 0x4436;
     public static final short CLJ_KEYWORD               = 0x0037;
     public static final short CLJ_SYMBOL                = 0x0038;
     public static final short UTIL_DATE                 = 0x0039;

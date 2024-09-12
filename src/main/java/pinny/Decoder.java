@@ -235,6 +235,28 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return v.persistent().seq();
     }
 
+    public List<?> readJavaList() {
+        Object x;
+        final int len = readInteger();
+        final ArrayList<Object> list = new ArrayList<>(len);
+        for (int i = 0; i < len; i++) {
+            x = decode();
+            list.add(x);
+        }
+        return list;
+    }
+
+    public Vector<?> readJavaVector() {
+        Object x;
+        final int len = readInteger();
+        final Vector<Object> vector = new Vector<>(len);
+        for (int i = 0; i < len; i++) {
+            x = decode();
+            vector.add(x);
+        }
+        return vector;
+    }
+
     public IPersistentCollection readClojureVector() {
         Object x;
         final int len = readInteger();
@@ -476,24 +498,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public Map.Entry<?,?> readJavaMapEntry() {
         final Object key = decode();
         final Object val = decode();
-        return new Map.Entry<>() {
-            @Override
-            public Object getKey() {
-                return key;
-            }
-            @Override
-            public Object getValue() {
-                return val;
-            }
-            @Override
-            public Object setValue(Object value) {
-                throw Err.error("cannot set value for entry, value: %s", value);
-            }
-            @Override
-            public String toString() {
-                return String.format("Map.Entry<%s, %s>", key, val);
-            }
-        };
+        return new MEntry(key, val);
     }
 
     public Object decode() {
@@ -513,7 +518,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
         final short oid = readShort();
 
+        // stream iterator iterable chunked
+
         return switch (oid) {
+            case OID.JVM_STREAM -> readJavaList().stream();
+            // case OID.JVM_ITERATOR -> readJavaList().iterator();
+            // case OID.JVM_ITERABLE
+            case OID.JVM_LIST -> readJavaList();
+            case OID.JVM_VECTOR -> readJavaVector();
+            case OID.JVM_VECTOR_EMPTY -> new Vector<>();
+            case OID.JVM_LIST_EMPTY -> List.of();
             case OID.JVM_MAP_ENTRY -> readJavaMapEntry();
             case OID.CLJ_MAP_ENTRY -> readClojureMapEntry();
             case OID.CLJ_QUEUE_EMPTY -> PersistentQueue.EMPTY;

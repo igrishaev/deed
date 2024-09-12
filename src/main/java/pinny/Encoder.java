@@ -663,12 +663,12 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeLazySeq(final LazySeq lz) {
-        encodeUncountable(OID.CLJ_LAZY_SEQ, lz);
+        encodeUncountable(OID.CLJ_LAZY_SEQ, lz.iterator());
     }
 
     @SuppressWarnings("unused")
     public void encodeClojureSeq(final ASeq seq) {
-        encodeUncountable(OID.CLJ_SEQ, seq);
+        encodeUncountable(OID.CLJ_SEQ, seq.iterator());
     }
 
     @SuppressWarnings("unused")
@@ -678,7 +678,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeClojureEmptyList(final Object ignored) {
-        // A workaround with the private PersistentList.EmptyList class
+        // A workaround for the private PersistentList.EmptyList class
         writeOID(OID.CLJ_LIST_EMPTY);
     }
 
@@ -711,57 +711,31 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeJavaIterable(final Iterable<?> iterable) {
-        encodeUncountable(OID.JVM_ITERABLE, iterable);
+        encodeUncountable(OID.JVM_ITERABLE, iterable.iterator());
     }
 
-//    @SuppressWarnings("unused")
-//    public void encodeJavaIterator(final Iterator<?> iterator) {
-//        encodeUncountable(OID.JVM_ITERATOR, iterator.);
-//    }
-
-//    @SuppressWarnings("unused")
-//    public void encodeJavaStream(final Stream<?> stream) {
-//        encodeUncountable(OID.JVM_ITERABLE, stream);
-//    }
-
     @SuppressWarnings("unused")
-    public void encodeJavaCollection(final Collection<?> collection) {
-        encodeUncountable(OID.JVM_COLLECTION, collection);
+    public void encodeJavaIterator(final Iterator<?> iterator) {
+        encodeUncountable(OID.JVM_ITERATOR, iterator);
     }
 
-    // TODO: drop it
     @SuppressWarnings("unused")
-    public boolean encodeStandard(final Object x) {
-
-        if (x instanceof Map.Entry<?,?> me) {
-            encodeJavaMapEntry(me);
-            return true;
-        }
-
-        if (x instanceof PersistentList l) {
-            encodeCountable(OID.CLJ_LIST, l.count(), l);
-            return true;
-        }
-
-//        if (x instanceof List<?> l) {
-//            encodeCountable(OID.JVM_LIST, l.size(), l);
-//            return true;
-//        }
-
-
-        return false;
+    public void encodeJavaStream(final Stream<?> stream) {
+        encodeUncountable(OID.JVM_ITERABLE, stream.iterator());
     }
 
     public void encode(final Object x) {
         protoEncode.invoke(x, this);
     }
 
-    public void encodeUncountable(final short oid, final Iterable<?> iterable) {
+    public void encodeUncountable(final short oid, final Iterator<?> iterator) {
         writeOID(oid);
+        Object x;
         final int limit = Const.OBJ_CHUNK_SIZE;
         final Object[] chunk = new Object[limit];
         int pos = 0;
-        for (Object x: iterable) {
+        while (iterator.hasNext()) {
+            x = iterator.next();
             chunk[pos] = x;
             pos++;
             if (pos == limit) {

@@ -41,9 +41,14 @@
    (java.util UUID
               Map
               Map$Entry
+              List
+              Vector
+              Iterator
               Date)
    (java.util.regex Pattern)
    (pinny Encoder Decoder Err EOF OID)))
+
+;; TODO: stream
 
 (set! *warn-on-reflection* true)
 
@@ -237,6 +242,22 @@
   ;;
   ;; Java Collections
   ;;
+
+  List
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaList encoder this))
+
+  Vector
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaVector encoder this))
+
+  Iterable
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaIterable encoder this))
+
+  Iterator
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaIterator encoder this))
 
   Map
   (-encode [this ^Encoder encoder]

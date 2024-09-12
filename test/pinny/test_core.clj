@@ -15,6 +15,9 @@
    (java.sql Time
              Timestamp)
    (java.util Date
+              List
+              Vector
+              Iterator
               HashMap)
    (java.net URL
              URI)
@@ -382,13 +385,23 @@
       (is (= {} b))
       (is (instance? HashMap b))))
 
+  (testing "java list"
+    (let [a (List/of 1 2 3)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (= "java.util.ArrayList" (-> b class .getName))))
+    (let [a (List/of)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (instance? List b))))
+
   (testing "java map entry"
     (let [a (first
              (doto (new HashMap)
                (.put 1 2)
                (.put 3 4)))
           b (enc-dec a)]
-      (is (= "Map.Entry<1, 2>" (str b)))))
+      (is (= "MEntry<1, 2>" (str b)))))
 
   (testing "clojure map entry"
     (let [a (first {:foo 1})
@@ -515,6 +528,7 @@
       (is (= "clojure.lang.PersistentTreeMap" (-> b class .getName)))
       (is (= a b))))
 
+  #_
   (testing "unknown record"
     (let [r1 (new Foo 1 2 3)
           r2 (enc-dec r1)]

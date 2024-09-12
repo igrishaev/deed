@@ -3,6 +3,7 @@
 - set min java version
 - relax mode? strict mode?
 - cypher in/out
+- meta support?
 - fix runtime exceptions
 - better header
 - header fixed size
