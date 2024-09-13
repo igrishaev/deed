@@ -705,7 +705,7 @@ public final class Encoder implements AutoCloseable {
         if (v.isEmpty()) {
             writeOID(OID.JVM_VECTOR_EMPTY);
         } else {
-            encodeCountable(OID.JVM_VECTOR_EMPTY, v.size(), v);
+            encodeCountable(OID.JVM_VECTOR, v.size(), v);
         }
     }
 
@@ -721,7 +721,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeJavaStream(final Stream<?> stream) {
-        encodeUncountable(OID.JVM_ITERABLE, stream.iterator());
+        encodeUncountable(OID.JVM_STREAM, stream.iterator());
     }
 
     public void encode(final Object x) {

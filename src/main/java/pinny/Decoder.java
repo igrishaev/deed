@@ -235,6 +235,24 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return v.persistent().seq();
     }
 
+    public ArrayList<?> readChunkedList() {
+        int limit;
+        Object x;
+        final ArrayList<Object> list = new ArrayList<>();
+        while (true) {
+            limit = readInteger();
+            if (limit == 0) {
+                break;
+            } else {
+                for (int i = 0; i < limit; i++) {
+                    x = decode();
+                    list.add(x);
+                }
+            }
+        }
+        return list;
+    }
+
     public List<?> readJavaList() {
         Object x;
         final int len = readInteger();
@@ -518,12 +536,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
         final short oid = readShort();
 
-        // stream iterator iterable chunked
-
         return switch (oid) {
-            case OID.JVM_STREAM -> readJavaList().stream();
-            // case OID.JVM_ITERATOR -> readJavaList().iterator();
-            // case OID.JVM_ITERABLE
+            case OID.JVM_STREAM -> readChunkedList().stream();
+            case OID.JVM_ITERATOR -> readChunkedList().iterator();
+            case OID.JVM_ITERABLE -> readChunkedList();
             case OID.JVM_LIST -> readJavaList();
             case OID.JVM_VECTOR -> readJavaVector();
             case OID.JVM_VECTOR_EMPTY -> new Vector<>();

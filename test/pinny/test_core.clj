@@ -14,14 +14,18 @@
               ZoneId)
    (java.sql Time
              Timestamp)
+   (java.util.stream Stream)
    (java.util Date
               List
+              ArrayList
               Vector
               Iterator
               HashMap)
    (java.net URL
              URI)
+   (java.util.concurrent ArrayBlockingQueue)
    (clojure.lang Atom
+                 RT
                  PersistentQueue
                  Ref
                  BigInt
@@ -394,6 +398,44 @@
           b (enc-dec a)]
       (is (= a b))
       (is (instance? List b))))
+
+  (testing "java vector"
+    (let [a (doto (new Vector)
+              (.add 1)
+              (.add 2)
+              (.add 3))
+          b (enc-dec a)]
+      (is (= a b))
+      (is (instance? Vector b)))
+    (let [a (new Vector)
+          b (enc-dec a)]
+      (is (= a b))
+      (is (instance? Vector b))))
+
+  (testing "java iterable"
+    (let [a (doto (new ArrayBlockingQueue 8)
+              (.add 1)
+              (.add 2)
+              (.add 3))
+          b (enc-dec a)]
+      (is (= (vec a) (vec b)))
+      (is (instance? ArrayList b))))
+
+  (testing "java iterator"
+    (let [a (RT/iter [1 2 3])
+          b (enc-dec a)]
+      (is (instance? Iterator b))
+      (is (= [1 2 3]
+             (-> b iterator-seq vec)))))
+
+  (testing "java stream"
+    (let [a (doto (new ArrayList)
+              (.add 1)
+              (.add 2)
+              (.add 3))
+          b (enc-dec (.stream a))]
+      (is (= [1 2 3] (-> ^Stream b .toArray vec)))
+      (is (instance? Stream b))))
 
   (testing "java map entry"
     (let [a (first

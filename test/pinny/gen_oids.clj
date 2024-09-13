@@ -66,11 +66,11 @@
     UUID                                  ;; +
     JVM_LIST                              ;; +
     JVM_LIST_EMPTY                        ;; +
-    JVM_VECTOR                            ;;
-    JVM_VECTOR_EMPTY                      ;;
-    JVM_ITERABLE                          ;;
-    JVM_ITERATOR                          ;;
-    JVM_STREAM                            ;;
+    JVM_VECTOR                            ;; +
+    JVM_VECTOR_EMPTY                      ;; +
+    JVM_ITERABLE                          ;; +
+    JVM_ITERATOR                          ;; +
+    JVM_STREAM                            ;; +
     CLJ_KEYWORD                           ;; +
     CLJ_SYMBOL                            ;; +
     UTIL_DATE                             ;; +

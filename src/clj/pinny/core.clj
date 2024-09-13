@@ -24,6 +24,7 @@
                  BigInt
                  Ref
                  LazySeq)
+   (java.util.stream Stream)
    (java.math BigInteger
               BigDecimal)
    (java.net URL
@@ -39,6 +40,7 @@
               Period
               ZoneId)
    (java.util UUID
+              AbstractCollection
               Map
               Map$Entry
               List
@@ -47,8 +49,6 @@
               Date)
    (java.util.regex Pattern)
    (pinny Encoder Decoder Err EOF OID)))
-
-;; TODO: stream
 
 (set! *warn-on-reflection* true)
 
@@ -242,6 +242,10 @@
   ;;
   ;; Java Collections
   ;;
+
+  Stream
+  (-encode [this ^Encoder encoder]
+    (.encodeJavaStream encoder this))
 
   List
   (-encode [this ^Encoder encoder]
