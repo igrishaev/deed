@@ -688,7 +688,6 @@
     (is (= '[clojure.lang.Numbers divide "Numbers.java"]
            (-> m :trace first (subvec 0 3))))))
 
-;; check suppressed
 ;; check Exception
 ;; check ExInfo
 
@@ -710,20 +709,27 @@
     (is (= "Divide by zero" (ex-message c)))
     (is (nil? (ex-cause c)))
 
-    (is (= 1 m1))
-    (is (= 1 m2))
+    (is (= 2 (-> m1 :via count)))
+    (is (= 1 (-> m2 :via count)))))
 
+(deftest test-throwable-suppressed
 
-    #_
-    (is (= '{:via
-             [{:type java.lang.Throwable
-               :message "Divide by zero"
-               :at nil}]
-             :cause "Divide by zero"}
-           (-> m
-               (dissoc :trace)
-               (assoc-in [:via 0 :at] nil))))
+  (let [su (new Exception "4")
+        e3 (new Exception "3")
+        e2 (new Exception "2" e3)
+        e1 (new Exception "1" e2)
 
-    #_
-    (is (= '[clojure.lang.Numbers divide "Numbers.java"]
-           (-> m :trace first (subvec 0 3))))))
+        _ (.addSuppressed e3 su)
+
+        b (enc-dec e1)
+
+        root (-> b ex-cause ex-cause)
+
+        sups
+        (.getSuppressed root)]
+
+    (is (= 1 (count sups)))
+    (is (= "4" (-> sups
+                 first
+                 (ex-message))))
+    (is (= "3" (ex-message root)))))
