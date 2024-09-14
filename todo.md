@@ -6,6 +6,7 @@
 - meta support?
 - fix runtime exceptions
 - better header
+- Object: default toString or excepion?
 - header fixed size
 - decoder parse header
 - encode collections
