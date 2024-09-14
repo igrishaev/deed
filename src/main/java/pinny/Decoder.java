@@ -536,7 +536,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
     }
 
-    public ThrowableInfo readThrowableInfo() {
+    public Throwable readThrowable() {
         final boolean hasMessage = readBoolean();
         String message = null;
         if (hasMessage) {
@@ -558,15 +558,9 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             suppressed[i] = tryDecodeThrowable();
         }
 
-        return new ThrowableInfo(message, trace, cause, suppressed);
-    }
-
-    public Throwable readThrowable() {
-        final ThrowableInfo info = readThrowableInfo();
-
-        final Throwable result = new Throwable(info.message(), info.cause());
-        result.setStackTrace(info.trace());
-        for (Throwable s: info.suppressed()) {
+        final Throwable result = new Throwable(message, cause);
+        result.setStackTrace(trace);
+        for (Throwable s: suppressed) {
             result.addSuppressed(s);
         }
         return result;
@@ -574,14 +568,15 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public ExceptionInfo readExceptionInfo() {
         final IPersistentMap data = readClojureMap();
-        final ThrowableInfo info = readThrowableInfo();
+        final Throwable t = readThrowable();
+
         final ExceptionInfo result = new ExceptionInfo(
-                info.message(),
+                t.getMessage(),
                 data,
-                info.cause()
+                t.getCause()
         );
-        result.setStackTrace(info.trace());
-        for (Throwable s: info.suppressed()) {
+        result.setStackTrace(t.getStackTrace());
+        for (Throwable s: t.getSuppressed()) {
             result.addSuppressed(s);
         }
         return result;
