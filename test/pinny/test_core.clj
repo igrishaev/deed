@@ -25,6 +25,7 @@
              URI)
    (java.util.concurrent ArrayBlockingQueue)
    (clojure.lang Atom
+                 ExceptionInfo
                  RT
                  PersistentQueue
                  Ref
@@ -733,3 +734,24 @@
                  first
                  (ex-message))))
     (is (= "3" (ex-message root)))))
+
+;; rollback encode Throwable
+
+(deftest test-ex-info
+
+  (let [a (ex-info "a" {:a 1})
+        b (enc-dec a)]
+    (is (= 1 b))
+
+    ))
+
+(deftest test-ex-info-nested
+
+  (let [a (ex-info "a" {:a 1}
+                   (ex-info "b" {:b 1}
+                            (ex-info "c" {:c 1})))
+        b (enc-dec a)]
+
+    (is (= 1 b))
+
+    ))

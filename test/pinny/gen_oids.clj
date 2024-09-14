@@ -36,9 +36,9 @@
     CLJ_SORTED_MAP_EMPTY                  ;; +
     URI                                   ;; +
     URL                                   ;; +
-    EXCEPTION
-    THROWABLE
-    EX_INFO
+    EXCEPTION                             ;;
+    THROWABLE                             ;; +
+    EX_INFO                               ;;
     BOOL_TRUE                             ;; +
     BOOL_FALSE                            ;; +
     STRING                                ;; +

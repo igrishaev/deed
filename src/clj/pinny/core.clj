@@ -10,6 +10,7 @@
                  APersistentSet
                  APersistentMap
                  PersistentList
+                 ExceptionInfo
                  PersistentList$EmptyList
                  PersistentTreeSet
                  PersistentTreeMap
@@ -144,12 +145,16 @@
     (.encodePattern encoder this))
 
   ;;
-  ;; Throwable
+  ;; Exceptions
   ;;
 
   Throwable
   (-encode [this ^Encoder encoder]
     (.encodeThrowable encoder this))
+
+  ExceptionInfo
+  (-encode [this ^Encoder encoder]
+    (.encodeExceptionInfo encoder this))
 
   ;;
   ;; Net

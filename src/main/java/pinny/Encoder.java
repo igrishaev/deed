@@ -375,12 +375,16 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
-        writeOID(oid);
+    public void writeCountable(final int len, final Iterable<?> iterable) {
         writeInt(len);
         for (final Object x : iterable) {
             encode(x);
         }
+    }
+
+    public void encodeCountable(final short oid, final int len, final Iterable<?> iterable) {
+        writeOID(oid);
+        writeCountable(len, iterable);
     }
 
     @SuppressWarnings("unused")
@@ -571,13 +575,17 @@ public final class Encoder implements AutoCloseable {
         encodeAsUtilDate(OID.SQL_TIMESTAMP, ts);
     }
 
-    public void encodeAsMap(final short oid, final Map<?,?> m) {
-        writeOID(oid);
+    public void writeMap(final Map<?,?> m) {
         writeInt(m.size());
         for (final Map.Entry<?,?> e: m.entrySet()) {
             encode(e.getKey());
             encode(e.getValue());
         }
+    }
+
+    public void encodeAsMap(final short oid, final Map<?,?> m) {
+        writeOID(oid);
+        writeMap(m);
     }
 
     @SuppressWarnings("unused")
@@ -734,12 +742,12 @@ public final class Encoder implements AutoCloseable {
             writeBoolean(false);
         } else {
             writeBoolean(true);
-            writeThrowable(cause);
+            encodeThrowable(cause);
         }
 
         writeInt(suppressed.length);
         for (Throwable s: suppressed) {
-            writeThrowable(s);
+            encodeThrowable(s);
         }
     }
 
@@ -747,6 +755,23 @@ public final class Encoder implements AutoCloseable {
     public void encodeThrowable(final Throwable t) {
         writeOID(OID.THROWABLE);
         writeThrowable(t);
+    }
+
+    public Map<?,?> getExData(final ExceptionInfo e) {
+        final IPersistentMap data = e.getData();
+        if (data instanceof Map<?,?> m) {
+            return m;
+        } else {
+            throw Err.error("unsupported ex-data: %s %s", data.getClass(), data);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeExceptionInfo(final ExceptionInfo e) {
+        writeOID(OID.EX_INFO);
+        final Map<?,?> data = getExData(e);
+        writeMap(data);
+        writeThrowable(e);
     }
 
     @SuppressWarnings("unused")

@@ -527,7 +527,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new StackTraceElement(className, methodName, fileName, lineNumber);
     }
 
-    public Throwable readThrowable() {
+    public Throwable tryDecodeThrowable() {
+        final Object x = decode();
+        if (x instanceof Throwable t) {
+            return t;
+        } else {
+            throw Err.error("unexpected non-Throwable object: %s %s", x.getClass(), x);
+        }
+    }
+
+    public ThrowableInfo readThrowableInfo() {
         final boolean hasMessage = readBoolean();
         String message = null;
         if (hasMessage) {
@@ -541,17 +550,38 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final boolean hasCause = readBoolean();
         Throwable cause = null;
         if (hasCause) {
-            cause = readThrowable();
+            cause = tryDecodeThrowable();
         }
         final int suppressedLen = readInteger();
         final Throwable[] suppressed = new Throwable[suppressedLen];
         for (int i = 0; i < suppressedLen; i++) {
-            suppressed[i] = readThrowable();
+            suppressed[i] = tryDecodeThrowable();
         }
 
-        final Throwable result = new Throwable(message, cause);
-        result.setStackTrace(trace);
-        for (Throwable s: suppressed) {
+        return new ThrowableInfo(message, trace, cause, suppressed);
+    }
+
+    public Throwable readThrowable() {
+        final ThrowableInfo info = readThrowableInfo();
+
+        final Throwable result = new Throwable(info.message(), info.cause());
+        result.setStackTrace(info.trace());
+        for (Throwable s: info.suppressed()) {
+            result.addSuppressed(s);
+        }
+        return result;
+    }
+
+    public ExceptionInfo readExceptionInfo() {
+        final IPersistentMap data = readClojureMap();
+        final ThrowableInfo info = readThrowableInfo();
+        final ExceptionInfo result = new ExceptionInfo(
+                info.message(),
+                data,
+                info.cause()
+        );
+        result.setStackTrace(info.trace());
+        for (Throwable s: info.suppressed()) {
             result.addSuppressed(s);
         }
         return result;
@@ -575,6 +605,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.EX_INFO -> readExceptionInfo();
             case OID.THROWABLE -> readThrowable();
             case OID.JVM_STREAM -> readChunkedList().stream();
             case OID.JVM_ITERATOR -> readChunkedList().iterator();
