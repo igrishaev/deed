@@ -661,3 +661,16 @@
         (catch Exception e
           (is (= "future deref timeout (ms): 5000"
                  (ex-message e))))))))
+
+
+(deftest test-throwable-ok
+
+  (let [a (try
+            (/ 0 0)
+            (catch Exception e
+              e))
+        b (enc-dec a)]
+    (is (= 1 b))
+    )
+
+  )

@@ -4,6 +4,7 @@ import clojure.lang.IFn;
 import clojure.lang.PersistentVector;
 
 import java.io.*;
+import pinny.Decoder;
 
 import clojure.java.api.Clojure;
 

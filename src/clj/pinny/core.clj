@@ -144,6 +144,14 @@
     (.encodePattern encoder this))
 
   ;;
+  ;; Throwable
+  ;;
+
+  Throwable
+  (-encode [this ^Encoder encoder]
+    (.encodeThrowable encoder this))
+
+  ;;
   ;; Net
   ;;
 
@@ -473,6 +481,12 @@
 
 
 (comment
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (try
+                (/ 0 0)
+                (catch Exception e
+                  e))))
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e (new Foo 1 2 3)))

@@ -700,6 +700,55 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    public void writeStackTraceElement(final StackTraceElement element) {
+        writeString(element.getClassName());
+        writeString(element.getMethodName());
+        final String fileName = element.getFileName();
+        if (fileName == null) {
+            writeString("");
+        } else {
+            writeString(element.getFileName());
+        }
+        writeInt(element.getLineNumber());
+    }
+
+    public void writeThrowable(final Throwable t) {
+        final String message = t.getMessage();
+        final StackTraceElement[] trace = t.getStackTrace();
+        final Throwable cause = t.getCause();
+        final Throwable[] suppressed = t.getSuppressed();
+
+        if (message == null) {
+            writeBoolean(false);
+        } else {
+            writeBoolean(true);
+            writeString(message);
+        }
+
+        writeInt(trace.length);
+        for (StackTraceElement element: trace) {
+            writeStackTraceElement(element);
+        }
+
+        if (cause == null) {
+            writeBoolean(false);
+        } else {
+            writeBoolean(true);
+            writeThrowable(cause);
+        }
+
+        writeInt(suppressed.length);
+        for (Throwable s: suppressed) {
+            writeThrowable(s);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeThrowable(final Throwable t) {
+        writeOID(OID.THROWABLE);
+        writeThrowable(t);
+    }
+
     @SuppressWarnings("unused")
     public void encodeJavaVector(final Vector<?> v) {
         if (v.isEmpty()) {

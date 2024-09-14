@@ -519,6 +519,44 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new MEntry(key, val);
     }
 
+    public StackTraceElement readStackTraceElement() {
+        final String className = readString();
+        final String methodName = readString();
+        final String fileName = readString();
+        final int lineNumber = readInteger();
+        return new StackTraceElement(className, methodName, fileName, lineNumber);
+    }
+
+    public Throwable readThrowable() {
+        final boolean hasMessage = readBoolean();
+        String message = null;
+        if (hasMessage) {
+            message = readString();
+        }
+        final int traceLen = readInteger();
+        final StackTraceElement[] trace = new StackTraceElement[traceLen];
+        for (int i = 0; i < traceLen; i++) {
+            trace[i] = readStackTraceElement();
+        }
+        final boolean hasCause = readBoolean();
+        Throwable cause = null;
+        if (hasCause) {
+            cause = readThrowable();
+        }
+        final int suppressedLen = readInteger();
+        final Throwable[] suppressed = new Throwable[suppressedLen];
+        for (int i = 0; i < suppressedLen; i++) {
+            suppressed[i] = readThrowable();
+        }
+
+        final Throwable result = new Throwable(message, cause);
+        result.setStackTrace(trace);
+        for (Throwable s: suppressed) {
+            result.addSuppressed(s);
+        }
+        return result;
+    }
+
     public Object decode() {
         int r;
 
@@ -537,6 +575,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.THROWABLE -> readThrowable();
             case OID.JVM_STREAM -> readChunkedList().stream();
             case OID.JVM_ITERATOR -> readChunkedList().iterator();
             case OID.JVM_ITERABLE -> readChunkedList();
