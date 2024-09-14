@@ -662,15 +662,68 @@
           (is (= "future deref timeout (ms): 5000"
                  (ex-message e))))))))
 
-
 (deftest test-throwable-ok
 
   (let [a (try
             (/ 0 0)
             (catch Exception e
               e))
-        b (enc-dec a)]
-    (is (= 1 b))
-    )
+        b (enc-dec a)
+        m (Throwable->map b)
+        c (ex-cause b)]
 
-  )
+    (is (nil? c))
+    (is (instance? Throwable b))
+    (is (= "Divide by zero" (ex-message b)))
+
+    (is (= '{:via
+             [{:type java.lang.Throwable
+               :message "Divide by zero"
+               :at nil}]
+             :cause "Divide by zero"}
+           (-> m
+               (dissoc :trace)
+               (assoc-in [:via 0 :at] nil))))
+
+    (is (= '[clojure.lang.Numbers divide "Numbers.java"]
+           (-> m :trace first (subvec 0 3))))))
+
+;; check suppressed
+;; check Exception
+;; check ExInfo
+
+(deftest test-throwable-cause
+
+  (let [a (try
+            (/ 0 0)
+            (catch Exception e
+              (new Exception "math problem" e)))
+        b (enc-dec a)
+        c (ex-cause b)
+
+        m1 (Throwable->map b)
+        m2 (Throwable->map c)]
+
+    (is (instance? Throwable b))
+    (is (= "math problem" (ex-message b)))
+
+    (is (= "Divide by zero" (ex-message c)))
+    (is (nil? (ex-cause c)))
+
+    (is (= 1 m1))
+    (is (= 1 m2))
+
+
+    #_
+    (is (= '{:via
+             [{:type java.lang.Throwable
+               :message "Divide by zero"
+               :at nil}]
+             :cause "Divide by zero"}
+           (-> m
+               (dissoc :trace)
+               (assoc-in [:via 0 :at] nil))))
+
+    #_
+    (is (= '[clojure.lang.Numbers divide "Numbers.java"]
+           (-> m :trace first (subvec 0 3))))))
