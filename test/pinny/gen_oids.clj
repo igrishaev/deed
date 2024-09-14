@@ -38,7 +38,7 @@
     URL                                   ;; +
     EXCEPTION                             ;;
     THROWABLE                             ;; +
-    EX_INFO                               ;;
+    EX_INFO                               ;; +
     BOOL_TRUE                             ;; +
     BOOL_FALSE                            ;; +
     STRING                                ;; +

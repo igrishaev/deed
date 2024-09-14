@@ -735,23 +735,25 @@
                  (ex-message))))
     (is (= "3" (ex-message root)))))
 
-;; rollback encode Throwable
-
 (deftest test-ex-info
-
   (let [a (ex-info "a" {:a 1})
-        b (enc-dec a)]
-    (is (= 1 b))
-
-    ))
+        b (enc-dec a)
+        m (Throwable->map b)]
+    (is (instance? ExceptionInfo b))
+    (is (= {:a 1} (ex-data b)))))
 
 (deftest test-ex-info-nested
 
   (let [a (ex-info "a" {:a 1}
-                   (ex-info "b" {:b 1}
-                            (ex-info "c" {:c 1})))
-        b (enc-dec a)]
+                   (ex-info "b" {:b 2}
+                            (ex-info "c" {:c 3})))
+        b (enc-dec a)
+        m (Throwable->map b)]
 
-    (is (= 1 b))
-
-    ))
+    (is (= '[{:type clojure.lang.ExceptionInfo, :message "a", :data {:a 1}}
+             {:type clojure.lang.ExceptionInfo, :message "b", :data {:b 2}}
+             {:type clojure.lang.ExceptionInfo, :message "c", :data {:c 3}}]
+         (->> m
+              :via
+              (mapv (fn [row]
+                      (dissoc row :at))))))))

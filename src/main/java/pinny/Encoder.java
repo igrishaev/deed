@@ -742,12 +742,12 @@ public final class Encoder implements AutoCloseable {
             writeBoolean(false);
         } else {
             writeBoolean(true);
-            writeThrowable(cause);
+            encode(cause);
         }
 
         writeInt(suppressed.length);
         for (Throwable s: suppressed) {
-            writeThrowable(s);
+            encode(s);
         }
     }
 
