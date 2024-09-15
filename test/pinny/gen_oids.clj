@@ -15,7 +15,7 @@
     LONG_ZERO                             ;; +
     LONG_ONE                              ;; +
     LONG_MINUS_ONE                        ;; +
-    IO_INPUT_STREAM
+    IO_INPUT_STREAM                       ;;
     IO_READER
     IO_FILE
     BYTEBUFFER

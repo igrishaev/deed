@@ -129,6 +129,16 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    public void writeBytes(final byte[] bytes, final int off) {
+        final int len = bytes.length - off;
+        try {
+            dataOutputStream.writeInt(off);
+            dataOutputStream.write(bytes, off, len);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void writeString(final String s) {
         final byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         writeBytes(bytes);
@@ -826,6 +836,7 @@ public final class Encoder implements AutoCloseable {
         writeOID(oid);
         Object x;
         final int limit = Const.OBJ_CHUNK_SIZE;
+        // TODO: reuse array;
         final Object[] chunk = new Object[limit];
         int pos = 0;
         while (iterator.hasNext()) {
@@ -841,6 +852,36 @@ public final class Encoder implements AutoCloseable {
             encodeChunk(chunk, pos);
         }
         writeInt(0);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeInputStream(final InputStream in) {
+        writeOID(OID.IO_INPUT_STREAM);
+        final int len = 0xFFFF; // TODO: options
+        final byte[] buf = new byte[len];
+        int r;
+        int off = 0;
+        while (true) {
+            try {
+                r = in.readNBytes(buf, off, len);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (r == -1) {
+                break;
+            } else {
+                off += r;
+                if (off == len - 1) {
+                    off = 0;
+                    writeBytes(buf);
+                }
+            }
+        }
+        if (off > 0) {
+            writeBytes(buf, off);
+        }
+        writeInt(0);
+
     }
 
     @SuppressWarnings("unused")

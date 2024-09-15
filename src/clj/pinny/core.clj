@@ -3,7 +3,8 @@
    [clojure.java.io :as io])
   (:import
    (java.util.concurrent Future)
-   (java.io IOException)
+   (java.io IOException
+            InputStream)
    (clojure.lang IPersistentVector
                  APersistentVector
                  PersistentVector
@@ -116,6 +117,14 @@
   Ratio
   (-encode [this ^Encoder encoder]
     (.encodeRatio encoder this))
+
+  ;;
+  ;; IO
+  ;;
+
+  InputStream
+  (-encode [this ^Encoder encoder]
+    (.encodeInputStream encoder this))
 
   ;;
   ;; String

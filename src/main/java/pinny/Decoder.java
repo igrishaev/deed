@@ -130,10 +130,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public byte[] readBytes() {
         final int size = readInteger();
         final byte[] buf = new byte[size];
-        try {
-            dataInputStream.readFully(buf);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (size > 0) {
+            try {
+                dataInputStream.readFully(buf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return buf;
     }
@@ -609,6 +611,26 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return result;
     }
 
+    public InputStream readInputStream() {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] bytes;
+        while (true) {
+            bytes = readBytes();
+            if (bytes.length == 0) {
+                break;
+            } else {
+                try {
+                    out.write(bytes);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        // TODO: use temp file maybe?
+        final byte[] buf = out.toByteArray();
+        return new ByteArrayInputStream(buf);
+    }
+
     public Object decode() {
         int r;
 
@@ -627,6 +649,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.IO_INPUT_STREAM -> readInputStream();
             case OID.EX_NPE -> readNullPointerException();
             case OID.IO_EXCEPTION -> readIOException();
             case OID.EXCEPTION -> readException();
