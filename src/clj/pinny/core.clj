@@ -3,6 +3,7 @@
    [clojure.java.io :as io])
   (:import
    (java.util.concurrent Future)
+   (java.io IOException)
    (clojure.lang IPersistentVector
                  APersistentVector
                  PersistentVector
@@ -152,9 +153,17 @@
   (-encode [this ^Encoder encoder]
     (.encodeThrowable encoder this))
 
+  Exception
+  (-encode [this ^Encoder encoder]
+    (.encodeException encoder this))
+
   ExceptionInfo
   (-encode [this ^Encoder encoder]
     (.encodeExceptionInfo encoder this))
+
+  IOException
+  (-encode [this ^Encoder encoder]
+    (.encodeIOException encoder this))
 
   ;;
   ;; Net

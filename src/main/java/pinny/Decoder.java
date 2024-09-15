@@ -527,7 +527,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new StackTraceElement(className, methodName, fileName, lineNumber);
     }
 
-    public Throwable tryDecodeThrowable() {
+    public Throwable decodeThrowable() {
         final Object x = decode();
         if (x instanceof Throwable t) {
             return t;
@@ -537,6 +537,22 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public Throwable readThrowable() {
+        return readThrowable(Throwable::new);
+    }
+
+    public Throwable readException() {
+        return readThrowable(Exception::new);
+    }
+
+    public Throwable readIOException() {
+        return readThrowable(IOException::new);
+    }
+
+    public interface MakeThrowable {
+        Throwable call(final String message, final Throwable cause);
+    }
+
+    public Throwable readThrowable(final MakeThrowable makeThrowable) {
         final boolean hasMessage = readBoolean();
         String message = null;
         if (hasMessage) {
@@ -550,15 +566,15 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final boolean hasCause = readBoolean();
         Throwable cause = null;
         if (hasCause) {
-            cause = tryDecodeThrowable();
+            cause = decodeThrowable();
         }
         final int suppressedLen = readInteger();
         final Throwable[] suppressed = new Throwable[suppressedLen];
         for (int i = 0; i < suppressedLen; i++) {
-            suppressed[i] = tryDecodeThrowable();
+            suppressed[i] = decodeThrowable();
         }
 
-        final Throwable result = new Throwable(message, cause);
+        final Throwable result = makeThrowable.call(message, cause);
         result.setStackTrace(trace);
         for (Throwable s: suppressed) {
             result.addSuppressed(s);
@@ -600,6 +616,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.IO_EXCEPTION -> readIOException();
+            case OID.EXCEPTION -> readException();
             case OID.EX_INFO -> readExceptionInfo();
             case OID.THROWABLE -> readThrowable();
             case OID.JVM_STREAM -> readChunkedList().stream();

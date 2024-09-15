@@ -751,10 +751,32 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    public void encodeAsThrowable(final short oid, final Throwable t) {
+        writeOID(oid);
+        writeThrowable(t);
+    }
+
     @SuppressWarnings("unused")
     public void encodeThrowable(final Throwable t) {
-        writeOID(OID.THROWABLE);
-        writeThrowable(t);
+        encodeAsThrowable(OID.THROWABLE, t);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeException(final Exception e) {
+        encodeAsThrowable(OID.EXCEPTION, e);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeIOException(final IOException e) {
+        encodeAsThrowable(OID.IO_EXCEPTION, e);
+    }
+
+    @SuppressWarnings("unused")
+    public void encodeExceptionInfo(final ExceptionInfo e) {
+        writeOID(OID.EX_INFO);
+        final Map<?,?> data = getExData(e);
+        writeMap(data);
+        writeThrowable(e);
     }
 
     public Map<?,?> getExData(final ExceptionInfo e) {
@@ -764,14 +786,6 @@ public final class Encoder implements AutoCloseable {
         } else {
             throw Err.error("unsupported ex-data: %s %s", data.getClass(), data);
         }
-    }
-
-    @SuppressWarnings("unused")
-    public void encodeExceptionInfo(final ExceptionInfo e) {
-        writeOID(OID.EX_INFO);
-        final Map<?,?> data = getExData(e);
-        writeMap(data);
-        writeThrowable(e);
     }
 
     @SuppressWarnings("unused")

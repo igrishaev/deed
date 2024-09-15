@@ -36,6 +36,7 @@ public class OID {
     public static final short URI                       = 0x001C;
     public static final short URL                       = 0x001D;
     public static final short EXCEPTION                 = 0x001E;
+    public static final short IO_EXCEPTION              = 0x101E;
     public static final short THROWABLE                 = 0x001F;
     public static final short EX_INFO                   = 0x0020;
     public static final short BOOL_TRUE                 = 0x0021;

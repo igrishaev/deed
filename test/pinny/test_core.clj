@@ -21,6 +21,7 @@
               Vector
               Iterator
               HashMap)
+   (java.io IOException)
    (java.net URL
              URI)
    (java.util.concurrent ArrayBlockingQueue)
@@ -663,7 +664,7 @@
           (is (= "future deref timeout (ms): 5000"
                  (ex-message e))))))))
 
-(deftest test-throwable-ok
+(deftest test-throwable-exception
 
   (let [a (try
             (/ 0 0)
@@ -674,11 +675,11 @@
         c (ex-cause b)]
 
     (is (nil? c))
-    (is (instance? Throwable b))
+    (is (instance? Exception b))
     (is (= "Divide by zero" (ex-message b)))
 
     (is (= '{:via
-             [{:type java.lang.Throwable
+             [{:type java.lang.Exception
                :message "Divide by zero"
                :at nil}]
              :cause "Divide by zero"}
@@ -688,9 +689,6 @@
 
     (is (= '[clojure.lang.Numbers divide "Numbers.java"]
            (-> m :trace first (subvec 0 3))))))
-
-;; check Exception
-;; check ExInfo
 
 (deftest test-throwable-cause
 
@@ -757,3 +755,24 @@
               :via
               (mapv (fn [row]
                       (dissoc row :at))))))))
+
+(deftest test-ex-io-nested
+
+  (let [a (new IOException "io"
+               (new Exception "ex"
+                    (ex-info "info" {:foo 1}
+                             (new IOException "root"))))
+        b (enc-dec a)
+        m (Throwable->map b)]
+
+    (is (= '[{:type java.io.IOException, :message "io"}
+             {:type java.lang.Exception, :message "ex"}
+             {:type clojure.lang.ExceptionInfo, :message "info", :data {:foo 1}}
+             {:type java.io.IOException, :message "root"}]
+           (->> m
+                :via
+                (mapv (fn [row]
+                        (dissoc row :at))))))))
+
+;; check NPE
+;; check unsupported throwable
