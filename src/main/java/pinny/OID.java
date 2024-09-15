@@ -3,7 +3,6 @@ package pinny;
 public class OID {
 
     public static final short NULL                      = 0x0000;
-    public static final short SERIALIZABLE              = 0x0001;
     public static final short INT                       = 0x0002;
     public static final short INT_ZERO                  = 0x0003;
     public static final short INT_ONE                   = 0x0004;
@@ -39,6 +38,7 @@ public class OID {
     public static final short IO_EXCEPTION              = 0x101E;
     public static final short THROWABLE                 = 0x001F;
     public static final short EX_INFO                   = 0x0020;
+    public static final short EX_NPE                    = 0x1020;
     public static final short BOOL_TRUE                 = 0x0021;
     public static final short BOOL_FALSE                = 0x0022;
     public static final short STRING                    = 0x0023;

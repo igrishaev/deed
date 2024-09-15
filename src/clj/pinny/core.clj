@@ -165,6 +165,10 @@
   (-encode [this ^Encoder encoder]
     (.encodeIOException encoder this))
 
+  NullPointerException
+  (-encode [this ^Encoder encoder]
+    (.encodeNullPointerException encoder this))
+
   ;;
   ;; Net
   ;;

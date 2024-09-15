@@ -774,5 +774,16 @@
                 (mapv (fn [row]
                         (dissoc row :at))))))))
 
-;; check NPE
+(deftest test-ex-NPE
+
+  (let [a (try
+            (/ 1 nil)
+            (catch NullPointerException e
+              e))
+        b (enc-dec a)]
+
+    (is (instance? NullPointerException b))
+    (is (= "Cannot invoke \"Object.getClass()\" because \"x\" is null"
+           (ex-message b)))))
+
 ;; check unsupported throwable

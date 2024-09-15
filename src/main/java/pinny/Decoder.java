@@ -548,8 +548,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return readThrowable(IOException::new);
     }
 
+    public Throwable readNullPointerException() {
+        return readThrowable(NullPointerException::new);
+    }
+
     public interface MakeThrowable {
-        Throwable call(final String message, final Throwable cause);
+        Throwable call(final String message);
     }
 
     public Throwable readThrowable(final MakeThrowable makeThrowable) {
@@ -574,7 +578,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             suppressed[i] = decodeThrowable();
         }
 
-        final Throwable result = makeThrowable.call(message, cause);
+        final Throwable result = makeThrowable.call(message);
+        if (cause != null) {
+            result.initCause(cause);
+        }
         result.setStackTrace(trace);
         for (Throwable s: suppressed) {
             result.addSuppressed(s);
@@ -616,6 +623,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = readShort();
 
         return switch (oid) {
+            case OID.EX_NPE -> readNullPointerException();
             case OID.IO_EXCEPTION -> readIOException();
             case OID.EXCEPTION -> readException();
             case OID.EX_INFO -> readExceptionInfo();

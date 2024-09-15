@@ -772,6 +772,11 @@ public final class Encoder implements AutoCloseable {
     }
 
     @SuppressWarnings("unused")
+    public void encodeNullPointerException(final NullPointerException e) {
+        encodeAsThrowable(OID.EX_NPE, e);
+    }
+
+    @SuppressWarnings("unused")
     public void encodeExceptionInfo(final ExceptionInfo e) {
         writeOID(OID.EX_INFO);
         final Map<?,?> data = getExData(e);

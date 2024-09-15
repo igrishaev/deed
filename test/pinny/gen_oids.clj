@@ -3,7 +3,6 @@
 (def OIDS                                 ;; tested?
   '[
     NULL                                  ;; +
-    SERIALIZABLE
     INT                                   ;; +
     INT_ZERO                              ;; +
     INT_ONE                               ;; +
@@ -40,6 +39,7 @@
     IO_EXCEPTION                          ;; +
     THROWABLE                             ;; +
     EX_INFO                               ;; +
+    EX_NPE                                ;; +
     BOOL_TRUE                             ;; +
     BOOL_FALSE                            ;; +
     STRING                                ;; +
