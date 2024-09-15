@@ -713,8 +713,9 @@ public final class Encoder implements AutoCloseable {
         writeString(element.getMethodName());
         final String fileName = element.getFileName();
         if (fileName == null) {
-            writeString("");
+            writeBoolean(false);
         } else {
+            writeBoolean(true);
             writeString(element.getFileName());
         }
         writeInt(element.getLineNumber());

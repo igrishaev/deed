@@ -520,9 +520,13 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public StackTraceElement readStackTraceElement() {
+        String fileName = null;
         final String className = readString();
         final String methodName = readString();
-        final String fileName = readString();
+        final boolean hasFileName = readBoolean();
+        if (hasFileName) {
+            fileName = readString();
+        }
         final int lineNumber = readInteger();
         return new StackTraceElement(className, methodName, fileName, lineNumber);
     }
