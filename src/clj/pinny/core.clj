@@ -509,6 +509,20 @@
 
 (comment
 
+  (require '[clojure.string :as str])
+
+  (def ^String STRING
+    (str/join (repeat 3000 "abcabcabcabcabcabcabcabcabcabcabcabc")))
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (-> (subs STRING 0 0xFFFF) .getBytes (io/input-stream))))
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (-> STRING .getBytes (io/input-stream))))
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (-> "hello" .getBytes (io/input-stream))))
+
   (with-encoder [e (io/file "test.aaa")]
     (encode e (try
                 (/ 0 0)

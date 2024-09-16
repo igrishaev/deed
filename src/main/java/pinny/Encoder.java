@@ -129,10 +129,9 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void writeBytes(final byte[] bytes, final int off) {
-        final int len = bytes.length - off;
+    public void writeBytes(final byte[] bytes, final int off, final int len) {
         try {
-            dataOutputStream.writeInt(off);
+            dataOutputStream.writeInt(len);
             dataOutputStream.write(bytes, off, len);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -863,7 +862,7 @@ public final class Encoder implements AutoCloseable {
         int off = 0;
         while (true) {
             try {
-                r = in.readNBytes(buf, off, len);
+                r = in.read(buf, off, len - off);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -871,17 +870,16 @@ public final class Encoder implements AutoCloseable {
                 break;
             } else {
                 off += r;
-                if (off == len - 1) {
+                if (off == len) {
                     off = 0;
                     writeBytes(buf);
                 }
             }
         }
         if (off > 0) {
-            writeBytes(buf, off);
+            writeBytes(buf, 0, off);
         }
         writeInt(0);
-
     }
 
     @SuppressWarnings("unused")

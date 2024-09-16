@@ -21,7 +21,8 @@
               Vector
               Iterator
               HashMap)
-   (java.io IOException)
+   (java.io IOException
+            InputStream)
    (java.net URL
              URI)
    (java.util.concurrent ArrayBlockingQueue)
@@ -35,6 +36,7 @@
    (java.util.regex Pattern)
    (java.io ByteArrayOutputStream))
   (:require
+   [clojure.string :as str]
    [clojure.java.io :as io]
    [pinny.core :as p]
    [clojure.test :refer [is deftest testing]]))
@@ -786,4 +788,19 @@
     (is (= "Cannot invoke \"Object.getClass()\" because \"x\" is null"
            (ex-message b)))))
 
-;; check unsupported throwable
+;; TODO check unsupported throwable
+
+(deftest test-input-stream-ok
+  (let [a (-> "hello" .getBytes (io/input-stream))
+        b (enc-dec a)]
+    (is (instance? InputStream b))
+    (is (= "hello" (slurp b)))))
+
+(deftest test-input-stream-large
+  (let [s (str/join (repeat 3000 "abcabcabcabcabcabcabcabcabcabcabcabc"))
+        a (-> s .getBytes (io/input-stream))
+        b (enc-dec a)]
+    (is (instance? InputStream b))
+    (let [string (slurp b)]
+      (is (str/starts-with? string "abc"))
+      (is (= 108000 (count string))))))
