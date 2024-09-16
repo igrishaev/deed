@@ -2,7 +2,9 @@
 - reader
 - file
 - byte-buffer
+- tr vector, list, map, set
 
+- reuse commom arrays (encode chunk, encode input stream)
 - input stream: config chunk size
 - input stream: dump to temp file?
 - fix constants (one, zero, etc)
