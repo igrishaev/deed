@@ -1,4 +1,6 @@
 
+- input stream: config chunk size
+- input stream: dump to temp file?
 - fix constants (one, zero, etc)
 - set min java version
 - relax mode? strict mode?
