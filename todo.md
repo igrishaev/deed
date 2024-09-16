@@ -1,4 +1,8 @@
 
+- reader
+- file
+- byte-buffer
+
 - input stream: config chunk size
 - input stream: dump to temp file?
 - fix constants (one, zero, etc)
