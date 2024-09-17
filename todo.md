@@ -5,8 +5,17 @@
 - tr vector, list, map, set
 
 - reify API
+  - encode-to-file
+  - encode-seq-to-file
+  - decode-seq?
+  - encode-to-stream
+  - encode-seq-to-stream
+
+- lazy coll limit option
+
 - Object: default toString or excepion?
 - encode: skip unsupported?
+
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: dump to temp file?
 - set min java version

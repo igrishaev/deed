@@ -371,9 +371,6 @@
   (-encode [this ^Encoder encoder]
     (.encodeZoneId encoder this)))
 
-
-
-
 ;;
 ;; Arrays (these forms don't work when merged with the previous form)
 ;;
@@ -430,10 +427,17 @@
 
 (defmethod -decode :default
   [oid decoder]
-  (throw (ex-info "aaa" {})))
+  (throw
+   (Err/error nil
+              "cannot decode a custom object, oid: 0x%04x"
+              (into-array [oid]))))
 
 
-(defn ->options ^Options [opts]
+(defn ->options
+  "
+  Build an Options object out from a map or nil.
+  "
+  ^Options [opts]
   (if (nil? opts)
     (Options/standard)
     (let [{:keys [use-gzip?
@@ -464,12 +468,17 @@
         buf-output-size
         (.bufOutputSize buf-output-size)))))
 
-
 ;;
 ;; API
 ;;
 
 (defn encoder
+  "
+  Make an `Encoder` instance. The `out` is anything
+  that can be transformed into an `OutputStream`
+  using the `io/output-stream` function. The `options`
+  is either a Clojure map or nil.
+  "
   (^Encoder [out]
    (encoder out nil))
   (^Encoder [out options]
@@ -479,6 +488,12 @@
 
 
 (defn decoder
+  "
+  Make a `Decoder` instance. The `src` is anything
+  that can be transformed into an `InputStream`
+  using the `io/input-stream` function. The `options`
+  is either a Clojure map or nil.
+  "
   (^Decoder [src]
    (decoder src nil))
   (^Decoder [src options]
@@ -487,35 +502,78 @@
                    (->options options))))
 
 
-(defn ^Short version [^Decoder decoder]
+(defn ^Short version
+  "
+  Return a version number used in the decoder.
+  "
+  [^Decoder decoder]
   (.version decoder))
 
 
-(defn encode-multi ^Long [^Encoder encoder coll]
+(defn encode-multi
+  "
+  Encode a sequence of objects so they can be
+  read one by one later on. Return the number
+  of objects written.
+  "
+  ^Long [^Encoder encoder coll]
   (.encodeMulti encoder coll))
 
 
-(defn encode ^Long [^Encoder encoder x]
+(defn encode
+  "
+  Encode a single object.
+  "
+  [^Encoder encoder x]
   (.encode encoder x))
 
 
-(defmacro with-encoder [[bind out options] & body]
+(defmacro with-encoder
+  "
+  Perform the body binding the new `Encoder` object
+  to the `bind` symbol. The `out` object gets coerced
+  to the output stream. Both encoder and the `out`
+  object get closed afterwards.
+  "
+  [[bind out options] & body]
   `(with-open [out# (io/output-stream ~out)
                ~bind (encoder out# ~options)]
      ~@body))
 
 
-(defmacro with-decoder [[bind src options] & body]
+(defmacro with-decoder
+  "
+  Perform the body binding the new `Decoder` object
+  to the `bind` symbol. The `src` object gets coerced
+  to the input stream. Both encoder and the `src`
+  object get closed afterwards.
+  "
+  [[bind src options] & body]
   `(with-open [src# (io/input-stream ~src)
                ~bind (decoder src# ~options)]
      ~@body))
 
 
-(defn decode [^Decoder decoder]
+(defn decode
+  "
+  Decode a single object from the decoder. When
+  no items left, return an instance of EOF object.
+  "
+  [^Decoder decoder]
   (.decode decoder))
 
 
-(defn eof? [x]
+;; TODO
+#_
+(defn decode-seq []
+  (iterator-seq))
+
+
+(defn eof?
+  "
+  True if the object is EOF.
+  "
+  [x]
   (instance? EOF x))
 
 
@@ -540,8 +598,20 @@
   (sdfsdfg 3))
 
 
+(defmacro handle-record
+  "
+  Extend both encode & decode logic so they
+  support a custom defrecord class. Specify
+  the custom OID number and the class object.
 
-(defmacro handle-record [OID RecordClass]
+  Usage:
+
+  (defrecord MyCustomRecord [id size sku]
+    ...)
+
+  (handle-record 0x1234 MyCustomRecord)
+  "
+  [OID RecordClass]
   (let [create
         (symbol (str RecordClass "/create"))]
     `(do
@@ -558,15 +628,11 @@
        nil)))
 
 
-#_
-(defrecord Foo [a b c])
-
-
-#_
-(handle-record 123 Foo)
-
-
 (comment
+
+  (defrecord Foo [a b c])
+
+  (handle-record 123 Foo)
 
   (require '[clojure.string :as str])
 
