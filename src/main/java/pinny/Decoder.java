@@ -34,6 +34,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         EOF = new EOF();
         this.mmDecode = mmDecode;
         InputStream source = inputStream;
+        try {
+            final byte[] headerBytes = inputStream.readNBytes(Const.HEADER_LEN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (options.useGzip()) {
             try {
                 source = new GZIPInputStream(inputStream);
@@ -41,7 +46,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
                 throw Err.error(e, "could not open a Gzip input stream");
             }
         }
-        bufferedInputStream = new BufferedInputStream(source, Const.IN_BUF_SIZE);
+        bufferedInputStream = new BufferedInputStream(source, options.bufInputSize());
         dataInputStream = new DataInputStream(bufferedInputStream);
         readHeader();
     }

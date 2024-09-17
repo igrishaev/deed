@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.zip.GZIPOutputStream;
 
 public final class Encoder implements AutoCloseable {
 
@@ -29,24 +28,23 @@ public final class Encoder implements AutoCloseable {
         this(protoEncode, outputStream, Options.standard());
     }
 
-    private void initHeader() {
-        writeShort(Const.VERSION);
-    }
-
     public Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
         this.protoEncode = protoEncode;
         this.options = options;
-        OutputStream destination = outputStream;
-        destination = new BufferedOutputStream(destination, Const.OUT_BUF_SIZE);
+        OutputStream destination = IOTool.wrapBufferedOutputStream(
+                outputStream,
+                options.bufOutputSize()
+        );
+        final byte[] headerBytes = Header.of(options).toByteArray();
+        try {
+            destination.write(headerBytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (options.useGzip()) {
-            try {
-                destination = new GZIPOutputStream(destination);
-            } catch (IOException e) {
-                throw Err.error(e, "could not open Gzip output stream");
-            }
+            destination = IOTool.wrapGZIPOutputStream(destination);
         }
         dataOutputStream = new DataOutputStream(destination);
-        initHeader();
     }
 
     @SuppressWarnings("unused")
@@ -834,7 +832,7 @@ public final class Encoder implements AutoCloseable {
     public void encodeUncountable(final short oid, final Iterator<?> iterator) {
         writeOID(oid);
         Object x;
-        final int limit = Const.OBJ_CHUNK_SIZE;
+        final int limit = options.objectChunkSize();
         // TODO: reuse array;
         final Object[] chunk = new Object[limit];
         int pos = 0;
@@ -856,7 +854,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeInputStream(final InputStream in) {
         writeOID(OID.IO_INPUT_STREAM);
-        final int len = 0xFFFF; // TODO: options
+        final int len = options.byteChunkSize();
         final byte[] buf = new byte[len];
         int r;
         int off = 0;

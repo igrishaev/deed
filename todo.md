@@ -4,6 +4,7 @@
 - byte-buffer
 - tr vector, list, map, set
 
+- maybe wrap input/output buffered streams?
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: config chunk size
 - input stream: dump to temp file?
@@ -29,6 +30,7 @@
 - encode expand macro
 - decode expand macro
 - tests
+- reify API
 - test future timeout options
 - rename
 - option: skip unsupported (enc/dec)

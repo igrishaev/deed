@@ -1,13 +1,15 @@
 package pinny;
 
 public class Const {
-    public static int IN_BUF_SIZE = 0xFFFF;
-    public static int OUT_BUF_SIZE = 0xFFFF;
-    public static int OBJ_CHUNK_SIZE = 0xFF;
-    public static short VERSION = 1;
+    public static short HEADER_LEN = 32;
+    public static int OPT_IN_BUF_SIZE = 0xFFFF;
+    public static int OPT_OUT_BUF_SIZE = 0xFFFF;
+    public static short HEADER_VERSION = 1;
+
     public static boolean OPT_USE_GZIP = false;
     public static long OPT_FUTURE_GET_TIMEOUT_MS = 5000;
-    public static boolean OPT_ALLOW_SERIALIZABLE = false; // TODO remove
+    public static int OPT_OBJECT_CHUNK_SIZE = 0xFF;
+    public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;
 
     public static byte BYTE_MINUS_ONE = -1;
     public static byte BYTE_ZERO = 0;

@@ -1,9 +1,13 @@
 package pinny;
 
 public record Options(
+        short verson,
         boolean useGzip,
-        boolean allowSerializable,
-        long futureGetTimeoutMs
+        long futureGetTimeoutMs,
+        int objectChunkSize,
+        int byteChunkSize,
+        int bufInputSize,
+        int bufOutputSize
 ) {
 
     public static Options standard() {
@@ -17,19 +21,23 @@ public record Options(
 
     public final static class Builder {
 
+        private short version = Const.HEADER_VERSION;
         private boolean useGzip = Const.OPT_USE_GZIP;
-        private boolean allowSerializable = Const.OPT_ALLOW_SERIALIZABLE;
         private long futureGetTimeoutMs = Const.OPT_FUTURE_GET_TIMEOUT_MS;
+        private int objectChunkSize = Const.OPT_OBJECT_CHUNK_SIZE;
+        private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
+        private int bufInputSize = Const.OPT_IN_BUF_SIZE;
+        private int bufOutputSize = Const.OPT_OUT_BUF_SIZE;
 
         @SuppressWarnings("unused")
-        public Builder useGzip(final boolean useGzip) {
-            this.useGzip = useGzip;
+        public Builder version(final short version) {
+            this.version = version;
             return this;
         }
 
         @SuppressWarnings("unused")
-        public Builder allowSerializable(final boolean allowSerializable) {
-            this.allowSerializable = allowSerializable;
+        public Builder useGzip(final boolean useGzip) {
+            this.useGzip = useGzip;
             return this;
         }
 
@@ -39,11 +47,39 @@ public record Options(
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder objectChunkSize(final int objectChunkSize) {
+            this.objectChunkSize = objectChunkSize;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Builder byteChunkSize(final int byteChunkSize) {
+            this.byteChunkSize = byteChunkSize;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Builder bufInputSize(final int bufInputSize) {
+            this.bufInputSize = bufInputSize;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Builder bufOutputSize(final int bufOutputSize) {
+            this.bufOutputSize = bufOutputSize;
+            return this;
+        }
+
         public Options build() {
             return new Options(
+                    version,
                     useGzip,
-                    allowSerializable,
-                    futureGetTimeoutMs
+                    futureGetTimeoutMs,
+                    objectChunkSize,
+                    byteChunkSize,
+                    bufInputSize,
+                    bufOutputSize
             );
         }
     }
