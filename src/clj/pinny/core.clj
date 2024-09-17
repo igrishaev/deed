@@ -4,7 +4,8 @@
   (:import
    (java.util.concurrent Future)
    (java.io IOException
-            InputStream)
+            InputStream
+            OutputStream)
    (clojure.lang IPersistentVector
                  APersistentVector
                  PersistentVector
@@ -51,7 +52,7 @@
               Iterator
               Date)
    (java.util.regex Pattern)
-   (pinny Encoder Decoder Err EOF OID)))
+   (pinny Encoder Decoder Err EOF OID Options)))
 
 (set! *warn-on-reflection* true)
 
@@ -432,25 +433,81 @@
   (throw (ex-info "aaa" {})))
 
 
+(defn ->options ^Options [opts]
+  (if (nil? opts)
+    (Options/standard)
+    (let [{:keys [use-gzip?
+                  future-timeout-ms
+                  object-chunk-size
+                  byte-chunk-size
+                  buf-input-size
+                  buf-output-size]}
+          opts]
+
+      (cond-> (Options/builder)
+
+        (some? use-gzip?)
+        (.useGzip use-gzip?)
+
+        future-timeout-ms
+        (.futureGetTimeoutMs future-timeout-ms)
+
+        object-chunk-size
+        (.objectChunkSize object-chunk-size)
+
+        byte-chunk-size
+        (.byteChunkSize byte-chunk-size)
+
+        buf-input-size
+        (.bufInputSize buf-input-size)
+
+        buf-output-size
+        (.bufOutputSize buf-output-size)))))
+
+
 ;;
 ;; API
 ;;
 
+(defn encoder
+  (^Encoder [out]
+   (encoder out nil))
+  (^Encoder [out options]
+   (Encoder/create -encode
+                   (io/output-stream out)
+                   (->options options))))
+
+
+(defn decoder
+  (^Decoder [src]
+   (decoder src nil))
+  (^Decoder [src options]
+   (Decoder/create -decode
+                   (io/input-stream src)
+                   (->options options))))
+
+
+(defn ^Short version [^Decoder decoder]
+  (.version decoder))
+
+
 (defn encode-multi ^Long [^Encoder encoder coll]
   (.encodeMulti encoder coll))
+
 
 (defn encode ^Long [^Encoder encoder x]
   (.encode encoder x))
 
-(defmacro with-encoder [[bind dest] & body]
-  `(with-open [output# (io/output-stream ~dest)
-               ~bind (new Encoder -encode output#)]
+
+(defmacro with-encoder [[bind out options] & body]
+  `(with-open [out# (io/output-stream ~out)
+               ~bind (encoder out# ~options)]
      ~@body))
 
 
-(defmacro with-decoder [[bind source] & body]
-  `(with-open [input# (io/input-stream ~source)
-               ~bind (new Decoder -decode input#)]
+(defmacro with-decoder [[bind src options] & body]
+  `(with-open [src# (io/input-stream ~src)
+               ~bind (decoder src# ~options)]
      ~@body))
 
 
@@ -462,9 +519,11 @@
   (instance? EOF x))
 
 
+#_
 (defmacro expand-encode [[type encoder] & body]
   )
 
+#_
 (defmacro expand-decode [[oid decoder] & body]
   )
 
@@ -516,6 +575,9 @@
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e (-> (subs STRING 0 0xFFFF) .getBytes (io/input-stream))))
+
+  (with-encoder [e (io/file "test.aaa")]
+    (encode e (boolean-array [true false true])))
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e (-> STRING .getBytes (io/input-stream))))

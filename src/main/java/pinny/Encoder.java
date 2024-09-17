@@ -5,6 +5,7 @@ import clojure.lang.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.util.*;
@@ -20,119 +21,121 @@ import java.util.stream.Stream;
 
 public final class Encoder implements AutoCloseable {
 
-    private final DataOutputStream dataOutputStream;
+    private OutputStream outputStream;
+    private final byte[] bytes;
+    private final ByteBuffer bb;
     private final Options options;
     private final IFn protoEncode;
 
-    public Encoder(final IFn protoEncode, final OutputStream outputStream) {
-        this(protoEncode, outputStream, Options.standard());
+    @SuppressWarnings("unused")
+    public static Encoder create(final IFn protoEncode, final OutputStream outputStream) {
+        return create(protoEncode, outputStream, Options.standard());
     }
 
-    public Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
+    public static Encoder create(final IFn protoEncode, final OutputStream outputStream, final Options options) {
+        final Encoder encoder = new Encoder(protoEncode, outputStream, options);
+        return encoder.initStream().initHeader();
+    }
+
+    private Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
+        this.bytes = new byte[8];
+        this.bb = ByteBuffer.wrap(this.bytes);
         this.protoEncode = protoEncode;
         this.options = options;
-        OutputStream destination = IOTool.wrapBufferedOutputStream(
-                outputStream,
-                options.bufOutputSize()
-        );
-        final byte[] headerBytes = Header.of(options).toByteArray();
-        try {
-            destination.write(headerBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (options.useGzip()) {
-            destination = IOTool.wrapGZIPOutputStream(destination);
-        }
-        dataOutputStream = new DataOutputStream(destination);
+        this.outputStream = outputStream;
     }
 
-    @SuppressWarnings("unused")
-    public boolean useGzip() {
-        return options.useGzip();
+    private Encoder initStream() {
+        final int bufSize = options.bufOutputSize();
+        final boolean useGzip = options.useGzip();
+        outputStream = IOTool.wrapBuf(outputStream, bufSize);
+        if (useGzip) {
+            outputStream = IOTool.wrapGzip(outputStream);
+        }
+        return this;
+    }
+
+    private Encoder initHeader() {
+        writeShort(Const.HEADER_VERSION);
+        writeGap(Const.HEADER_GAP);
+        return this;
+    }
+
+    private void dumpBuffer(final int len) {
+        try {
+            this.outputStream.write(this.bytes, 0, len);
+        } catch (IOException e) {
+            throw Err.error(e, "could not read %s bytes from the input stream", len);
+        }
+    }
+
+    public void writeGap(final int len) {
+        try {
+            outputStream.write(new byte[len]);
+        } catch (IOException e) {
+            throw Err.error(e, "could not write a gap of %s bytes", len);
+        }
     }
 
     public void writeInt(final int i) {
-        try {
-            dataOutputStream.writeInt(i);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putInt(0, i);
+        dumpBuffer(Const.LEN_INT);
     }
 
     public void writeOID(final short oid) {
-        try {
-            dataOutputStream.writeShort(oid);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putShort(0, oid);
+        dumpBuffer(Const.LEN_OID);
     }
 
     public void writeShort(final short s) {
-        try {
-            dataOutputStream.writeShort(s);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putShort(0, s);
+        dumpBuffer(Const.LEN_SHORT);
     }
 
     public void writeLong(final long l) {
-        try {
-            dataOutputStream.writeLong(l);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putLong(0, l);
+        dumpBuffer(Const.LEN_LONG);
     }
 
     @SuppressWarnings("unused")
     public void writeFloat(final float f) {
-        try {
-            dataOutputStream.writeFloat(f);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putFloat(0, f);
+        dumpBuffer(Const.LEN_FLOAT);
     }
 
     @SuppressWarnings("unused")
     public void writeDouble(final double d) {
-        try {
-            dataOutputStream.writeDouble(d);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putDouble(0, d);
+        dumpBuffer(Const.LEN_DOUBLE);
     }
 
     public void writeByte(final byte b) {
-        try {
-            dataOutputStream.write(b);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.put(0, b);
+        dumpBuffer(Const.LEN_BYTE);
     }
 
     public void writeCharacter(final char c) {
-        try {
-            dataOutputStream.writeChar(c);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        bb.putChar(0, c);
+        dumpBuffer(Const.LEN_CHAR);
     }
 
     public void writeBytes(final byte[] bytes) {
+        writeInt(bytes.length);
         try {
-            dataOutputStream.writeInt(bytes.length);
-            dataOutputStream.write(bytes);
+            outputStream.write(bytes);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "could not write bytes, length: %s", bytes.length);
         }
     }
 
     public void writeBytes(final byte[] bytes, final int off, final int len) {
+        writeInt(len);
         try {
-            dataOutputStream.writeInt(len);
-            dataOutputStream.write(bytes, off, len);
+            outputStream.write(bytes, off, len);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "could not write bytes, length: %s, off: %s, len: %s",
+                    bytes.length, off, len
+            );
         }
     }
 
@@ -142,11 +145,7 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void writeBoolean(final boolean b) {
-        try {
-            dataOutputStream.writeBoolean(b);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        writeByte(b ? (byte) 1 : 0);
     }
 
     public void writeBigInteger(final BigInteger bi) {
@@ -862,7 +861,7 @@ public final class Encoder implements AutoCloseable {
             try {
                 r = in.read(buf, off, len - off);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw Err.error(e, "could not encode input stream, off: %s, len: %s", off, len);
             }
             if (r == -1) {
                 break;
@@ -883,7 +882,7 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void flush() {
         try {
-            dataOutputStream.flush();
+            outputStream.flush();
         } catch (IOException e) {
             throw Err.error(e, "could not flush the stream");
         }
@@ -892,7 +891,7 @@ public final class Encoder implements AutoCloseable {
     @Override
     public void close() {
         try {
-            dataOutputStream.close();
+            outputStream.close();
         } catch (IOException e) {
             throw Err.error(e, "could not close the stream");
         }

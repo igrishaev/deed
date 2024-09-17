@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.time.*;
 import java.util.*;
 import java.io.*;
@@ -13,92 +14,101 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
-    final private DataInputStream dataInputStream;
-    final private BufferedInputStream bufferedInputStream;
-    final private MultiFn mmDecode;
-    final private EOF EOF;
+    private short version = Const.HEADER_VERSION;
+    private InputStream inputStream;
+    private final byte[] bytes;
+    private final ByteBuffer bb;
+    private final MultiFn mmDecode;
+    private final EOF EOF;
+    private final Options options;
 
-    public Decoder(final MultiFn mmDecode, final InputStream inputStream) {
-        this(mmDecode, inputStream, Options.standard());
+    @SuppressWarnings("unused")
+    public static Decoder create(final MultiFn mmDecode, final InputStream inputStream) {
+        return create(mmDecode, inputStream, Options.standard());
     }
 
-    private void readHeader() {
-        readShort();
+    public static Decoder create(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
+        final Decoder decoder = new Decoder(mmDecode, inputStream, options);
+        return decoder.initStream().initHeader();
     }
 
-    public Decoder(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
-        EOF = new EOF();
+    private Decoder(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
+        this.EOF = new EOF();
+        this.options = options;
         this.mmDecode = mmDecode;
-        InputStream source = inputStream;
+        this.inputStream = inputStream;
+        this.bytes = new byte[8];
+        this.bb = ByteBuffer.wrap(this.bytes);
+    }
+
+    @SuppressWarnings("unused")
+    public short version() {
+        return this.version;
+    }
+
+    private Decoder initStream() {
+        final int bufSize = options.bufInputSize();
+        final boolean useGzip = options.useGzip();
+        inputStream = IOTool.wrapBuf(inputStream, bufSize);
+        if (useGzip) {
+            inputStream = IOTool.wrapGzip(inputStream);
+        }
+        return this;
+    }
+
+    private void skipBytes(final int n) {
         try {
-            final byte[] headerBytes = inputStream.readNBytes(Const.HEADER_LEN);
+            inputStream.skipNBytes(n);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "could not skip N bytes, n: %s", n);
         }
-        if (options.useGzip()) {
-            try {
-                source = new GZIPInputStream(inputStream);
-            } catch (IOException e) {
-                throw Err.error(e, "could not open a Gzip input stream");
-            }
+    }
+
+    private Decoder initHeader() {
+        this.version = readShort();
+        skipBytes(Const.HEADER_GAP);
+        return this;
+    }
+
+    private int fillBuffer(final int len) {
+        try {
+            return inputStream.read(this.bytes, 0, len);
+        } catch (IOException e) {
+            throw Err.error(e, "could not fill buffer, len: %s", len);
         }
-        bufferedInputStream = new BufferedInputStream(source, options.bufInputSize());
-        dataInputStream = new DataInputStream(bufferedInputStream);
-        readHeader();
     }
 
     public short readShort() {
-        try {
-            return dataInputStream.readShort();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_SHORT);
+        return bb.getShort(0);
     }
 
     public long readLong() {
-        try {
-            return dataInputStream.readLong();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_LONG);
+        return bb.getLong(0);
     }
 
     public int readInteger() {
-        try {
-            return dataInputStream.readInt();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_INT);
+        return bb.getInt(0);
     }
 
     public boolean readBoolean() {
-        try {
-            return dataInputStream.readBoolean();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final byte b = readByte();
+        return b != 0;
     }
 
     public double readDouble() {
-        try {
-            return dataInputStream.readDouble();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_DOUBLE);
+        return bb.getDouble(0);
     }
 
-
-
     public float readFloat() {
-        try {
-            return dataInputStream.readFloat();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_FLOAT);
+        return bb.getFloat(0);
     }
 
     public Atom readAtom() {
@@ -113,13 +123,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public String readString() {
         final int len = readInteger();
-        final byte[] buf = new byte[len];
         try {
-            dataInputStream.readFully(buf);
+            final byte[] buf = inputStream.readNBytes(len);
+            return new String(buf, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "could not read N bytes, n: %s", len);
         }
-        return new String(buf, StandardCharsets.UTF_8);
     }
 
     public Keyword readKeyword() {
@@ -134,23 +143,19 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public byte[] readBytes() {
         final int size = readInteger();
-        final byte[] buf = new byte[size];
         if (size > 0) {
             try {
-                dataInputStream.readFully(buf);
+                return inputStream.readNBytes(size);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw Err.error(e, "could not read N bytes, n: %s", size);
             }
         }
-        return buf;
+        return new byte[0];
     }
 
     public byte readByte() {
-        try {
-            return dataInputStream.readByte();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_BYTE);
+        return bb.get(0);
     }
 
     public BigInteger readBigInteger() {
@@ -338,11 +343,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public char readCharacter() {
-        try {
-            return dataInputStream.readChar();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fillBuffer(Const.LEN_CHAR);
+        return bb.getChar(0);
     }
 
     public UUID readUUID() {
@@ -543,7 +545,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         if (x instanceof Throwable t) {
             return t;
         } else {
-            throw Err.error("unexpected non-Throwable object: %s %s", x.getClass(), x);
+            throw Err.error("unexpected non-Throwable object: %s %s",
+                    x == null ? "NULL" : x.getClass().getCanonicalName(),
+                    x
+            );
         }
     }
 
@@ -627,7 +632,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
                 try {
                     out.write(bytes);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw Err.error(e, "could not write bytes, len: %s", bytes.length);
                 }
             }
         }
@@ -637,21 +642,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public Object decode() {
-        int r;
-
-        bufferedInputStream.mark(1);
-        try {
-            r = bufferedInputStream.read();
-            bufferedInputStream.reset();
-        } catch (IOException e) {
-            throw Err.error(e, "could not read() from the input stream");
-        }
-
+        final int r = fillBuffer(Const.LEN_OID);
         if (r == -1) {
             return EOF;
         }
-
-        final short oid = readShort();
+        final short oid = bb.getShort(0);
 
         return switch (oid) {
             case OID.IO_INPUT_STREAM -> readInputStream();
@@ -781,7 +776,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     @Override
     public void close() {
         try {
-            dataInputStream.close();
+            inputStream.close();
         } catch (IOException e) {
             throw Err.error(e, "could not close the stream");
         }

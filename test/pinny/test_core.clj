@@ -22,7 +22,8 @@
               Iterator
               HashMap)
    (java.io IOException
-            InputStream)
+            InputStream
+            File)
    (java.net URL
              URI)
    (java.util.concurrent ArrayBlockingQueue)
@@ -804,3 +805,16 @@
     (let [string (slurp b)]
       (is (str/starts-with? string "abc"))
       (is (= 108000 (count string))))))
+
+(defn get-temp-file
+  (^File []
+   (get-temp-file "tmp" ".tmp"))
+  (^File [prefix suffix]
+   (File/createTempFile prefix suffix)))
+
+(deftest test-version
+  (let [file (get-temp-file "test" ".dump")]
+    (with-open [enc (p/encoder file)]
+      (p/encode enc 1))
+    (with-open [dec (p/decoder file)]
+      (is (= 1 (p/version dec))))))

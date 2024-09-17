@@ -1,7 +1,6 @@
 package pinny;
 
 public record Options(
-        short verson,
         boolean useGzip,
         long futureGetTimeoutMs,
         int objectChunkSize,
@@ -21,19 +20,12 @@ public record Options(
 
     public final static class Builder {
 
-        private short version = Const.HEADER_VERSION;
         private boolean useGzip = Const.OPT_USE_GZIP;
         private long futureGetTimeoutMs = Const.OPT_FUTURE_GET_TIMEOUT_MS;
         private int objectChunkSize = Const.OPT_OBJECT_CHUNK_SIZE;
         private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
         private int bufInputSize = Const.OPT_IN_BUF_SIZE;
         private int bufOutputSize = Const.OPT_OUT_BUF_SIZE;
-
-        @SuppressWarnings("unused")
-        public Builder version(final short version) {
-            this.version = version;
-            return this;
-        }
 
         @SuppressWarnings("unused")
         public Builder useGzip(final boolean useGzip) {
@@ -73,7 +65,6 @@ public record Options(
 
         public Options build() {
             return new Options(
-                    version,
                     useGzip,
                     futureGetTimeoutMs,
                     objectChunkSize,
