@@ -814,7 +814,64 @@
 
 (deftest test-version
   (let [file (get-temp-file "test" ".dump")]
-    (with-open [enc (p/encoder file)]
-      (p/encode enc 1))
-    (with-open [dec (p/decoder file)]
-      (is (= 1 (p/version dec))))))
+    (with-open [e (p/encoder file)]
+      (p/encode e 1))
+    (with-open [d (p/decoder file)]
+      (is (= 1 (p/version d))))))
+
+(deftest test-enc-dec-seq
+  (let [file (get-temp-file "test" ".dump")]
+    (with-open [e (p/encoder file)]
+      (p/encode-seq e (for [x [1 2 3]]
+                        (* x x))))
+    (with-open [d (p/decoder file)]
+      (let [x1 (p/decode d)
+            x2 (p/decode d)
+            x3 (p/decode d)
+            x4 (p/decode d)
+            x5 (p/decode d)]
+        (is (= 1 x1))
+        (is (= 4 x2))
+        (is (= 9 x3))
+        (is (p/eof? x4))
+        (is (p/eof? x5))))))
+
+(deftest test-decode-iteration
+  (let [file (get-temp-file "test" ".dump")]
+    (with-open [e (p/encoder file)]
+      (p/encode-seq e (for [x [1 2 3]]
+                        (* x x))))
+    (with-open [d (p/decoder file)]
+      (is (= [1 4 9] (vec d))))
+
+    (with-open [d (p/decoder file)]
+      (= [1 4 9] (for [x d]
+                   x)))
+
+    (with-open [d (p/decoder file)]
+      (= [2 5 10] (map inc d)))
+
+    ;; TODO: fix it
+    (with-open [d (p/decoder file)]
+      (is (= [4 9] (seq d))))
+
+    ;; TODO: fix it
+    (with-open [d (p/decoder file)]
+      (is (= [4 9] (p/decode-seq d))))
+
+    ))
+
+
+#_
+
+(let [iter (RT/iter d)]
+  (is (= :a (.next iter)))
+  (is (= :a (.hasNext iter)))
+  (is (= :a (.next iter)))
+  (is (= :a (.next iter)))
+  )
+
+#_
+(let [xs (p/decode-seq d)]
+        (is (= [4 9] xs))
+        )

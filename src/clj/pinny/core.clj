@@ -510,7 +510,7 @@
   (.version decoder))
 
 
-(defn encode-multi
+(defn encode-seq
   "
   Encode a sequence of objects so they can be
   read one by one later on. Return the number
@@ -562,6 +562,9 @@
   [^Decoder decoder]
   (.decode decoder))
 
+
+(defn decode-seq [^Decoder d]
+  (-> d .iterator iterator-seq))
 
 ;; TODO
 #_

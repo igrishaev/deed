@@ -4,12 +4,13 @@
 - byte-buffer
 - tr vector, list, map, set
 
+- fix (seq d)
+
 - reify API
-  - encode-to-file
-  - encode-seq-to-file
-  - decode-seq?
-  - encode-to-stream
-  - encode-seq-to-stream
+  - encode-to
+  - encode-seq-to
+  - decode-from
+  - decode-seq-from
 
 - lazy coll limit option
 
