@@ -4,13 +4,13 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- fix (seq d)
-
 - reify API
   - encode-to
   - encode-seq-to
   - decode-from
   - decode-seq-from
+
+- iter: use array instead of NONE
 
 - lazy coll limit option
 

@@ -758,17 +758,23 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public Iterator<Object> iterator() {
         return new Iterator<>() {
 
-            private Object next;
+            private final Object NONE = new Object();
+            private Object next = NONE;
 
             @Override
             public boolean hasNext() {
-                next = decode();
+                // make hasNext idemportant
+                if (NONE == next) {
+                    next = decode();
+                }
                 return next != EOF;
             }
 
             @Override
             public Object next() {
-                return next;
+                final Object temp = next;
+                next = NONE;
+                return temp;
             }
         };
     }

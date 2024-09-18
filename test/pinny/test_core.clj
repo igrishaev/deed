@@ -732,8 +732,8 @@
 
     (is (= 1 (count sups)))
     (is (= "4" (-> sups
-                 first
-                 (ex-message))))
+                   first
+                   (ex-message))))
     (is (= "3" (ex-message root)))))
 
 (deftest test-ex-info
@@ -754,10 +754,10 @@
     (is (= '[{:type clojure.lang.ExceptionInfo, :message "a", :data {:a 1}}
              {:type clojure.lang.ExceptionInfo, :message "b", :data {:b 2}}
              {:type clojure.lang.ExceptionInfo, :message "c", :data {:c 3}}]
-         (->> m
-              :via
-              (mapv (fn [row]
-                      (dissoc row :at))))))))
+           (->> m
+                :via
+                (mapv (fn [row]
+                        (dissoc row :at))))))))
 
 (deftest test-ex-io-nested
 
@@ -837,33 +837,40 @@
         (is (p/eof? x5))))))
 
 (deftest test-decode-iteration
-  (let [file (get-temp-file "test" ".dump")]
+  (let [file (get-temp-file "test" ".dump")
+        data [nil 1 nil 2 nil 3 nil]]
     (with-open [e (p/encoder file)]
-      (p/encode-seq e (for [x [1 2 3]]
-                        (* x x))))
-    (with-open [d (p/decoder file)]
-      (is (= [1 4 9] (vec d))))
+      (p/encode-seq e (for [x data]
+                        x)))
 
     (with-open [d (p/decoder file)]
-      (= [1 4 9] (for [x d]
-                   x)))
+      (is (= data (vec d))))
 
     (with-open [d (p/decoder file)]
-      (= [2 5 10] (map inc d)))
+      (is (= data (for [x d]
+                    x))))
 
-    ;; TODO: fix it
     (with-open [d (p/decoder file)]
-      (is (= [4 9] (seq d))))
+      (is (= '("" "1" "" "2" "" "3" "") (map str d))))
 
-    ;; TODO: fix it
     (with-open [d (p/decoder file)]
-      (is (= [4 9] (p/decode-seq d))))
+      (is (= data (seq d))))
 
-    ))
+    (with-open [d (p/decoder file)]
+      (is (= data (p/decode-seq d))))
+
+    (with-open [d (p/decoder file)]
+      (let [i (RT/iter d)]
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (= nil (.next i)))
+        (is (.hasNext i))
+        )
+
+      )))
 
 
 #_
-
 (let [iter (RT/iter d)]
   (is (= :a (.next iter)))
   (is (= :a (.hasNext iter)))
@@ -873,5 +880,5 @@
 
 #_
 (let [xs (p/decode-seq d)]
-        (is (= [4 9] xs))
-        )
+  (is (= [4 9] xs))
+  )
