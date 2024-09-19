@@ -55,12 +55,23 @@
       (deed/with-encoder [e (io/file "out.deed")]
         (deed/encode e DATA)))
 
+  (quick-bench
+      (deed/decode-from (io/file "out.deed")))
+
   ;; write
   (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
     (quick-bench
         (deed/encode e DATA)))
 
   (time (do (nippy/freeze DATA) nil))
+
+  (quick-bench
+      (nippy/thaw-from-file (io/file "out.nippy")))
+
+  (quick-bench
+      (nippy/freeze-to-file (io/file "out.nippy") DATA))
+
+
 
   (quick-bench
       (nippy/freeze DATA {:compressor nil

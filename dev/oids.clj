@@ -1,4 +1,4 @@
-(ns deed.gen-oids)
+(ns oids)
 
 (def OIDS                                 ;; tested?
   '[

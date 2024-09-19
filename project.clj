@@ -20,7 +20,10 @@
                   "--release" ~MIN_JAVA_VERSION]
 
   :profiles
-  {:test
-   {:source-paths ["test"]
+  {:dev
+   {:source-paths ["dev"]
     :dependencies [[criterium "0.4.6"]
-                   [com.taoensso/nippy "3.4.2"]]}})
+                   [com.taoensso/nippy "3.4.2"]]}
+
+   :test
+   {:source-paths ["test"]}})

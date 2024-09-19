@@ -39,3 +39,6 @@ build/
 
 .lein-failures
 .nrepl-port
+
+*.nippy
+*.deed
