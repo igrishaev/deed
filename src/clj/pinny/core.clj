@@ -1,4 +1,4 @@
-(ns pinny.core
+(ns deed.core
   (:require
    [clojure.java.io :as io])
   (:import
@@ -52,7 +52,7 @@
               Iterator
               Date)
    (java.util.regex Pattern)
-   (pinny Encoder Decoder Err EOF OID Options)))
+   (deed Encoder Decoder Err EOF OID Options)))
 
 (set! *warn-on-reflection* true)
 
@@ -576,6 +576,10 @@
 
 
 (defn encode-to
+  "
+  Encode a single value into the `out` destination
+  (a file, a stream, etc).
+  "
   ([x out]
    (encode-to x out nil))
   ([x out options]
@@ -584,6 +588,10 @@
 
 
 (defn encode-seq-to
+  "
+  Encode multiple values into the `out` destination.
+  Return a number of values written.
+  "
   ([xs out]
    (encode-seq-to xs out nil))
   ([xs out options]
@@ -591,7 +599,28 @@
      (encode-seq e xs))))
 
 
+(defn decode-from
+  "
+  Decode a single value from the `src` source (a file,
+  an input stream, etc).
+  "
+  ([src]
+   (decode-from src nil))
+  ([src options]
+   (with-decoder [d src options]
+     (decode d))))
 
+
+(defn decode-seq-from
+  "
+  Encode multiple values from the `src` source as
+  a vector.
+  "
+  ([src]
+   (decode-seq-from src nil))
+  ([src options]
+   (with-decoder [e src options]
+     (vec e))))
 
 
 #_

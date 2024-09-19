@@ -1,4 +1,4 @@
-package pinny;
+package deed;
 
 public class Err {
 

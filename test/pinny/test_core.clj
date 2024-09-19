@@ -1,4 +1,4 @@
-(ns pinny.test-core
+(ns deed.test-core
   (:import
    (java.math BigInteger
               BigDecimal)
@@ -40,7 +40,7 @@
   (:require
    [clojure.string :as str]
    [clojure.java.io :as io]
-   [pinny.core :as p]
+   [deed.core :as p]
    [clojure.test :refer [is deftest testing]]))
 
 (defn enc-dec [x]
@@ -586,7 +586,7 @@
   (testing "known record"
     (let [r1 (new Bar "a" "b")
           r2 (enc-dec r1)]
-      (is (= "pinny.test_core.Bar" (-> r2 class .getName)))
+      (is (= "deed.test_core.Bar" (-> r2 class .getName)))
       (is (= r1 r2))))
 
   (testing "biginteger"
@@ -899,6 +899,19 @@
       (is (= [1] (vec d)))))
 
   (let [file (get-temp-file "test" ".dump")]
-    (p/encode-seq-to [1 2 3] file)
+    (is (= 3 (p/encode-seq-to [1 2 3] file)))
     (p/with-decoder [d file]
       (is (= [1 2 3] (vec d))))))
+
+
+(deftest test-decode-hi-level-api
+
+  (let [file (get-temp-file "test" ".dump")]
+
+    (p/with-encoder [e file]
+      (p/encode e 1)
+      (p/encode e 2)
+      (p/encode e 3))
+
+    (is (= 1 (p/decode-from file)))
+    (is (= [1 2 3] (p/decode-seq-from file)))))

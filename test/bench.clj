@@ -4,7 +4,7 @@
   (:require
    [taoensso.nippy :as nippy]
    [clojure.java.io :as io]
-   [pinny.core :as pinny])
+   [deed.core :as deed])
   (:use criterium.core))
 
 (def DATA
@@ -42,23 +42,23 @@
 
   ;; time
   (time
-   (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-     (pinny/encode e DATA)))
+   (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+     (deed/encode e DATA)))
 
   ;; mem
   (quick-bench
-      (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-        (pinny/encode e DATA)))
+      (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+        (deed/encode e DATA)))
 
   ;; file
   (quick-bench
-      (pinny/with-encoder [e (io/file "out.pinny")]
-        (pinny/encode e DATA)))
+      (deed/with-encoder [e (io/file "out.deed")]
+        (deed/encode e DATA)))
 
   ;; write
-  (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+  (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
     (quick-bench
-        (pinny/encode e DATA)))
+        (deed/encode e DATA)))
 
   (time (do (nippy/freeze DATA) nil))
 
@@ -68,8 +68,8 @@
 
 
   (quick-bench
-      (pinny/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-        (pinny/encode e DATA)))
+      (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
+        (deed/encode e DATA)))
 
   (quick-bench
       (nippy/freeze DATA))
@@ -123,4 +123,4 @@
 ;; Execution time mean : 51.339890 ms
 
 ;; i5 nippy Execution time mean : 126.351367 ms
-;; i5 pinny Execution time mean : 65.736057 ms
+;; i5 deed Execution time mean : 65.736057 ms

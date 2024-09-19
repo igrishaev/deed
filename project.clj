@@ -1,6 +1,6 @@
 (def MIN_JAVA_VERSION "16")
 
-(defproject com.github.igrishaev/pinny "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/deed "0.1.0-SNAPSHOT"
 
   :description
   "Fast, flexible, 0-deps (de)serialization library for Clojure"

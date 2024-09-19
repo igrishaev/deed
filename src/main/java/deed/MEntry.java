@@ -1,4 +1,4 @@
-package pinny;
+package deed;
 
 import java.util.Map;
 

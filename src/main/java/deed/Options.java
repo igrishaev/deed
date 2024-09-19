@@ -1,4 +1,4 @@
-package pinny;
+package deed;
 
 public record Options(
         boolean useGzip,

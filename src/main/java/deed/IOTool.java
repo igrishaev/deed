@@ -1,4 +1,4 @@
-package pinny;
+package deed;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

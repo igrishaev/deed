@@ -1,4 +1,4 @@
-(ns pinny.gen-oids)
+(ns deed.gen-oids)
 
 (def OIDS                                 ;; tested?
   '[
@@ -116,7 +116,7 @@
 
 (defn generateClass []
 
-  (println "package pinny;")
+  (println "package deed;")
   (println)
   (println "public class OID {")
   (println)
