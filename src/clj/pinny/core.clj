@@ -510,6 +510,14 @@
   (.version decoder))
 
 
+(defn encode
+  "
+  Encode a single object.
+  "
+  [^Encoder encoder x]
+  (.encode encoder x))
+
+
 (defn encode-seq
   "
   Encode a sequence of objects so they can be
@@ -518,14 +526,6 @@
   "
   ^Long [^Encoder encoder coll]
   (.encodeMulti encoder coll))
-
-
-(defn encode
-  "
-  Encode a single object.
-  "
-  [^Encoder encoder x]
-  (.encode encoder x))
 
 
 (defmacro with-encoder
@@ -564,12 +564,7 @@
 
 
 (defn decode-seq [^Decoder d]
-  (-> d .iterator iterator-seq))
-
-;; TODO
-#_
-(defn decode-seq []
-  (iterator-seq))
+  (seq d))
 
 
 (defn eof?
@@ -578,6 +573,25 @@
   "
   [x]
   (instance? EOF x))
+
+
+(defn encode-to
+  ([x out]
+   (encode-to x out nil))
+  ([x out options]
+   (with-encoder [e out options]
+     (encode e x))))
+
+
+(defn encode-seq-to
+  ([xs out]
+   (encode-seq-to xs out nil))
+  ([xs out options]
+   (with-encoder [e out options]
+     (encode-seq e xs))))
+
+
+
 
 
 #_
@@ -665,8 +679,6 @@
 
   (with-decoder [dec (io/file "test.aaa")]
     (decode dec))
-
-
 
   (with-encoder [e (io/file "test.aaa")]
     (encode e {:aaa 1}))

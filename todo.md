@@ -5,22 +5,20 @@
 - tr vector, list, map, set
 
 - reify API
-  - encode-to
-  - encode-seq-to
   - decode-from
   - decode-seq-from
-
-- iter: use array instead of NONE
 
 - lazy coll limit option
 
 - Object: default toString or excepion?
 - encode: skip unsupported?
+- rename project
 
+- rearrange the files (project structure)
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: dump to temp file?
-- set min java version
 - relax mode? strict mode?
+- TODO check unsupported throwable
 - cypher in/out
 - meta support?
 - generate OID file

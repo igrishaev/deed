@@ -12,15 +12,15 @@ public class Main {
 
     public static void main(String... args) throws IOException {
 
-        IFn inc = Clojure.var("clojure.core", "inc");
-        IFn map = Clojure.var("clojure.core", "map");
-
-        try(final FileOutputStream out = new FileOutputStream("test.pinny");
-            final Encoder encoder = new Encoder(null, out)) {
-
-            System.out.println(map.invoke(inc, PersistentVector.create(1, 2, 3)));
-
-            encoder.encode(map.invoke(inc, PersistentVector.create(1, 2, 3, 4)));
+//        IFn inc = Clojure.var("clojure.core", "inc");
+//        IFn map = Clojure.var("clojure.core", "map");
+//
+//        try(final FileOutputStream out = new FileOutputStream("test.pinny");
+//            final Encoder encoder = new Encoder(null, out)) {
+//
+//            System.out.println(map.invoke(inc, PersistentVector.create(1, 2, 3)));
+//
+//            encoder.encode(map.invoke(inc, PersistentVector.create(1, 2, 3, 4)));
 
             // encoder.encode(999);
 //            encoder.encode(true);
@@ -36,6 +36,6 @@ public class Main {
 //                System.out.println(x);
 //            }
 //        }
-    }
+    // }
 
 }

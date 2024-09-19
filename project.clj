@@ -1,9 +1,9 @@
-(def MIN_JAVA_VERSION "17")
+(def MIN_JAVA_VERSION "16")
 
 (defproject com.github.igrishaev/pinny "0.1.0-SNAPSHOT"
 
   :description
-  "todo"
+  "Fast, flexible, 0-deps (de)serialization library for Clojure"
 
   :dependencies
   [[org.clojure/clojure "1.11.1"]]

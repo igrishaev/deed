@@ -20,6 +20,7 @@
               ArrayList
               Vector
               Iterator
+              NoSuchElementException
               HashMap)
    (java.io IOException
             InputStream
@@ -865,20 +866,39 @@
         (is (.hasNext i))
         (is (= nil (.next i)))
         (is (.hasNext i))
-        )
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (= 1 (.next i)))
+        (is (= nil (.next i)))
+        (is (= 2 (.next i)))
+        (is (= nil (.next i)))
+        (is (= 3 (.next i)))
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (.hasNext i))
+        (is (= nil (.next i)))
+        (is (false? (.hasNext i)))
+        (is (false? (.hasNext i)))
+        (is (false? (.hasNext i)))
+        (is (false? (.hasNext i)))
+        (try
+          (.next i)
+          (is false "must have been an error")
+          (catch NoSuchElementException e
+            (is (= "decode iterator has reached the end"
+                   (ex-message e)))))))))
 
-      )))
 
+(deftest test-encode-hi-level-api
 
-#_
-(let [iter (RT/iter d)]
-  (is (= :a (.next iter)))
-  (is (= :a (.hasNext iter)))
-  (is (= :a (.next iter)))
-  (is (= :a (.next iter)))
-  )
+  (let [file (get-temp-file "test" ".dump")]
+    (p/encode-to 1 file)
+    (p/with-decoder [d file]
+      (is (= [1] (vec d)))))
 
-#_
-(let [xs (p/decode-seq d)]
-  (is (= [4 9] xs))
-  )
+  (let [file (get-temp-file "test" ".dump")]
+    (p/encode-seq-to [1 2 3] file)
+    (p/with-decoder [d file]
+      (is (= [1 2 3] (vec d))))))

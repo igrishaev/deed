@@ -330,7 +330,6 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public URL readURL() {
         final String payload = readString();
         try {
-            //noinspection deprecation
             return new URL(payload);
         } catch (MalformedURLException e) {
             throw Err.error(e, "couldn't parse URL: %s", payload);
@@ -758,23 +757,35 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     public Iterator<Object> iterator() {
         return new Iterator<>() {
 
-            private final Object NONE = new Object();
-            private Object next = NONE;
+            private final List<Object> cache = new ArrayList<>(1);
 
             @Override
             public boolean hasNext() {
-                // make hasNext idemportant
-                if (NONE == next) {
-                    next = decode();
+                if (cache.isEmpty()) {
+                    final Object x = decode();
+                    if (EOF == x) {
+                        return false;
+                    } else {
+                        cache.add(x);
+                        return true;
+                    }
+                } else {
+                    return true;
                 }
-                return next != EOF;
             }
 
             @Override
             public Object next() {
-                final Object temp = next;
-                next = NONE;
-                return temp;
+                if (cache.isEmpty()) {
+                    final Object x = decode();
+                    if (EOF == x) {
+                        throw new NoSuchElementException("decode iterator has reached the end");
+                    } else {
+                        return x;
+                    }
+                } else {
+                    return cache.remove(0);
+                }
             }
         };
     }
