@@ -119,7 +119,7 @@
 ;; Nippy file
 ;; Execution time mean : 75.161894 ms
 
-;; Pinny file
+;; Deed file
 ;; Execution time mean : 51.339890 ms
 
 ;; i5 nippy Execution time mean : 126.351367 ms

@@ -40,18 +40,18 @@
   (:require
    [clojure.string :as str]
    [clojure.java.io :as io]
-   [deed.core :as p]
+   [deed.core :as d]
    [clojure.test :refer [is deftest testing]]))
 
 (defn enc-dec [x]
   (let [out (new ByteArrayOutputStream 0xFF)]
-    (p/with-encoder [e out]
-      (p/encode e x))
+    (d/with-encoder [e out]
+      (d/encode e x))
     (let [in (-> out
                  .toByteArray
                  io/input-stream)]
-      (p/with-decoder [d in]
-        (p/decode d)))))
+      (d/with-decoder [d in]
+        (d/decode d)))))
 
 (defn Short? [x]
   (instance? Short x))
@@ -99,7 +99,7 @@
 
 (defrecord Bar [x y])
 
-(p/handle-record 999 Bar)
+(d/handle-record 999 Bar)
 
 (deftest test-general-ok
 
@@ -815,52 +815,52 @@
 
 (deftest test-version
   (let [file (get-temp-file "test" ".dump")]
-    (with-open [e (p/encoder file)]
-      (p/encode e 1))
-    (with-open [d (p/decoder file)]
-      (is (= 1 (p/version d))))))
+    (with-open [e (d/encoder file)]
+      (d/encode e 1))
+    (with-open [d (d/decoder file)]
+      (is (= 1 (d/version d))))))
 
 (deftest test-enc-dec-seq
   (let [file (get-temp-file "test" ".dump")]
-    (with-open [e (p/encoder file)]
-      (p/encode-seq e (for [x [1 2 3]]
+    (with-open [e (d/encoder file)]
+      (d/encode-seq e (for [x [1 2 3]]
                         (* x x))))
-    (with-open [d (p/decoder file)]
-      (let [x1 (p/decode d)
-            x2 (p/decode d)
-            x3 (p/decode d)
-            x4 (p/decode d)
-            x5 (p/decode d)]
+    (with-open [d (d/decoder file)]
+      (let [x1 (d/decode d)
+            x2 (d/decode d)
+            x3 (d/decode d)
+            x4 (d/decode d)
+            x5 (d/decode d)]
         (is (= 1 x1))
         (is (= 4 x2))
         (is (= 9 x3))
-        (is (p/eof? x4))
-        (is (p/eof? x5))))))
+        (is (d/eof? x4))
+        (is (d/eof? x5))))))
 
 (deftest test-decode-iteration
   (let [file (get-temp-file "test" ".dump")
         data [nil 1 nil 2 nil 3 nil]]
-    (with-open [e (p/encoder file)]
-      (p/encode-seq e (for [x data]
+    (with-open [e (d/encoder file)]
+      (d/encode-seq e (for [x data]
                         x)))
 
-    (with-open [d (p/decoder file)]
+    (with-open [d (d/decoder file)]
       (is (= data (vec d))))
 
-    (with-open [d (p/decoder file)]
+    (with-open [d (d/decoder file)]
       (is (= data (for [x d]
                     x))))
 
-    (with-open [d (p/decoder file)]
+    (with-open [d (d/decoder file)]
       (is (= '("" "1" "" "2" "" "3" "") (map str d))))
 
-    (with-open [d (p/decoder file)]
+    (with-open [d (d/decoder file)]
       (is (= data (seq d))))
 
-    (with-open [d (p/decoder file)]
-      (is (= data (p/decode-seq d))))
+    (with-open [d (d/decoder file)]
+      (is (= data (d/decode-seq d))))
 
-    (with-open [d (p/decoder file)]
+    (with-open [d (d/decoder file)]
       (let [i (RT/iter d)]
         (is (.hasNext i))
         (is (.hasNext i))
@@ -894,13 +894,13 @@
 (deftest test-encode-hi-level-api
 
   (let [file (get-temp-file "test" ".dump")]
-    (p/encode-to 1 file)
-    (p/with-decoder [d file]
+    (d/encode-to 1 file)
+    (d/with-decoder [d file]
       (is (= [1] (vec d)))))
 
   (let [file (get-temp-file "test" ".dump")]
-    (is (= 3 (p/encode-seq-to [1 2 3] file)))
-    (p/with-decoder [d file]
+    (is (= 3 (d/encode-seq-to [1 2 3] file)))
+    (d/with-decoder [d file]
       (is (= [1 2 3] (vec d))))))
 
 
@@ -908,10 +908,10 @@
 
   (let [file (get-temp-file "test" ".dump")]
 
-    (p/with-encoder [e file]
-      (p/encode e 1)
-      (p/encode e 2)
-      (p/encode e 3))
+    (d/with-encoder [e file]
+      (d/encode e 1)
+      (d/encode e 2)
+      (d/encode e 3))
 
-    (is (= 1 (p/decode-from file)))
-    (is (= [1 2 3] (p/decode-seq-from file)))))
+    (is (= 1 (d/decode-from file)))
+    (is (= [1 2 3] (d/decode-seq-from file)))))
