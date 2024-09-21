@@ -108,6 +108,7 @@
     CLJ_TR_SET
     CLJ_TR_VEC
     CLJ_TR_LIST
+    UNSUPPORTED
     ])
 
 

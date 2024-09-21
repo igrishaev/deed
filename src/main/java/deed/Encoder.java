@@ -893,6 +893,24 @@ public final class Encoder implements AutoCloseable {
     }
 
     @SuppressWarnings("unused")
+    public void encodeObject(final Object x) {
+        if (options.encodeUnsupported()) {
+            encodeUnsupported(x);
+        } else {
+            throw Err.error("Cannot encode object, type: %s, object: %s",
+                    x.getClass().getName(), x.toString()
+            );
+        }
+    }
+
+    public void encodeUnsupported(final Object x) {
+        final Unsupported u = Unsupported.of(x);
+        writeOID(OID.UNSUPPORTED);
+        writeString(u.className());
+        writeString(u.content());
+    }
+
+    @SuppressWarnings("unused")
     public void flush() {
         try {
             outputStream.flush();

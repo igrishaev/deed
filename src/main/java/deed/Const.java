@@ -13,6 +13,7 @@ public class Const {
     public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;
 
     public static int OPT_UNCOUNTABLE_MAX_ITEMS = Integer.MAX_VALUE;
+    public static boolean OPT_ENCODE_UNSUPPORTED = true;
 
     public static byte BYTE_MINUS_ONE = -1;
     public static byte BYTE_ZERO = 0;

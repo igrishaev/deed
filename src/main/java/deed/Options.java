@@ -7,7 +7,8 @@ public record Options(
         int byteChunkSize,
         int bufInputSize,
         int bufOutputSize,
-        int uncountableMaxItems
+        int uncountableMaxItems,
+        boolean encodeUnsupported
 ) {
 
     public static Options standard() {
@@ -28,6 +29,7 @@ public record Options(
         private int bufInputSize = Const.OPT_IN_BUF_SIZE;
         private int bufOutputSize = Const.OPT_OUT_BUF_SIZE;
         private int uncountableMaxItems = Const.OPT_UNCOUNTABLE_MAX_ITEMS;
+        private boolean encodeUnsupported = Const.OPT_ENCODE_UNSUPPORTED;
 
         @SuppressWarnings("unused")
         public Builder useGzip(final boolean useGzip) {
@@ -71,6 +73,12 @@ public record Options(
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder encodeUnsupported(final boolean encodeUnsupported) {
+            this.encodeUnsupported = encodeUnsupported;
+            return this;
+        }
+
         public Options build() {
             return new Options(
                     useGzip,
@@ -79,7 +87,8 @@ public record Options(
                     byteChunkSize,
                     bufInputSize,
                     bufOutputSize,
-                    uncountableMaxItems
+                    uncountableMaxItems,
+                    encodeUnsupported
             );
         }
     }

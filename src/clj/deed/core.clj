@@ -5,7 +5,8 @@
    (java.util.concurrent Future)
    (java.io IOException
             InputStream
-            OutputStream)
+            OutputStream
+            Writer)
    (clojure.lang IPersistentVector
                  APersistentVector
                  PersistentVector
@@ -52,7 +53,8 @@
               Iterator
               Date)
    (java.util.regex Pattern)
-   (deed Encoder Decoder Err EOF OID Options)))
+   (deed Encoder Decoder Err EOF OID Options
+         Unsupported)))
 
 (set! *warn-on-reflection* true)
 
@@ -71,9 +73,7 @@
 
   Object
   (-encode [this ^Encoder encoder]
-    (throw (Err/error nil
-                      "don't know how to encode: %s %s"
-                      (into-array Object [(type this) this]))))
+    (.encodeObject encoder this))
 
   ;;
   ;; Numbers
@@ -446,7 +446,8 @@
                   byte-chunk-size
                   buf-input-size
                   buf-output-size
-                  uncountable-max-items]}
+                  uncountable-max-items
+                  encode-unsupported?]}
           opts]
 
       (cond-> (Options/builder)
@@ -471,6 +472,9 @@
 
         uncountable-max-items
         (.uncountableMaxItems uncountable-max-items)
+
+        (some? encode-unsupported?)
+        (.encodeUnsupported encode-unsupported?)
 
         :finally
         (.build)))))
@@ -580,6 +584,19 @@
   "
   [x]
   (instance? EOF x))
+
+
+(defn unsupported?
+  "
+  True if the object is Unsupported.
+  "
+  [x]
+  (instance? Unsupported x))
+
+
+(defmethod print-method Unsupported
+  [u ^Writer writer]
+  (.write writer (str u)))
 
 
 (defn encode-to

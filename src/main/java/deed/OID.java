@@ -103,5 +103,6 @@ public class OID {
     public static final short JVM_BIG_INT               = 0x0055;
     public static final short CLJ_BIG_INT               = 0x0059;
     public static final short CLJ_RATIO                 = 0x005D;
+    public static final short UNSUPPORTED               = 0x105D;
 
 }

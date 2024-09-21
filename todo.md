@@ -4,10 +4,9 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- test future timeout options
+- option: skip unsupported (enc/dec)
 
-- Object: default toString or excepion?
-- encode: skip unsupported?
+- test future timeout options
 
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: dump to temp file?
@@ -26,9 +25,7 @@
 - encode expand macro
 - decode expand macro
 
-- option: skip unsupported (enc/dec)
-- option: object chunk
-- option: uncountable max size
+- make: linter
 
 - docs
 - spec

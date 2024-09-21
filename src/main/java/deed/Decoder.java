@@ -620,6 +620,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return result;
     }
 
+    public Unsupported readUnsupported() {
+        final String className = readString();
+        final String content = readString();
+        return new Unsupported(className, content);
+    }
+
     public InputStream readInputStream() {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] bytes;
@@ -648,6 +654,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = bb.getShort(0);
 
         return switch (oid) {
+            case OID.UNSUPPORTED -> readUnsupported();
             case OID.IO_INPUT_STREAM -> readInputStream();
             case OID.EX_NPE -> readNullPointerException();
             case OID.IO_EXCEPTION -> readIOException();

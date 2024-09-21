@@ -941,3 +941,32 @@
     (d/encode-seq-to (iterate inc 0) file {:uncountable-max-items 0})
     (is (= []
            (d/decode-seq-from file)))))
+
+(deftype MySpecialType [a b c])
+
+(deftest test-unsupported-default
+  (let [prefix "Unsupported[className=deed.test_core.MySpecialType, content=deed.test_core.MySpecialType@"
+        file (get-temp-file "test" ".dump")
+        my (new MySpecialType 1 2 3)]
+    (d/encode-to my file)
+    (let [u (d/decode-from file)]
+      (is (d/unsupported? u))
+      (-> u
+          str
+          (str/starts-with? prefix))
+      (is (= #{:content :class}
+             (-> @u keys set)))
+      (is (-> u
+              pr-str
+              (str/starts-with? prefix))))))
+
+(deftest test-unsupported-default
+  (let [file (get-temp-file "test" ".dump")
+        my (new MySpecialType 1 2 3)]
+    (try
+      (d/encode-to my file {:encode-unsupported? false})
+      (is false "miss")
+      (catch RuntimeException e
+        (is (-> e
+                ex-message
+                (str/starts-with? "Cannot encode object, type: deed.test_core.MySpecialType")))))))
