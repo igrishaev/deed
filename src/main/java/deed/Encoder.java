@@ -834,15 +834,21 @@ public final class Encoder implements AutoCloseable {
     public void encodeUncountable(final short oid, final Iterator<?> iterator) {
         writeOID(oid);
         Object x;
-        final int limit = options.objectChunkSize();
+        final int chunkSize = options.objectChunkSize();
         // TODO: reuse array;
-        final Object[] chunk = new Object[limit];
+        final Object[] chunk = new Object[chunkSize];
         int pos = 0;
+        int counter = 0;
+        final int limit = options.uncountableMaxItems();
         while (iterator.hasNext()) {
+            counter++;
+            if (counter == limit) {
+                break;
+            }
             x = iterator.next();
             chunk[pos] = x;
             pos++;
-            if (pos == limit) {
+            if (pos == chunkSize) {
                 pos = 0;
                 encodeChunk(chunk);
             }

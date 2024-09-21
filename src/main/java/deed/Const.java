@@ -12,6 +12,8 @@ public class Const {
     public static int OPT_OBJECT_CHUNK_SIZE = 0xFF;
     public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;
 
+    public static int OPT_UNCOUNTABLE_MAX_ITEMS = Integer.MAX_VALUE;
+
     public static byte BYTE_MINUS_ONE = -1;
     public static byte BYTE_ZERO = 0;
     public static byte BYTE_ONE = 1;

@@ -445,7 +445,8 @@
                   object-chunk-size
                   byte-chunk-size
                   buf-input-size
-                  buf-output-size]}
+                  buf-output-size
+                  uncountable-max-items]}
           opts]
 
       (cond-> (Options/builder)
@@ -466,7 +467,10 @@
         (.bufInputSize buf-input-size)
 
         buf-output-size
-        (.bufOutputSize buf-output-size)))))
+        (.bufOutputSize buf-output-size)
+
+        uncountable-max-items
+        (.uncountableMaxItems uncountable-max-items)))))
 
 ;;
 ;; API

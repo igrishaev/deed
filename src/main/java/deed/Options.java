@@ -6,7 +6,8 @@ public record Options(
         int objectChunkSize,
         int byteChunkSize,
         int bufInputSize,
-        int bufOutputSize
+        int bufOutputSize,
+        int uncountableMaxItems
 ) {
 
     public static Options standard() {
@@ -26,6 +27,7 @@ public record Options(
         private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
         private int bufInputSize = Const.OPT_IN_BUF_SIZE;
         private int bufOutputSize = Const.OPT_OUT_BUF_SIZE;
+        private int uncountableMaxItems = Const.OPT_UNCOUNTABLE_MAX_ITEMS;
 
         @SuppressWarnings("unused")
         public Builder useGzip(final boolean useGzip) {
@@ -63,6 +65,12 @@ public record Options(
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder uncountableMaxItems(final int uncountableMaxItems) {
+            this.uncountableMaxItems = uncountableMaxItems;
+            return this;
+        }
+
         public Options build() {
             return new Options(
                     useGzip,
@@ -70,7 +78,8 @@ public record Options(
                     objectChunkSize,
                     byteChunkSize,
                     bufInputSize,
-                    bufOutputSize
+                    bufOutputSize,
+                    uncountableMaxItems
             );
         }
     }

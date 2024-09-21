@@ -38,3 +38,6 @@
 - benchmarks
 
 (System/identityHashCode ?)
+
+test
+- gzip
