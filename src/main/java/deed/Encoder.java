@@ -402,10 +402,14 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public long encodeMulti(final Iterable<?> xs) {
+        final int limit = options.uncountableMaxItems();
         long n = 0;
         for (final Object x: xs) {
-            encode(x);
             n++;
+            if (n > limit) {
+                break;
+            }
+            encode(x);
         }
         return n;
     }
@@ -842,7 +846,7 @@ public final class Encoder implements AutoCloseable {
         final int limit = options.uncountableMaxItems();
         while (iterator.hasNext()) {
             counter++;
-            if (counter == limit) {
+            if (counter > limit) {
                 break;
             }
             x = iterator.next();

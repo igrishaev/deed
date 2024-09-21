@@ -470,7 +470,10 @@
         (.bufOutputSize buf-output-size)
 
         uncountable-max-items
-        (.uncountableMaxItems uncountable-max-items)))))
+        (.uncountableMaxItems uncountable-max-items)
+
+        :finally
+        (.build)))))
 
 ;;
 ;; API

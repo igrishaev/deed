@@ -4,7 +4,6 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- lazy coll limit option
 - test future timeout options
 
 - Object: default toString or excepion?
@@ -12,8 +11,6 @@
 
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: dump to temp file?
-
-- TODO check unsupported throwable
 
 - cypher in/out
 

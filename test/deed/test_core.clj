@@ -790,7 +790,11 @@
     (is (= "Cannot invoke \"Object.getClass()\" because \"x\" is null"
            (ex-message b)))))
 
-;; TODO check unsupported throwable
+(deftest test-ex-something-else
+  (let [a (new OutOfMemoryError "mem")
+        b (enc-dec a)]
+    (is (= "java.lang.Throwable" (-> b class .getName)))
+    (is (= "mem" (ex-message b)))))
 
 (deftest test-input-stream-ok
   (let [a (-> "hello" .getBytes (io/input-stream))
@@ -915,3 +919,25 @@
 
     (is (= 1 (d/decode-from file)))
     (is (= [1 2 3] (d/decode-seq-from file)))))
+
+
+(deftest test-option-lazy-seq-limit
+
+  (let [file (get-temp-file "test" ".dump")]
+    (d/encode-to (iterate inc 0) file {:uncountable-max-items 10})
+    (is (= '(0 1 2 3 4 5 6 7 8 9)
+           (d/decode-from file))))
+
+  (let [file (get-temp-file "test" ".dump")]
+    (d/encode-seq-to (iterate inc 0) file {:uncountable-max-items 10})
+    (is (= [0 1 2 3 4 5 6 7 8 9]
+           (d/decode-seq-from file))))
+
+  (let [file (get-temp-file "test" ".dump")]
+    (d/encode-to (iterate inc 0) file {:uncountable-max-items 0})
+    (is (nil? (d/decode-from file))))
+
+  (let [file (get-temp-file "test" ".dump")]
+    (d/encode-seq-to (iterate inc 0) file {:uncountable-max-items 0})
+    (is (= []
+           (d/decode-seq-from file)))))
