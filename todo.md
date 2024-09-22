@@ -4,9 +4,13 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- test future timeout options
+- encode expand macro
+- decode expand macro
+
+- test gzip
 
 - reuse commom arrays (encode chunk, encode input stream)
+
 - input stream: dump to temp file?
 
 - option: skip unsupported (enc/dec)
@@ -22,9 +26,6 @@
 - vectorz package
 - base64 in/out stream
 
-- encode expand macro
-- decode expand macro
-
 - make: linter
 
 - docs
@@ -32,6 +33,3 @@
 - benchmarks
 
 (System/identityHashCode ?)
-
-test
-- gzip

@@ -43,15 +43,18 @@
    [deed.core :as d]
    [clojure.test :refer [is deftest testing]]))
 
-(defn enc-dec [x]
-  (let [out (new ByteArrayOutputStream 0xFF)]
-    (d/with-encoder [e out]
-      (d/encode e x))
-    (let [in (-> out
-                 .toByteArray
-                 io/input-stream)]
-      (d/with-decoder [d in]
-        (d/decode d)))))
+(defn enc-dec
+  ([x]
+   (enc-dec x nil))
+  ([x options]
+   (let [out (new ByteArrayOutputStream 0xFF)]
+     (d/with-encoder [e out options]
+       (d/encode e x))
+     (let [in (-> out
+                  .toByteArray
+                  io/input-stream)]
+       (d/with-decoder [d in options]
+         (d/decode d))))))
 
 (defn Short? [x]
   (instance? Short x))
@@ -623,14 +626,7 @@
     (let [b1 (byte 99)
           b2 (enc-dec b1)]
       (is (instance? Byte b2))
-      (is (= b1 b2))))
-
-  ;; unknown type
-  ;; custom deftype
-
-
-
-  )
+      (is (= b1 b2)))))
 
 (deftest test-future-cases
 
@@ -655,17 +651,15 @@
           (is (= "future has failed: Divide by zero"
                  (ex-message e)))))))
 
-  ;; TODO: timeout options
-
   (testing "timeout"
     (let [f1 (future
-               (Thread/sleep 6000))]
+               (Thread/sleep 500))]
 
       (try
-        (enc-dec f1)
+        (enc-dec f1 {:deref-timeout-ms 100})
         (is false)
         (catch Exception e
-          (is (= "future deref timeout (ms): 5000"
+          (is (= "future deref timeout (ms): 100"
                  (ex-message e))))))))
 
 (deftest test-throwable-exception
@@ -984,3 +978,36 @@
            (-> c
                deref
                :class)))))
+
+
+(deftype AnotherType [x y z])
+
+
+;; TODO: write oid API
+;; TODO: various field types (with nil)
+(d/expand-encode [AnotherType at e]
+  (.writeOID e 6666)
+  (d/encode e (.-x at))
+  (d/encode e (.-y at))
+  (d/encode e (.-z at)))
+
+
+(d/expand-decode [6666 d]
+  (let [x (d/decode d)
+        y (d/decode d)
+        z (d/decode d)]
+    (new AnotherType x y z)))
+
+
+(deftest test-custom-type
+  (let [^AnotherType a (new AnotherType "a" "b" "c")
+        ^AnotherType b (enc-dec a)]
+
+    (is (= "deed.test_core.AnotherType"
+           (-> b class .getName)))
+
+    (is (= (.-x a) (.-x b)))
+    (is (= (.-y a) (.-y b)))
+    (is (= (.-z a) (.-z b)))
+
+    ))

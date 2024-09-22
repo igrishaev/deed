@@ -367,7 +367,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeFuture(final Future<?> f) {
-        final long timeout = options.futureGetTimeoutMs();
+        final long timeout = options.derefTimeoutMs();
         try {
             final Object x = f.get(timeout, TimeUnit.MILLISECONDS);
             writeOID(OID.FUTURE);

@@ -449,7 +449,7 @@
   (if (nil? opts)
     (Options/standard)
     (let [{:keys [use-gzip?
-                  future-timeout-ms
+                  deref-timeout-ms
                   object-chunk-size
                   byte-chunk-size
                   buf-input-size
@@ -463,8 +463,8 @@
         (some? use-gzip?)
         (.useGzip use-gzip?)
 
-        future-timeout-ms
-        (.futureGetTimeoutMs future-timeout-ms)
+        deref-timeout-ms
+        (.derefTimeoutMs deref-timeout-ms)
 
         object-chunk-size
         (.objectChunkSize object-chunk-size)
@@ -655,8 +655,33 @@
      (vec e))))
 
 
+;; TODO: docstrings
+
+(defmacro expand-encode [[Type value encoder] & body]
+  `(do
+     (extend-protocol IEncode
+       ~Type
+       (-encode [~value ~(with-meta encoder {:tag 'deed.Encoder})]
+         ~@body))
+     nil))
+
+
+(defmacro expand-decode [[OID decoder] & body]
+  `(do
+     (defmethod -decode ~OID
+       [_# ~(with-meta decoder {:tag 'deed.Decoder})]
+       ~@body)
+     nil))
+
+
 #_
-(defmacro expand-encode [[type encoder] & body]
+(expand-encode [Foo foo e]
+  (println e)
+  )
+
+#_
+(expand-decode [123 foo d]
+  (println d)
   )
 
 #_

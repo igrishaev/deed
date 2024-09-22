@@ -2,7 +2,7 @@ package deed;
 
 public record Options(
         boolean useGzip,
-        long futureGetTimeoutMs,
+        long derefTimeoutMs,
         int objectChunkSize,
         int byteChunkSize,
         int bufInputSize,
@@ -23,7 +23,7 @@ public record Options(
     public final static class Builder {
 
         private boolean useGzip = Const.OPT_USE_GZIP;
-        private long futureGetTimeoutMs = Const.OPT_FUTURE_GET_TIMEOUT_MS;
+        private long derefTimeoutMs = Const.OPT_DEREF_TIMEOUT_MS;
         private int objectChunkSize = Const.OPT_OBJECT_CHUNK_SIZE;
         private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
         private int bufInputSize = Const.OPT_IN_BUF_SIZE;
@@ -38,8 +38,8 @@ public record Options(
         }
 
         @SuppressWarnings("unused")
-        public Builder futureGetTimeoutMs(final long futureGetTimeoutMs) {
-            this.futureGetTimeoutMs = futureGetTimeoutMs;
+        public Builder derefTimeoutMs(final long derefTimeoutMs) {
+            this.derefTimeoutMs = derefTimeoutMs;
             return this;
         }
 
@@ -82,7 +82,7 @@ public record Options(
         public Options build() {
             return new Options(
                     useGzip,
-                    futureGetTimeoutMs,
+                    derefTimeoutMs,
                     objectChunkSize,
                     byteChunkSize,
                     bufInputSize,
