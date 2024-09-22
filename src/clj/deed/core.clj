@@ -369,7 +369,15 @@
 
   ZoneId
   (-encode [this ^Encoder encoder]
-    (.encodeZoneId encoder this)))
+    (.encodeZoneId encoder this))
+
+  ;;
+  ;; Special
+  ;;
+
+  Unsupported
+  (-encode [this ^Encoder encoder]
+    (.encodeUnsupported encoder this)))
 
 ;;
 ;; Arrays (these forms don't work when merged with the previous form)

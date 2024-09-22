@@ -4,12 +4,12 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- option: skip unsupported (enc/dec)
-
 - test future timeout options
 
 - reuse commom arrays (encode chunk, encode input stream)
 - input stream: dump to temp file?
+
+- option: skip unsupported (enc/dec)
 
 - cypher in/out
 

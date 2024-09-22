@@ -895,7 +895,8 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeObject(final Object x) {
         if (options.encodeUnsupported()) {
-            encodeUnsupported(x);
+            final Unsupported u = Unsupported.of(x);
+            encodeUnsupported(u);
         } else {
             throw Err.error("Cannot encode object, type: %s, object: %s",
                     x.getClass().getName(), x.toString()
@@ -903,8 +904,7 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void encodeUnsupported(final Object x) {
-        final Unsupported u = Unsupported.of(x);
+    public void encodeUnsupported(final Unsupported u) {
         writeOID(OID.UNSUPPORTED);
         writeString(u.className());
         writeString(u.content());

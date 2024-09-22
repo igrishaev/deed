@@ -970,3 +970,17 @@
         (is (-> e
                 ex-message
                 (str/starts-with? "Cannot encode object, type: deed.test_core.MySpecialType")))))))
+
+
+(deftest test-unsupported-back
+  (let [a (new MySpecialType 1 2 3)
+        b (enc-dec a)
+        c (enc-dec b)]
+
+    (is (d/unsupported? b))
+    (is (d/unsupported? c))
+
+    (is (= "deed.test_core.MySpecialType"
+           (-> c
+               deref
+               :class)))))
