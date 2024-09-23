@@ -42,3 +42,5 @@ build/
 
 *.nippy
 *.deed
+
+.idea

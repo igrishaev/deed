@@ -30,6 +30,7 @@
 
 - make: linter
 
+- readme
 - docs
 - spec
 - benchmarks
