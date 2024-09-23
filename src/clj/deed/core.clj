@@ -664,14 +664,13 @@
 ;; Expanding
 ;;
 
-;; TODO: handle OID?
-
 (defmacro expand-encode
   "
   A helper macro to expand encoding logic for a
   certain type.
 
   Arguments:
+  - the `OID` is a Short unique number describing the type;
   - the `Type` is a class;
   - the `value` is a symbol bound to the value of this class;
   - the `encoder` is a symbol bound to the current `Encoder`
@@ -682,13 +681,15 @@
   `.writeInt`, `.writeString`, and other methods.
 
   "
-  [[Type value encoder] & body]
-  `(do
-     (extend-protocol IEncode
-       ~Type
-       (-encode [~value ~(with-meta encoder {:tag 'deed.Encoder})]
-         ~@body))
-     nil))
+  [[OID Type value encoder] & body]
+  (let [e (with-meta encoder {:tag 'deed.Encoder})]
+    `(do
+       (extend-protocol IEncode
+         ~Type
+         (-encode [~value ~e]
+           (.writeOID ~e ~OID)
+           ~@body))
+       nil)))
 
 
 (defmacro expand-decode

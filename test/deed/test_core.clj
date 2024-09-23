@@ -27,6 +27,7 @@
             File)
    (java.net URL
              URI)
+   (java.util.zip GZIPInputStream)
    (java.util.concurrent ArrayBlockingQueue)
    (clojure.lang Atom
                  ExceptionInfo
@@ -983,14 +984,16 @@
 (deftype AnotherType [x y z])
 
 
-(d/expand-encode [AnotherType at e]
-  (d/writeOID e 6666)
+(def MyOID 6666)
+
+
+(d/expand-encode [MyOID AnotherType at e]
   (d/encode e (.-x at))
   (d/encode e (.-y at))
   (d/encode e (.-z at)))
 
 
-(d/expand-decode [6666 d]
+(d/expand-decode [MyOID d]
   (let [x (d/decode d)
         y (d/decode d)
         z (d/decode d)]
@@ -1032,3 +1035,16 @@
     (is (= [1 2 3] (.-x c)))
     (is (= nil (.-y c)))
     (is (= 42 @(.-z c)))))
+
+
+(deftest test-gzip-param
+  (let [opt {:use-gzip? true}
+        file (get-temp-file "test" ".dump")]
+    (d/encode-seq-to [1 2 3] file opt)
+    (let [items (d/decode-seq-from file opt)]
+      (is (= [1 2 3] items)))
+    (with-open [in (-> file
+                       io/input-stream
+                       GZIPInputStream.)]
+      (let [items (d/decode-seq-from in)]
+        (is (= [1 2 3] items))))))

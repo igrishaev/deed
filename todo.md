@@ -4,13 +4,6 @@
 - byte-buffer
 - tr vector, list, map, set
 
-;; todo: from seq/to seq proto?
-;; TODO: handle OID in expand-encode?
-- encode expand macro
-- decode expand macro
-
-- test gzip
-
 - reuse commom arrays (encode chunk, encode input stream)
 
 - input stream: dump to temp file?
