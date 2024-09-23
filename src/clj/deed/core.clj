@@ -582,7 +582,12 @@
   (.decode decoder))
 
 
-(defn decode-seq [^Decoder d]
+(defn decode-seq
+  "
+  Get a lazy sequence of decoded values out from
+  a `Decoder` instance.
+  "
+  [^Decoder d]
   (seq d))
 
 
@@ -655,9 +660,29 @@
      (vec e))))
 
 
-;; TODO: docstrings
+;;
+;; Expanding
+;;
 
-(defmacro expand-encode [[Type value encoder] & body]
+;; TODO: handle OID?
+
+(defmacro expand-encode
+  "
+  A helper macro to expand encoding logic for a
+  certain type.
+
+  Arguments:
+  - the `Type` is a class;
+  - the `value` is a symbol bound to the value of this class;
+  - the `encoder` is a symbol bound to the current `Encoder`
+    instance.
+
+  The body must encode inner fields of the object using
+  ether top-level `encode` function or by calling the low-level
+  `.writeInt`, `.writeString`, and other methods.
+
+  "
+  [[Type value encoder] & body]
   `(do
      (extend-protocol IEncode
        ~Type
@@ -666,7 +691,21 @@
      nil))
 
 
-(defmacro expand-decode [[OID decoder] & body]
+(defmacro expand-decode
+  "
+  A helper macro to expand decoding logic for a certain
+  numeric code.
+
+  Arguments:
+  - the `OID` is a Short unique number describing the type;
+  - the `decoder` is a symbol bound to the current `Decoder`
+    instance.
+
+  The body must read fields by calling either top-level `decode`
+  function or low-level `.readInteger`, `.readString`, and other
+  methods, and construct the final value out from them.
+  "
+  [[OID decoder] & body]
   `(do
      (defmethod -decode ~OID
        [_# ~(with-meta decoder {:tag 'deed.Decoder})]
@@ -674,31 +713,8 @@
      nil))
 
 
-#_
-(expand-encode [Foo foo e]
-  (println e)
-  )
-
-#_
-(expand-decode [123 foo d]
-  (println d)
-  )
-
-#_
-(defmacro expand-decode [[oid decoder] & body]
-  )
-
-#_
-(expand-encode [clojure.foo.Test e]
-  (sdfadsf fsdf)
-  (sdfsdf sdf sf)
-  (sdfsdfg 3))
-
-#_
-(expand-decode [0x1323 d]
-  (sdfadsf fsdf)
-  (sdfsdf sdf sf)
-  (sdfsdfg 3))
+(defn writeOID [^Encoder encoder ^Short oid]
+  (.writeOID encoder oid))
 
 
 (defmacro handle-record
@@ -730,6 +746,10 @@
 
        nil)))
 
+
+;;
+;; Dev
+;;
 
 (comment
 

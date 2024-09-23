@@ -1,7 +1,9 @@
 
+all: test
+
 repl:
 	lein with-profile +test,+dev repl
 
-.phony: test
+.PHONY: test
 test:
 	lein test

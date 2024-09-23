@@ -4,6 +4,8 @@
 - byte-buffer
 - tr vector, list, map, set
 
+;; todo: from seq/to seq proto?
+;; TODO: handle OID in expand-encode?
 - encode expand macro
 - decode expand macro
 

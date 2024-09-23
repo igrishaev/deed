@@ -983,10 +983,8 @@
 (deftype AnotherType [x y z])
 
 
-;; TODO: write oid API
-;; TODO: various field types (with nil)
 (d/expand-encode [AnotherType at e]
-  (.writeOID e 6666)
+  (d/writeOID e 6666)
   (d/encode e (.-x at))
   (d/encode e (.-y at))
   (d/encode e (.-z at)))
@@ -999,7 +997,7 @@
     (new AnotherType x y z)))
 
 
-(deftest test-custom-type
+(deftest test-custom-type-ok
   (let [^AnotherType a (new AnotherType "a" "b" "c")
         ^AnotherType b (enc-dec a)]
 
@@ -1008,6 +1006,29 @@
 
     (is (= (.-x a) (.-x b)))
     (is (= (.-y a) (.-y b)))
-    (is (= (.-z a) (.-z b)))
+    (is (= (.-z a) (.-z b)))))
 
-    ))
+
+(deftest test-custom-type-various-fields
+  (let [^AnotherType a (new AnotherType
+                            "a"
+                            {:foo 42}
+                            (new AnotherType
+                                 [1 2 3]
+                                 nil
+                                 (future 42)))
+        ^AnotherType b (enc-dec a)
+        ^AnotherType c (.-z b)]
+
+    (is (= "deed.test_core.AnotherType"
+           (-> b class .getName)))
+
+    (is (= "deed.test_core.AnotherType"
+           (-> c class .getName)))
+
+    (is (= "a" (.-x b)))
+    (is (= {:foo 42} (.-y b)))
+
+    (is (= [1 2 3] (.-x c)))
+    (is (= nil (.-y c)))
+    (is (= 42 @(.-z c)))))
