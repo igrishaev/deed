@@ -1,21 +1,20 @@
 
-- reader
-- file
-- byte-buffer
-- tr vector, list, map, set
 
-- input stream: dump to temp file?
+- meta support?
 
 - option: skip unsupported (enc/dec)
 
 - cypher in/out
 
-- meta support?
-
 - locking?
 
+- reader
+- file
+- byte-buffer
+- tr vector, list, map, set
 - generate OID file
-- track OID enc/dec
+
+- track OID enc/dec ?
 
 - contrib package
 - vectorz package

@@ -627,48 +627,32 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public InputStream readInputStream() {
-        FileOutputStream fileOut = null;
-        ByteArrayOutputStream byteOut = null;
-        File file = null;
         final boolean useFile = options.ioUseTempFile();
         byte[] bytes;
+        OutputStream out;
         if (useFile) {
-            try {
-                file = File.createTempFile("temp", ".deed");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                fileOut = new FileOutputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            out = FileOutStream.ofTemp();
         } else {
-            byteOut = new ByteArrayOutputStream();
+            out = new ByteArrayOutputStream();
         }
-        try (final OutputStream out = useFile ? fileOut : byteOut) {
+        try (final OutputStream o = out) {
             while (true) {
                 bytes = readBytes();
                 if (bytes.length == 0) {
                     break;
                 } else {
-                    out.write(bytes);
+                    o.write(bytes);
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "couldn't write to the output stream");
         }
-        if (options.ioUseTempFile()) {
-            try {
-                return new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        if (out instanceof ByteArrayOutputStream ba) {
+            return IOTool.byteArrayInputStream(ba);
         } else {
-            final byte[] ba = byteOut.toByteArray();
-            return new ByteArrayInputStream(ba);
+            FileOutStream fo = (FileOutStream) out;
+            return IOTool.fileInputStream(fo.file());
         }
-
     }
 
     public Object decode() {

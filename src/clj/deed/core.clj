@@ -455,7 +455,8 @@
                   buf-input-size
                   buf-output-size
                   uncountable-max-items
-                  encode-unsupported?]}
+                  encode-unsupported?
+                  io-temp-file?]}
           opts]
 
       (cond-> (Options/builder)
@@ -481,8 +482,11 @@
         uncountable-max-items
         (.uncountableMaxItems uncountable-max-items)
 
-        (some? encode-unsupported?)
+        (boolean? encode-unsupported?)
         (.encodeUnsupported encode-unsupported?)
+
+        (some? io-temp-file?)
+        (.ioUseTempFile io-temp-file?)
 
         :finally
         (.build)))))

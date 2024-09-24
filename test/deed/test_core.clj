@@ -1048,3 +1048,22 @@
                        GZIPInputStream.)]
       (let [items (d/decode-seq-from in)]
         (is (= [1 2 3] items))))))
+
+
+(deftest test-input-stream-use-file
+  (let [string
+        "123abc123abc123abc123abc123abc123abc123abc"
+
+        a (-> string
+              .getBytes
+              (io/input-stream))
+
+        file
+        (get-temp-file "test" ".dump")]
+
+    (d/encode-to a file)
+
+    (let [b (d/decode-from file {:io-temp-file? true})]
+      (is (= "java.io.FileInputStream"
+             (-> b class .getName)))
+      (is (= string (slurp b))))))
