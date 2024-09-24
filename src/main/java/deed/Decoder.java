@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
-    private short version = Const.HEADER_VERSION;
+    private Header header = null;
     private InputStream inputStream;
     private final byte[] bytes;
     private final ByteBuffer bb;
@@ -46,7 +46,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     @SuppressWarnings("unused")
     public short version() {
-        return this.version;
+        return this.header.version();
     }
 
     private Decoder initStream() {
@@ -68,8 +68,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     private Decoder initHeader() {
-        this.version = readShort();
-        skipBytes(Const.HEADER_GAP);
+        final Object x = decode();
+        if (x instanceof Header h) {
+            this.header = h;
+        } else {
+            throw Err.error("Unexpected header object: %s", x);
+        }
         return this;
     }
 
@@ -636,6 +640,12 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
     }
 
+    public Header readHeader() {
+        final short version = readShort();
+        skipBytes(Const.HEADER_GAP);
+        return Header.of(version);
+    }
+
     public InputStream readInputStream() {
         final boolean useFile = options.ioUseTempFile();
         byte[] bytes;
@@ -673,6 +683,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = bb.getShort(0);
 
         return switch (oid) {
+            case OID.HEADER -> readHeader();
             case OID.META -> readMetadata();
             case OID.UNSUPPORTED -> readUnsupported();
             case OID.IO_INPUT_STREAM -> readInputStream();

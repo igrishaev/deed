@@ -10,7 +10,8 @@ public record Options(
         int uncountableMaxItems,
         boolean encodeUnsupported,
         boolean ioUseTempFile,
-        boolean saveMeta
+        boolean saveMeta,
+        boolean append
 ) {
 
     public static Options standard() {
@@ -34,6 +35,7 @@ public record Options(
         private boolean encodeUnsupported = Const.OPT_ENCODE_UNSUPPORTED;
         private boolean ioUseTempFile = Const.OPT_USE_IO_TEMP_FILE;
         private boolean saveMeta = Const.OPT_SAVE_META;
+        private boolean append = Const.OPT_APPEND;
 
         @SuppressWarnings("unused")
         public Builder useGzip(final boolean useGzip) {
@@ -95,6 +97,12 @@ public record Options(
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder append(final boolean append) {
+            this.append = append;
+            return this;
+        }
+
         public Options build() {
             return new Options(
                     useGzip,
@@ -106,7 +114,8 @@ public record Options(
                     uncountableMaxItems,
                     encodeUnsupported,
                     ioUseTempFile,
-                    saveMeta
+                    saveMeta,
+                    append
             );
         }
     }

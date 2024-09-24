@@ -1,8 +1,5 @@
 
-- write leading header object
-- append option
-
-- option: skip unsupported (enc/dec)
+- test append
 
 - cypher in/out
 

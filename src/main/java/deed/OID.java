@@ -2,6 +2,7 @@ package deed;
 
 public class OID {
 
+    public static final short HEADER                    = 0x0300;
     public static final short NULL                      = 0x0000;
     public static final short META                      = 0x1000;
     public static final short INT                       = 0x0002;

@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 public final class Encoder implements AutoCloseable {
 
+    private final Header header;
     private OutputStream outputStream;
     private final byte[] bytes;
     private final ByteBuffer bb;
@@ -38,6 +39,7 @@ public final class Encoder implements AutoCloseable {
     }
 
     private Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
+        this.header = Header.of(Const.HEADER_VERSION);
         this.bytes = new byte[8];
         this.bb = ByteBuffer.wrap(this.bytes);
         this.protoEncode = protoEncode;
@@ -56,8 +58,9 @@ public final class Encoder implements AutoCloseable {
     }
 
     private Encoder initHeader() {
-        writeShort(Const.HEADER_VERSION);
-        writeGap(Const.HEADER_GAP);
+        if (options.append()) {
+            encodeHeader(header);
+        }
         return this;
     }
 
@@ -829,6 +832,12 @@ public final class Encoder implements AutoCloseable {
     @SuppressWarnings("unused")
     public void encodeJavaStream(final Stream<?> stream) {
         encodeUncountable(OID.JVM_STREAM, stream.iterator());
+    }
+
+    public void encodeHeader(final Header header) {
+        writeOID(OID.HEADER);
+        writeShort(header.version());
+        writeGap(Const.HEADER_GAP);
     }
 
     private static APersistentMap getMeta(final Object x) {

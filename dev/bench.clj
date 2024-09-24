@@ -2,6 +2,7 @@
   (:import
    java.io.ByteArrayOutputStream)
   (:require
+   [jsonista.core :as json]
    [taoensso.nippy :as nippy]
    [clojure.java.io :as io]
    [deed.core :as deed])
@@ -49,6 +50,10 @@
   (quick-bench
       (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
         (deed/encode e DATA)))
+
+  ;; json mem
+  (quick-bench
+      (json/write-value (new ByteArrayOutputStream 0xFFFF) DATA))
 
   ;; file
   (quick-bench

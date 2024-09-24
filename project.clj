@@ -23,7 +23,8 @@
   {:dev
    {:source-paths ["dev"]
     :dependencies [[criterium "0.4.6"]
-                   [com.taoensso/nippy "3.4.2"]]}
+                   [com.taoensso/nippy "3.4.2"]
+                   [com.alpha-prosoft/jsonista "0.3.8.11"]]}
 
    :test
    {:source-paths ["test"]}})
