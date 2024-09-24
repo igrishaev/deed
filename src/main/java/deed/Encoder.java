@@ -831,11 +831,11 @@ public final class Encoder implements AutoCloseable {
         encodeUncountable(OID.JVM_STREAM, stream.iterator());
     }
 
-    private static Map<?,?> getMeta(final Object x) {
+    private static APersistentMap getMeta(final Object x) {
         if (x instanceof IMeta iMeta) {
             final IPersistentMap meta = iMeta.meta();
-            if (meta instanceof Map<?,?> map) {
-                return map;
+            if (meta instanceof APersistentMap apm) {
+                return apm;
             } else {
                 return null;
             }
@@ -844,21 +844,15 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
-    public void encodeWithMeta(final Object x) {
-        final Map<?,?> meta = getMeta(x);
-        if (meta != null) {
-            writeOID(OID.META);
-            writeMap(meta);
-        }
-        protoEncode.invoke(x, this);
-    }
-
     public void encode(final Object x) {
         if (options.saveMeta()) {
-            encodeWithMeta(x);
-        } else {
-            protoEncode.invoke(x, this);
+            final APersistentMap meta = getMeta(x);
+            if (meta != null) {
+                writeOID(OID.META);
+                encode(meta);
+            }
         }
+        protoEncode.invoke(x, this);
     }
 
     public void encodeUncountable(final short oid, final Iterator<?> iterator) {

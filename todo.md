@@ -1,6 +1,5 @@
 
-
-- meta support?
+- fix future
 
 - option: skip unsupported (enc/dec)
 

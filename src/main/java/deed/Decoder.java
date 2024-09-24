@@ -627,10 +627,10 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public IMeta readMetadata() {
-        final IPersistentMap meta = readClojureMap();
+        final Object meta = decode();
         final Object x = decode();
-        if (x instanceof IObj iObj) {
-            return iObj.withMeta(meta);
+        if ((meta instanceof IPersistentMap iMeta) &&  (x instanceof IObj iObj)) {
+            return iObj.withMeta(iMeta);
         } else {
             throw Err.error("Cannot assign meta to the object, meta: %s, obj: %s", meta, x);
         }

@@ -1101,7 +1101,7 @@
             (with-meta {:meta 1}
               (with-meta {:meta 2}
                 {:meta 3})))
-        b (enc-dec a)]
+        b (enc-dec a {:save-meta? true})]
 
     (is (= 'ABC b))
 
@@ -1123,5 +1123,3 @@
         b (enc-dec a {:save-meta? false})]
     (is (= {:a 1} b))
     (is (= nil (-> b meta)))))
-
-;; meta option
