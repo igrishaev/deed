@@ -1,6 +1,4 @@
 
-- test append
-
 - cypher in/out
 
 - locking?

@@ -24,6 +24,7 @@
               HashMap)
    (java.io IOException
             InputStream
+            FileOutputStream
             File)
    (java.net URL
              URI)
@@ -1127,3 +1128,26 @@
         b (enc-dec a {:save-meta? false})]
     (is (= {:a 1} b))
     (is (= nil (-> b meta)))))
+
+
+(deftest test-append-to-file
+  (let [file
+        (get-temp-file "test" ".deed")]
+
+    (with-open [out (new FileOutputStream file true)]
+      (d/encode-to 1 out))
+
+    (with-open [out (new FileOutputStream file true)]
+      (d/encode-to 2 out {:append? true}))
+
+    (with-open [out (new FileOutputStream file true)]
+      (d/encode-to 3 out))
+
+    (let [items
+          (d/decode-seq-from file)
+
+          [x1 x2 header x3]
+          items]
+
+      (is (= [1 2 3] [x1 x2 x3]))
+      (is (d/header? header)))))

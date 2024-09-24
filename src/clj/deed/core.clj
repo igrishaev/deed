@@ -53,7 +53,13 @@
               Iterator
               Date)
    (java.util.regex Pattern)
-   (deed Encoder Decoder Err EOF OID Options
+   (deed Encoder
+         Decoder
+         Err
+         Header
+         EOF
+         OID
+         Options
          Unsupported)))
 
 (set! *warn-on-reflection* true)
@@ -457,7 +463,8 @@
                   uncountable-max-items
                   encode-unsupported?
                   io-temp-file?
-                  save-meta?]}
+                  save-meta?
+                  append?]}
           opts]
 
       (cond-> (Options/builder)
@@ -486,11 +493,14 @@
         (boolean? encode-unsupported?)
         (.encodeUnsupported encode-unsupported?)
 
-        (some? io-temp-file?)
+        (boolean? io-temp-file?)
         (.ioUseTempFile io-temp-file?)
 
-        (some? save-meta?)
+        (boolean? save-meta?)
         (.saveMeta save-meta?)
+
+        (boolean? append?)
+        (.append append?)
 
         :finally
         (.build)))))
@@ -613,6 +623,14 @@
   "
   [x]
   (instance? Unsupported x))
+
+
+(defn header?
+  "
+  True if the object is a Header instance.
+  "
+  [x]
+  (instance? Header x))
 
 
 (defmethod print-method Unsupported

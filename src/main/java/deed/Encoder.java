@@ -58,7 +58,7 @@ public final class Encoder implements AutoCloseable {
     }
 
     private Encoder initHeader() {
-        if (options.append()) {
+        if (!options.append()) {
             encodeHeader(header);
         }
         return this;
