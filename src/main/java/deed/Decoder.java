@@ -626,6 +626,16 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return new Unsupported(className, content);
     }
 
+    public IMeta readMetadata() {
+        final IPersistentMap meta = readClojureMap();
+        final Object x = decode();
+        if (x instanceof Obj obj) {
+            return obj.withMeta(meta);
+        } else {
+            throw Err.error("Cannot assign meta to the object, meta: %s, obj: %s", meta, x);
+        }
+    }
+
     public InputStream readInputStream() {
         final boolean useFile = options.ioUseTempFile();
         byte[] bytes;
@@ -663,6 +673,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = bb.getShort(0);
 
         return switch (oid) {
+            case OID.META -> readMetadata();
             case OID.UNSUPPORTED -> readUnsupported();
             case OID.IO_INPUT_STREAM -> readInputStream();
             case OID.EX_NPE -> readNullPointerException();
