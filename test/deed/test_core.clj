@@ -1067,3 +1067,13 @@
       (is (= "java.io.FileInputStream"
              (-> b class .getName)))
       (is (= string (slurp b))))))
+
+
+(deftest test-meta-simple
+  (let [a ^{:foo [1 2 3]} [:a :b :c]
+        b (enc-dec a)]
+    (is (= [:a :b :c] b))
+    (is (= {:foo [1 2 3]} (meta b)))))
+
+;; meta nested
+;; meta option
