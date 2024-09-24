@@ -1075,5 +1075,53 @@
     (is (= [:a :b :c] b))
     (is (= {:foo [1 2 3]} (meta b)))))
 
-;; meta nested
+
+(deftest test-meta-complex
+  (let [a [(with-meta 'foo {:meta 1})
+           (with-meta 'bar {:meta 2})
+           (with-meta 'baz {:meta 3})
+           ^{:meta 4} [:a :b :c]
+           ^{:meta 5} {(with-meta 'abc {:meta 6})
+                       {:foo [^{:meta 7} [:A]]}}]
+        b (enc-dec a)]
+    (is (= '[foo bar baz [:a :b :c] {abc {:foo [[:A]]}}]
+           b))
+
+    (is (= {:meta 1} (-> b (get 0) meta)))
+    (is (= {:meta 2} (-> b (get 1) meta)))
+    (is (= {:meta 3} (-> b (get 2) meta)))
+    (is (= {:meta 4} (-> b (get 3) meta)))
+    (is (= {:meta 5} (-> b (get 4) meta)))
+    (is (= {:meta 6} (-> b (get 4) first first meta)))
+    (is (= {:meta 7} (-> b (get 4) (get 'abc) :foo first meta)))))
+
+
+(deftest test-meta-nested
+  (let [a (with-meta 'ABC
+            (with-meta {:meta 1}
+              (with-meta {:meta 2}
+                {:meta 3})))
+        b (enc-dec a)]
+
+    (is (= 'ABC b))
+
+    (is (= {:meta 1} (-> b meta)))
+    (is (= {:meta 2} (-> b meta meta)))
+    (is (= {:meta 3} (-> b meta meta meta)))
+    (is (= nil (-> b meta meta meta meta))))
+
+  (let [a ^{:foo {:bar ^{:aaa 1} [1 2 3]}} []
+        b (enc-dec a)]
+
+    (is (= [] b))
+    (is (= {:foo {:bar [1 2 3]}} (-> b meta)))
+    (is (= {:aaa 1} (-> b meta :foo :bar meta)))))
+
+
+(deftest test-meta-option
+  (let [a ^{:foo 1} {:a 1}
+        b (enc-dec a {:save-meta? false})]
+    (is (= {:a 1} b))
+    (is (= nil (-> b meta)))))
+
 ;; meta option
