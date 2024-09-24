@@ -1151,3 +1151,24 @@
 
       (is (= [1 2 3] [x1 x2 x3]))
       (is (d/header? header)))))
+
+
+(deftest test-crypt-ok
+
+  (let [file
+        (get-temp-file "test" ".deed")]
+
+    #_
+    (is (= 1 file))
+
+    ;; "DESede/CBC/NoPadding" 24
+
+    (try
+      (d/encode-to 1 file {:cipher-algorithm "DES/ECB/NoPadding"
+                           :cipher-secret (byte-array 8)})
+      (catch Throwable e
+        (is (= 1 e))
+        )
+      ))
+
+  )

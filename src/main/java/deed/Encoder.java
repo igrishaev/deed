@@ -50,7 +50,13 @@ public final class Encoder implements AutoCloseable {
     private Encoder initStream() {
         final int bufSize = options.bufOutputSize();
         final boolean useGzip = options.useGzip();
+        final String cipherAlgorithm = options.cipherAlgorithm();
+        final byte[] cipherSecret = options.cipherSecret();
+
         outputStream = IOTool.wrapBuf(outputStream, bufSize);
+        if (cipherAlgorithm != null && cipherSecret != null) {
+            outputStream = Crypto.wrapCipher(outputStream, cipherAlgorithm, cipherSecret);
+        }
         if (useGzip) {
             outputStream = IOTool.wrapGzip(outputStream);
         }

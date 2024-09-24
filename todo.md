@@ -1,5 +1,6 @@
 
 - cypher in/out
+- cipher: rename options
 
 - locking?
 

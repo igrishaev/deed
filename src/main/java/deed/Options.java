@@ -11,7 +11,9 @@ public record Options(
         boolean encodeUnsupported,
         boolean ioUseTempFile,
         boolean saveMeta,
-        boolean append
+        boolean append,
+        String cipherAlgorithm,
+        byte[] cipherSecret
 ) {
 
     public static Options standard() {
@@ -36,6 +38,8 @@ public record Options(
         private boolean ioUseTempFile = Const.OPT_USE_IO_TEMP_FILE;
         private boolean saveMeta = Const.OPT_SAVE_META;
         private boolean append = Const.OPT_APPEND;
+        private String cipherAlgorithm = null;
+        private byte[] cipherSecret = null;
 
         @SuppressWarnings("unused")
         public Builder useGzip(final boolean useGzip) {
@@ -103,6 +107,18 @@ public record Options(
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder cipherAlgorithm(final String cipherAlgorithm) {
+            this.cipherAlgorithm = cipherAlgorithm;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Builder cipherSecret(final byte[] cipherSecret) {
+            this.cipherSecret = cipherSecret;
+            return this;
+        }
+
         public Options build() {
             return new Options(
                     useGzip,
@@ -115,7 +131,9 @@ public record Options(
                     encodeUnsupported,
                     ioUseTempFile,
                     saveMeta,
-                    append
+                    append,
+                    cipherAlgorithm,
+                    cipherSecret
             );
         }
     }

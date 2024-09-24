@@ -4,29 +4,28 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 
 public class Crypto {
 
-    public static SecretKey AESKey(final String secret) {
-        return AESKey(secret.getBytes(StandardCharsets.UTF_8));
+    public static SecretKey secretKey(final byte[] secret, final String transformation) {
+        final String[] parts = transformation.split("/");
+        if (parts.length == 0) {
+            throw Err.error("empty transformation: %s", transformation);
+        }
+        final String algorithm = parts[0];
+        return new SecretKeySpec(secret, algorithm);
     }
 
-    public static SecretKey AESKey(final byte[] secret) {
-        return new SecretKeySpec(secret, "AES");
-    }
-
-    public static Cipher AESCipher () {
-        final String transformation = "AES/ECB/PKCS5Padding";
+    public static Cipher cipher(final String transformation) {
         try {
             return Cipher.getInstance(transformation);
         } catch (NoSuchAlgorithmException e) {
-            throw Err.error(e, "not such algorithm: %s", transformation);
+            throw Err.error(e, "no such transformation: %s", transformation);
         } catch (NoSuchPaddingException e) {
-            throw Err.error(e, "not such padding: %s", transformation);
+            throw Err.error(e, "no such padding: %s", transformation);
         }
     }
 
@@ -46,20 +45,25 @@ public class Crypto {
         }
     }
 
-    public static CipherOutputStream wrapCipher(final OutputStream out, final Cipher cipher) {
-        if (out instanceof CipherOutputStream cos) {
-            return cos;
-        } else {
-            return new CipherOutputStream(out, cipher);
-        }
+    public static CipherOutputStream wrapCipher(
+            final OutputStream out,
+            final String algorithm,
+            final byte[] secret
+    ) {
+        final Cipher cipher = cipher(algorithm);
+        final Key secretKey = secretKey(secret, algorithm);
+        initEncrypt(cipher, secretKey);
+        return new CipherOutputStream(out, cipher);
     }
 
-    public static CipherInputStream wrapCipher(final InputStream in, final Cipher cipher) {
-        if (in instanceof CipherInputStream cis) {
-            return cis;
-        } else {
-            return new CipherInputStream(in, cipher);
-        }
+    public static CipherInputStream wrapCipher(
+            final InputStream in,
+            final String algorithm,
+            final byte[] secret
+    ) {
+        final Cipher cipher = cipher(algorithm);
+        final Key secretKey = secretKey(secret, algorithm);
+        initDecrypt(cipher, secretKey);
+        return new CipherInputStream(in, cipher);
     }
-
 }
