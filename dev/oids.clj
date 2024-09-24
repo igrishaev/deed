@@ -3,6 +3,7 @@
 (def OIDS                                 ;; tested?
   '[
     NULL                                  ;; +
+    META                                  ;;
     INT                                   ;; +
     INT_ZERO                              ;; +
     INT_ONE                               ;; +

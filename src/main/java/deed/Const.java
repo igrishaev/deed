@@ -15,6 +15,7 @@ public class Const {
 
     public static int OPT_UNCOUNTABLE_MAX_ITEMS = Integer.MAX_VALUE;
     public static boolean OPT_ENCODE_UNSUPPORTED = true;
+    public static boolean OPT_SAVE_META = true;
 
     public static byte BYTE_MINUS_ONE = -1;
     public static byte BYTE_ZERO = 0;

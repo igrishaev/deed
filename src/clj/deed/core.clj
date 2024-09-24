@@ -456,7 +456,8 @@
                   buf-output-size
                   uncountable-max-items
                   encode-unsupported?
-                  io-temp-file?]}
+                  io-temp-file?
+                  save-meta?]}
           opts]
 
       (cond-> (Options/builder)
@@ -487,6 +488,9 @@
 
         (some? io-temp-file?)
         (.ioUseTempFile io-temp-file?)
+
+        (some? save-meta?)
+        (.saveMeta save-meta?)
 
         :finally
         (.build)))))
