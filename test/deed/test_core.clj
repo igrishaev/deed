@@ -635,11 +635,15 @@
     (let [f1 (future 42)
           f2 (enc-dec f1)]
       (is (future? f2))
+      (is (= "deed.FutureWrapper" (-> f2 class .getName)))
+      (is (some? (meta f2)))
+      (is (future-done? f2))
+      (is (not (future-cancelled? f2)))
       (is (= 42 @f2))))
 
   (testing "nested"
     (let [f1 (future (future (future :lol)))
-          f2 (enc-dec f1)]
+          f2 (enc-dec f1 {:save-meta? false})]
       (is (future? f2))
       (is (-> f2 deref deref deref (= :lol)))))
 

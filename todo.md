@@ -1,6 +1,4 @@
 
-- fix future
-
 - option: skip unsupported (enc/dec)
 
 - cypher in/out

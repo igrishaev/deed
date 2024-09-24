@@ -425,8 +425,8 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public Future<?> readFuture() {
-        final Object payload = decode();
-        return CompletableFuture.completedFuture(payload);
+        final Object x = decode();
+        return FutureWrapper.of(x);
     }
 
     public Date readUtilDate(){
