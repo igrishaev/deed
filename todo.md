@@ -4,8 +4,6 @@
 - byte-buffer
 - tr vector, list, map, set
 
-- reuse commom arrays (encode chunk, encode input stream)
-
 - input stream: dump to temp file?
 
 - option: skip unsupported (enc/dec)
@@ -13,6 +11,8 @@
 - cypher in/out
 
 - meta support?
+
+- locking?
 
 - generate OID file
 - track OID enc/dec

@@ -627,23 +627,48 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public InputStream readInputStream() {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        FileOutputStream fileOut = null;
+        ByteArrayOutputStream byteOut = null;
+        File file = null;
+        final boolean useFile = options.ioUseTempFile();
         byte[] bytes;
-        while (true) {
-            bytes = readBytes();
-            if (bytes.length == 0) {
-                break;
-            } else {
-                try {
+        if (useFile) {
+            try {
+                file = File.createTempFile("temp", ".deed");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                fileOut = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            byteOut = new ByteArrayOutputStream();
+        }
+        try (final OutputStream out = useFile ? fileOut : byteOut) {
+            while (true) {
+                bytes = readBytes();
+                if (bytes.length == 0) {
+                    break;
+                } else {
                     out.write(bytes);
-                } catch (IOException e) {
-                    throw Err.error(e, "could not write bytes, len: %s", bytes.length);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        // TODO: use temp file maybe?
-        final byte[] buf = out.toByteArray();
-        return new ByteArrayInputStream(buf);
+        if (options.ioUseTempFile()) {
+            try {
+                return new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            final byte[] ba = byteOut.toByteArray();
+            return new ByteArrayInputStream(ba);
+        }
+
     }
 
     public Object decode() {

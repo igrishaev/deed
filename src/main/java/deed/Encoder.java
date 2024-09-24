@@ -839,7 +839,6 @@ public final class Encoder implements AutoCloseable {
         writeOID(oid);
         Object x;
         final int chunkSize = options.objectChunkSize();
-        // TODO: reuse array;
         final Object[] chunk = new Object[chunkSize];
         int pos = 0;
         int counter = 0;

@@ -11,6 +11,7 @@ public class Const {
     public static long OPT_DEREF_TIMEOUT_MS = 5000;
     public static int OPT_OBJECT_CHUNK_SIZE = 0xFF;
     public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;
+    public static boolean OPT_USE_IO_TEMP_FILE = false;
 
     public static int OPT_UNCOUNTABLE_MAX_ITEMS = Integer.MAX_VALUE;
     public static boolean OPT_ENCODE_UNSUPPORTED = true;
