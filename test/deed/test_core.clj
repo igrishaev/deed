@@ -1161,11 +1161,13 @@
     #_
     (is (= 1 file))
 
+    ;; des 8
+    ;; aes 16
     ;; "DESede/CBC/NoPadding" 24
 
     (try
-      (d/encode-to 1 file {:cipher-algorithm "DES/ECB/NoPadding"
-                           :cipher-secret (byte-array 8)})
+      (d/encode-to 1 file {:cipher-algorithm "RSA"
+                           :cipher-secret (byte-array 128)})
       (catch Throwable e
         (is (= 1 e))
         )
