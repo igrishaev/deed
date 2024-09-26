@@ -34,6 +34,8 @@
               BigDecimal)
    (java.net URL
              URI)
+   (java.util.zip GZIPInputStream
+                  GZIPOutputStream)
    (java.time LocalDate
               LocalTime
               LocalDateTime
@@ -60,6 +62,7 @@
          EOF
          OID
          Options
+         IOTool
          Unsupported)))
 
 (set! *warn-on-reflection* true)
@@ -454,8 +457,7 @@
   ^Options [opts]
   (if (nil? opts)
     (Options/standard)
-    (let [{:keys [use-gzip?
-                  deref-timeout-ms
+    (let [{:keys [deref-timeout-ms
                   object-chunk-size
                   byte-chunk-size
                   buf-input-size
@@ -470,9 +472,6 @@
           opts]
 
       (cond-> (Options/builder)
-
-        (some? use-gzip?)
-        (.useGzip use-gzip?)
 
         deref-timeout-ms
         (.derefTimeoutMs deref-timeout-ms)
@@ -512,6 +511,26 @@
 
         :finally
         (.build)))))
+
+
+;;
+;; Stream utils
+;;
+
+
+(defn gzip-input-stream
+  ^GZIPInputStream [src]
+  (-> src
+      (io/input-stream)
+      (IOTool/wrapGZIPInputStream)))
+
+
+(defn gzip-output-stream
+  ^GZIPOutputStream [out]
+  (-> out
+      (io/output-stream)
+      (IOTool/wrapGZIPOutputStream)))
+
 
 ;;
 ;; API

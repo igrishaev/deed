@@ -7,7 +7,6 @@ public class Const {
     public static int OPT_IN_BUF_SIZE = 0xFFFF;
     public static int OPT_OUT_BUF_SIZE = 0xFFFF;
 
-    public static boolean OPT_USE_GZIP = false;
     public static long OPT_DEREF_TIMEOUT_MS = 5000;
     public static int OPT_OBJECT_CHUNK_SIZE = 0xFF;
     public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;

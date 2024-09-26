@@ -51,11 +51,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     private Decoder initStream() {
         final int bufSize = options.bufInputSize();
-        final boolean useGzip = options.useGzip();
         inputStream = IOTool.wrapBuf(inputStream, bufSize);
-        if (useGzip) {
-            inputStream = IOTool.wrapGzip(inputStream);
-        }
         return this;
     }
 

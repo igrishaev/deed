@@ -1,4 +1,9 @@
 
+- fix gzip stream
+- fix cipher stream
+
+- own stream coercion?
+
 - cypher in/out
 - cipher: rename options
 

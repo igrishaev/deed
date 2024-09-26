@@ -1042,15 +1042,22 @@
     (is (= 42 @(.-z c)))))
 
 
-(deftest test-gzip-param
-  (let [opt {:use-gzip? true}
-        file (get-temp-file "test" ".dump")]
-    (d/encode-seq-to [1 2 3] file opt)
-    (let [items (d/decode-seq-from file opt)]
-      (is (= [1 2 3] items)))
+(deftest test-gzip-stream
+  (let [file
+        (get-temp-file "test" ".dump")
+
+        out
+        (d/gzip-output-stream file)]
+
+    (d/encode-seq-to [1 2 3] out)
+
     (with-open [in (-> file
                        io/input-stream
                        GZIPInputStream.)]
+      (let [items (d/decode-seq-from in)]
+        (is (= [1 2 3] items))))
+
+    (with-open [in (d/gzip-input-stream file)]
       (let [items (d/decode-seq-from in)]
         (is (= [1 2 3] items))))))
 

@@ -1,7 +1,6 @@
 package deed;
 
 public record Options(
-        boolean useGzip,
         long derefTimeoutMs,
         int objectChunkSize,
         int byteChunkSize,
@@ -27,7 +26,6 @@ public record Options(
 
     public final static class Builder {
 
-        private boolean useGzip = Const.OPT_USE_GZIP;
         private long derefTimeoutMs = Const.OPT_DEREF_TIMEOUT_MS;
         private int objectChunkSize = Const.OPT_OBJECT_CHUNK_SIZE;
         private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
@@ -40,12 +38,6 @@ public record Options(
         private boolean append = Const.OPT_APPEND;
         private String cipherAlgorithm = null;
         private byte[] cipherSecret = null;
-
-        @SuppressWarnings("unused")
-        public Builder useGzip(final boolean useGzip) {
-            this.useGzip = useGzip;
-            return this;
-        }
 
         @SuppressWarnings("unused")
         public Builder derefTimeoutMs(final long derefTimeoutMs) {
@@ -121,7 +113,6 @@ public record Options(
 
         public Options build() {
             return new Options(
-                    useGzip,
                     derefTimeoutMs,
                     objectChunkSize,
                     byteChunkSize,

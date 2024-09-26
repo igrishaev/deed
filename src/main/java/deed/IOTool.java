@@ -22,19 +22,6 @@ public class IOTool {
         }
     }
 
-    public static GZIPOutputStream wrapGzip (final OutputStream out) {
-        if (out instanceof GZIPOutputStream gz) {
-            return gz;
-        } else {
-            try {
-                return new GZIPOutputStream(out);
-            } catch (IOException e) {
-                throw Err.error(e, "could not create GZIPOutputStream");
-            }
-
-        }
-    }
-
     public static File tempFile() {
         try {
             return File.createTempFile("temp", ".tmp");
@@ -55,7 +42,8 @@ public class IOTool {
         }
     }
 
-    public static GZIPInputStream wrapGzip (final InputStream in) {
+    @SuppressWarnings("unused")
+    public static GZIPInputStream wrapGZIPInputStream (final InputStream in) {
         if (in instanceof GZIPInputStream gz) {
             return gz;
         } else {
@@ -64,6 +52,20 @@ public class IOTool {
             } catch (IOException e) {
                 throw Err.error(e, "could not create GZIPInputStream");
             }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static GZIPOutputStream wrapGZIPOutputStream (final OutputStream out) {
+        if (out instanceof GZIPOutputStream gz) {
+            return gz;
+        } else {
+            try {
+                return new GZIPOutputStream(out);
+            } catch (IOException e) {
+                throw Err.error(e, "could not create GZIPOutputStream");
+            }
+
         }
     }
 }
