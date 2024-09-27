@@ -138,3 +138,43 @@ public class Crypto {
         return DESedeOutputStream(out, keySecret, DESede_CBC_NoPadding);
     }
 }
+
+
+
+    @SuppressWarnings("unused")
+    public static InputStream toInputStream(final Object x) {
+        if (x instanceof InputStream in) {
+            return in;
+        } else if (x instanceof File f) {
+            return fileInputStream(f);
+        } else if (x instanceof Socket s) {
+            try {
+                return s.getInputStream();
+            } catch (IOException e) {
+                throw Err.error(e, "cannot get input stream from socket %s", s);
+            }
+        } else if (x instanceof URL u) {
+            if (u.getProtocol().equals("file")) {
+                final File f = new File(u.getFile());
+                return fileInputStream(f);
+            } else {
+                try {
+                    return u.openStream();
+                } catch (IOException e) {
+                    throw Err.error(e, "cannot open stream from URL %s", u);
+                }
+            }
+        } else if (x instanceof URI u) {
+            try {
+                return toInputStream(u.toURL());
+            } catch (MalformedURLException e) {
+                throw Err.error("the URL is malformed: %s", u);
+            }
+        } else {
+            throw Err.error("cannot coerce to input stream: %s", x);
+        }
+    }
+
+    public static OutputStream toOutputStream(final Object x) {
+        if (x instanceof OutputStream)
+    }

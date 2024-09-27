@@ -460,8 +460,6 @@
     (let [{:keys [deref-timeout-ms
                   object-chunk-size
                   byte-chunk-size
-                  buf-input-size
-                  buf-output-size
                   uncountable-max-items
                   encode-unsupported?
                   io-temp-file?
@@ -481,12 +479,6 @@
 
         byte-chunk-size
         (.byteChunkSize byte-chunk-size)
-
-        buf-input-size
-        (.bufInputSize buf-input-size)
-
-        buf-output-size
-        (.bufOutputSize buf-output-size)
 
         uncountable-max-items
         (.uncountableMaxItems uncountable-max-items)

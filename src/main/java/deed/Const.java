@@ -4,9 +4,6 @@ public class Const {
     public static short HEADER_GAP = 30;
     public static short HEADER_VERSION = 1;
 
-    public static int OPT_IN_BUF_SIZE = 0xFFFF;
-    public static int OPT_OUT_BUF_SIZE = 0xFFFF;
-
     public static long OPT_DEREF_TIMEOUT_MS = 5000;
     public static int OPT_OBJECT_CHUNK_SIZE = 0xFF;
     public static int OPT_BYTE_CHUNK_SIZE = 0xFFFF;

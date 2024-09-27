@@ -1,5 +1,5 @@
 
-- own stream coercion?
+- encode to bytes
 
 - locking?
 

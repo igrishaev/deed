@@ -6,22 +6,6 @@ import java.util.zip.GZIPOutputStream;
 
 public class IOTool {
 
-    public static BufferedInputStream wrapBuf (final InputStream in, final int bufSize) {
-        if (in instanceof BufferedInputStream b) {
-            return b;
-        } else {
-            return new BufferedInputStream(in, bufSize);
-        }
-    }
-
-    public static BufferedOutputStream wrapBuf (final OutputStream out, final int bufSize) {
-        if (out instanceof BufferedOutputStream b) {
-            return b;
-        } else {
-            return new BufferedOutputStream(out, bufSize);
-        }
-    }
-
     public static File tempFile() {
         try {
             return File.createTempFile("temp", ".tmp");

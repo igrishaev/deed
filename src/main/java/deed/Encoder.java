@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public final class Encoder implements AutoCloseable {
 
     private final Header header;
-    private OutputStream outputStream;
+    private final OutputStream outputStream;
     private final byte[] bytes;
     private final ByteBuffer bb;
     private final Options options;
@@ -35,7 +35,7 @@ public final class Encoder implements AutoCloseable {
 
     public static Encoder create(final IFn protoEncode, final OutputStream outputStream, final Options options) {
         final Encoder encoder = new Encoder(protoEncode, outputStream, options);
-        return encoder.initStream().initHeader();
+        return encoder.initHeader();
     }
 
     private Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
@@ -45,12 +45,6 @@ public final class Encoder implements AutoCloseable {
         this.protoEncode = protoEncode;
         this.options = options;
         this.outputStream = outputStream;
-    }
-
-    private Encoder initStream() {
-        final int bufSize = options.bufOutputSize();
-        outputStream = IOTool.wrapBuf(outputStream, bufSize);
-        return this;
     }
 
     private Encoder initHeader() {

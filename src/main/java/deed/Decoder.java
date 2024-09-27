@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     private Header header = null;
-    private InputStream inputStream;
+    private final InputStream inputStream;
     private final byte[] bytes;
     private final ByteBuffer bb;
     private final MultiFn mmDecode;
@@ -32,7 +32,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     public static Decoder create(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
         final Decoder decoder = new Decoder(mmDecode, inputStream, options);
-        return decoder.initStream().initHeader();
+        return decoder.initHeader();
     }
 
     private Decoder(final MultiFn mmDecode, final InputStream inputStream, final Options options) {
@@ -47,12 +47,6 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     @SuppressWarnings("unused")
     public short version() {
         return this.header.version();
-    }
-
-    private Decoder initStream() {
-        final int bufSize = options.bufInputSize();
-        inputStream = IOTool.wrapBuf(inputStream, bufSize);
-        return this;
     }
 
     private void skipBytes(final int n) {

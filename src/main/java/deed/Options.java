@@ -4,8 +4,6 @@ public record Options(
         long derefTimeoutMs,
         int objectChunkSize,
         int byteChunkSize,
-        int bufInputSize,
-        int bufOutputSize,
         int uncountableMaxItems,
         boolean encodeUnsupported,
         boolean ioUseTempFile,
@@ -29,8 +27,6 @@ public record Options(
         private long derefTimeoutMs = Const.OPT_DEREF_TIMEOUT_MS;
         private int objectChunkSize = Const.OPT_OBJECT_CHUNK_SIZE;
         private int byteChunkSize = Const.OPT_BYTE_CHUNK_SIZE;
-        private int bufInputSize = Const.OPT_IN_BUF_SIZE;
-        private int bufOutputSize = Const.OPT_OUT_BUF_SIZE;
         private int uncountableMaxItems = Const.OPT_UNCOUNTABLE_MAX_ITEMS;
         private boolean encodeUnsupported = Const.OPT_ENCODE_UNSUPPORTED;
         private boolean ioUseTempFile = Const.OPT_USE_IO_TEMP_FILE;
@@ -54,18 +50,6 @@ public record Options(
         @SuppressWarnings("unused")
         public Builder byteChunkSize(final int byteChunkSize) {
             this.byteChunkSize = byteChunkSize;
-            return this;
-        }
-
-        @SuppressWarnings("unused")
-        public Builder bufInputSize(final int bufInputSize) {
-            this.bufInputSize = bufInputSize;
-            return this;
-        }
-
-        @SuppressWarnings("unused")
-        public Builder bufOutputSize(final int bufOutputSize) {
-            this.bufOutputSize = bufOutputSize;
             return this;
         }
 
@@ -116,8 +100,6 @@ public record Options(
                     derefTimeoutMs,
                     objectChunkSize,
                     byteChunkSize,
-                    bufInputSize,
-                    bufOutputSize,
                     uncountableMaxItems,
                     encodeUnsupported,
                     ioUseTempFile,
