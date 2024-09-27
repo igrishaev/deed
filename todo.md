@@ -1,13 +1,11 @@
 
-- encode to bytes
-
-- locking?
-
 - reader
 - file
 - byte-buffer
 - tr vector, list, map, set
 - generate OID file
+
+- locking?
 
 - track OID enc/dec ?
 

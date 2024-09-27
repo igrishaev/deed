@@ -1158,3 +1158,24 @@
 
       (is (= [1 2 3] [x1 x2 x3]))
       (is (d/header? header)))))
+
+
+(deftest test-encode-to-bytes
+
+  (let [out
+        (d/encode-to-bytes {:foo 1})
+
+        res
+        (d/decode-from out)]
+
+    (is (bytes? out))
+    (is (= {:foo 1} res)))
+
+  (let [out
+        (d/encode-seq-to-bytes [1 2 3])
+
+        res
+        (d/decode-seq-from out)]
+
+    (is (bytes? out))
+    (is (= [1 2 3] res))))

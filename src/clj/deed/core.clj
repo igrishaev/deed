@@ -6,6 +6,8 @@
    (java.io IOException
             InputStream
             OutputStream
+            ByteArrayOutputStream
+            ByteArrayInputStream
             Writer)
    (clojure.lang IPersistentVector
                  APersistentVector
@@ -678,6 +680,32 @@
   ([xs out options]
    (with-encoder [e out options]
      (encode-seq e xs))))
+
+
+(defn encode-to-bytes
+  "
+  Encode a single value into a byte array.
+  "
+  (^bytes [x]
+   (encode-to-bytes x nil))
+
+  (^bytes[x options]
+   (with-open [out (new ByteArrayOutputStream)]
+     (encode-to x out)
+     (.toByteArray out))))
+
+
+(defn encode-seq-to-bytes
+  "
+  Encode multiple values into a byte array.
+  "
+  (^bytes [xs]
+   (encode-seq-to-bytes xs nil))
+
+  (^bytes [xs options]
+   (with-open [out (new ByteArrayOutputStream)]
+     (encode-seq-to xs out)
+     (.toByteArray out))))
 
 
 (defn decode-from
