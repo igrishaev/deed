@@ -16,6 +16,7 @@ public class FileOutStream extends OutputStream {
         }
     }
 
+    @SuppressWarnings("unused")
     public static FileOutStream of(final File file) {
         return new FileOutStream(file);
     }

@@ -514,9 +514,8 @@
 
 
 ;;
-;; Stream utils
+;; Stream wrappers
 ;;
-
 
 (defn gzip-input-stream
   ^GZIPInputStream [src]
