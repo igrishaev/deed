@@ -477,6 +477,14 @@
       (is (= a b))
       (is (vector? b))))
 
+  (testing "clojure transient vector"
+    (let [a (transient [1 2 3])
+          b (enc-dec a)]
+      (is (= (persistent! a) (persistent! b))))
+    (let [a (transient [])
+          b (enc-dec a)]
+      (is (= (persistent! a) (persistent! b)))))
+
   (testing "clojure list"
     (let [a (list 1 2 3)
           b (enc-dec a)]

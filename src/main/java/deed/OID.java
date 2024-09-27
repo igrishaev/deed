@@ -67,8 +67,6 @@ public class OID {
     public static final short CLJ_MAP_ENTRY             = -123;
     public static final short CLJ_RECORD                = -124;
     public static final short CLJ_TR_VEC                = 9991;
-    public static final short CLJ_TR_MAP                = 9993;
-    public static final short CLJ_TR_SET                = 9994;
     public static final short UUID                      = 0x0035;
     public static final short JVM_LIST                  = 0x0036;
     public static final short JVM_LIST_EMPTY            = 0x1036;
@@ -110,5 +108,4 @@ public class OID {
     public static final short CLJ_BIG_INT               = 0x0059;
     public static final short CLJ_RATIO                 = 0x005D;
     public static final short UNSUPPORTED               = 0x105D;
-
 }

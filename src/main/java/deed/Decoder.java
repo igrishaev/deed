@@ -281,7 +281,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return vector;
     }
 
-    public IPersistentCollection readClojureVector() {
+    public ITransientCollection readTransientVector() {
         Object x;
         final int len = readInteger();
         ITransientCollection v = PersistentVector.EMPTY.asTransient();
@@ -289,7 +289,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             x = decode();
             v = v.conj(x);
         }
-        return v.persistent();
+        return v;
+    }
+
+    public IPersistentCollection readClojureVector() {
+        return readTransientVector().persistent();
     }
 
     public PersistentQueue readClojureQueue() {
@@ -695,6 +699,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
             case OID.CLJ_QUEUE -> readClojureQueue();
             case OID.CLJ_LIST_EMPTY -> PersistentList.EMPTY;
             case OID.CLJ_LIST, OID.CLJ_VEC -> readClojureVector();
+            case OID.CLJ_TR_VEC -> readTransientVector();
             case OID.CLJ_SEQ, OID.CLJ_LAZY_SEQ -> readClojureSeq();
             case OID.SQL_TIME -> readSqlTime();
             case OID.SQL_DATE -> readSqlDate();

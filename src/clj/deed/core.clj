@@ -11,6 +11,7 @@
             Writer)
    (clojure.lang IPersistentVector
                  APersistentVector
+                 ITransientVector
                  PersistentVector
                  IPersistentSet
                  APersistentSet
@@ -277,6 +278,10 @@
   LazySeq
   (-encode [this ^Encoder encoder]
     (.encodeLazySeq encoder this))
+
+  ITransientVector
+  (-encode [this ^Encoder encoder]
+    (.encodeITransientVector encoder this))
 
   ;;
   ;; Clojure records
