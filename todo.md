@@ -1,21 +1,19 @@
 
 - byte-buffer
-
 - generate OID file
+- track OID enc/dec ?
+- sub-package
+- base64 in/out stream
+- DOS?
 
 - file
-
 - locking?
-
-- track OID enc/dec ?
 
 - contrib package
 - vectorz package
 
 net.mikera/vectorz-clj
 net.mikera/core.matrix
-
-- base64 in/out stream
 
 - make: linter
 
