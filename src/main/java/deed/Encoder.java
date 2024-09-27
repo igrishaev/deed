@@ -609,6 +609,16 @@ public final class Encoder implements AutoCloseable {
     }
 
     @SuppressWarnings("unused")
+    public void encodeITransientVector(final ITransientVector trVec) {
+        final int len = trVec.count();
+        writeOID(OID.CLJ_TR_VEC);
+        writeInt(len);
+        for (int i = 0; i < len; i++) {
+            encode(trVec.nth(i));
+        }
+    }
+
+    @SuppressWarnings("unused")
     public void encodeAPersistentVector(final APersistentVector v) {
         if (v.isEmpty()) {
             writeOID(OID.CLJ_VEC_EMPTY);

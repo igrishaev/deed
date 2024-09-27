@@ -20,6 +20,7 @@
     IO_INPUT_STREAM                       ;; +
     IO_READER
     IO_FILE
+    IO_BYTEBUFFER
     BYTEBUFFER
     ARR_BYTE                              ;; +
     ARR_INT                               ;; +
@@ -64,6 +65,9 @@
     CLJ_MAP_EMPTY                         ;; +
     CLJ_MAP_ENTRY                         ;; +
     CLJ_RECORD                            ;; +
+    CLJ_TR_VEC
+    CLJ_TR_MAP
+    CLJ_TR_SET
     JVM_MAP                               ;; +
     JVM_MAP_ENTRY                         ;; +
     UUID                                  ;; +

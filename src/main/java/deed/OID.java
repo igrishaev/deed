@@ -20,6 +20,7 @@ public class OID {
     public static final short IO_INPUT_STREAM           = 0x000E;
     public static final short IO_READER                 = 0x000F;
     public static final short IO_FILE                   = 0x0010;
+    public static final short IO_BYTEBUFFER             = 9955;
     public static final short ARR_BYTE                  = 0x0011;
     public static final short ARR_INT                   = 0x0012;
     public static final short ARR_SHORT                 = 0x0013;
@@ -65,6 +66,9 @@ public class OID {
     public static final short JVM_MAP_ENTRY             = 0x0034;
     public static final short CLJ_MAP_ENTRY             = -123;
     public static final short CLJ_RECORD                = -124;
+    public static final short CLJ_TR_VEC                = 9991;
+    public static final short CLJ_TR_MAP                = 9993;
+    public static final short CLJ_TR_SET                = 9994;
     public static final short UUID                      = 0x0035;
     public static final short JVM_LIST                  = 0x0036;
     public static final short JVM_LIST_EMPTY            = 0x1036;
