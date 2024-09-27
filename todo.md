@@ -13,6 +13,10 @@
 
 - contrib package
 - vectorz package
+
+net.mikera/vectorz-clj
+net.mikera/core.matrix
+
 - base64 in/out stream
 
 - make: linter
