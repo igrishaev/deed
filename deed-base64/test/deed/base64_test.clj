@@ -30,3 +30,47 @@
     (is (= "AAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAGM="
            (slurp file)))
     (is (= 99 res))))
+
+
+(deftest test-base64-bytes
+
+  (let [buf
+        (b64/encode-to-base64-bytes 42)
+
+        res
+        (b64/decode-from-base64-bytes buf)]
+
+    (is (= 42 res))
+
+    (is (= [65, 65, 69, 65, 65, 81, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+            65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+            65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 77, 65, 65, 65,
+            65, 65, 65, 65, 65, 65, 67, 111, 61]
+           (vec buf)))))
+
+
+(deftest test-base64-bytes-seq
+  (let [buf
+        (b64/encode-seq-to-base64-bytes [1 2 3])
+        res
+        (b64/decode-seq-from-base64-bytes buf)]
+    (is (= [1 2 3] res))))
+
+
+(deftest test-base64-string
+  (let [string
+        (b64/encode-to-base64-string 42)
+        res
+        (b64/decode-from-base64-string string)]
+    (is (= 42 res))
+    (is (= "AAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAACo="
+           string))))
+
+(deftest test-base64-seq-string
+  (let [string
+        (b64/encode-seq-to-base64-string [:foo 1 nil])
+        res
+        (b64/decode-seq-from-base64-string string)]
+    (is (= [:foo 1 nil] res))
+    (is (= "AAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABKAAAAA2ZvbwAOAAA="
+           string))))

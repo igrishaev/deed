@@ -701,7 +701,7 @@
 
   (^bytes[x options]
    (with-open [out (new ByteArrayOutputStream)]
-     (encode-to x out)
+     (encode-to x out options)
      (.toByteArray out))))
 
 
@@ -714,7 +714,7 @@
 
   (^bytes [xs options]
    (with-open [out (new ByteArrayOutputStream)]
-     (encode-seq-to xs out)
+     (encode-seq-to xs out options)
      (.toByteArray out))))
 
 

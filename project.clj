@@ -1,4 +1,4 @@
-(defproject com.github.igrishaev/deed "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/_ "0.1.0-SNAPSHOT"
 
   :url
   "https://github.com/igrishaev/deed"
@@ -36,7 +36,8 @@
   []
 
   :managed-dependencies
-  [[com.github.igrishaev/deed :version]
+  [[com.github.igrishaev/deed-core :version]
+   [com.github.igrishaev/deed-bas64 :version]
    [org.clojure/clojure "1.11.1"]
 
    ;; base64

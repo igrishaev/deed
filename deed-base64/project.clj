@@ -9,10 +9,10 @@
   [[lein-parent "0.3.8"]]
 
   :dependencies
-  [[com.github.igrishaev/deed]
+  [[com.github.igrishaev/deed-core]
    [commons-codec/commons-codec]]
 
-  :source-paths ["src/clj"]
+  :source-paths ["src"]
 
   :parent-project
   {:path "../project.clj"
