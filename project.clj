@@ -36,13 +36,20 @@
   []
 
   :managed-dependencies
-  [[org.clojure/clojure "1.11.1"]
+  [[com.github.igrishaev/deed :version]
+   [org.clojure/clojure "1.11.1"]
+
+   ;; base64
+   [commons-codec/commons-codec "1.17.1"]
+
+   ;; bench
    [criterium "0.4.6"]
    [com.taoensso/nippy "3.4.2"]
    [com.alpha-prosoft/jsonista "0.3.8.11"]]
 
   :sub
-  ["deed-core"]
+  ["deed-core"
+   "deed-base64"]
 
   :profiles
   {:dev
