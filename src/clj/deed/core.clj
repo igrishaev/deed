@@ -3,6 +3,7 @@
    [clojure.java.io :as io])
   (:import
    (java.util.concurrent Future)
+   (java.nio ByteBuffer)
    (java.io IOException
             InputStream
             OutputStream
@@ -134,6 +135,10 @@
   ;;
   ;; IO
   ;;
+
+  ByteBuffer
+  (-encode [this ^Encoder encoder]
+    (.encodeByteBuffer encoder this))
 
   InputStream
   (-encode [this ^Encoder encoder]

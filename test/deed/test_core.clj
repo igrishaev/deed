@@ -12,6 +12,7 @@
               Duration
               Period
               ZoneId)
+   (java.nio ByteBuffer)
    (java.sql Time
              Timestamp)
    (java.util.stream Stream)
@@ -1187,3 +1188,12 @@
 
     (is (bytes? out))
     (is (= [1 2 3] res))))
+
+
+(deftest test-bytebuffer
+  (let [a (doto (ByteBuffer/allocate 32)
+            (.putFloat (float 123.123)))
+        ^ByteBuffer b (enc-dec a)]
+    (is (instance? ByteBuffer b))
+    (is (= 4 (.position b)))
+    (is (= 32 (.limit b)))))

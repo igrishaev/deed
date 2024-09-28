@@ -2,8 +2,9 @@
 
 (def OIDS                                 ;; tested?
   '[
-    HEADER                                ;; +
     NULL                                  ;; +
+    HEADER                                ;; +
+    UNSUPPORTED                           ;; +
     META                                  ;; +
     INT                                   ;; +
     INT_ZERO                              ;; +
@@ -20,7 +21,7 @@
     IO_INPUT_STREAM                       ;; +
     IO_READER
     IO_FILE
-    IO_BYTEBUFFER
+    IO_BYTEBUFFER                         ;; +
     ARR_BYTE                              ;; +
     ARR_INT                               ;; +
     ARR_SHORT                             ;; +
@@ -64,7 +65,7 @@
     CLJ_MAP_EMPTY                         ;; +
     CLJ_MAP_ENTRY                         ;; +
     CLJ_RECORD                            ;; +
-    CLJ_TR_VEC
+    CLJ_TR_VEC                            ;; +
     JVM_MAP                               ;; +
     JVM_MAP_ENTRY                         ;; +
     UUID                                  ;; +
@@ -107,11 +108,7 @@
     JVM_BIG_INT                           ;; +
     CLJ_BIG_INT                           ;; +
     CLJ_RATIO                             ;; +
-    CLJ_TR_MAP
-    CLJ_TR_SET
-    CLJ_TR_VEC
-    CLJ_TR_LIST
-    UNSUPPORTED
+
     ])
 
 

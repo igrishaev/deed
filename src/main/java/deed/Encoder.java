@@ -619,6 +619,17 @@ public final class Encoder implements AutoCloseable {
     }
 
     @SuppressWarnings("unused")
+    public void encodeByteBuffer(final ByteBuffer bb) {
+        final byte[] array = bb.array();
+        final int position = bb.position();
+        final int limit = bb.limit();
+        writeOID(OID.IO_BYTEBUFFER);
+        writeInt(position);
+        writeInt(limit);
+        writeBytes(array);
+    }
+
+    @SuppressWarnings("unused")
     public void encodeAPersistentVector(final APersistentVector v) {
         if (v.isEmpty()) {
             writeOID(OID.CLJ_VEC_EMPTY);

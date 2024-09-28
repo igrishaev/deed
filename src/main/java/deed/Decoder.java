@@ -669,6 +669,13 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         }
     }
 
+    public ByteBuffer readByteBuffer() {
+        final int position = readInteger();
+        final int limit = readInteger();
+        final byte[] bytes = readBytes();
+        return ByteBuffer.wrap(bytes).position(position).limit(limit);
+    }
+
     public Object decode() {
         final int r = fillBuffer(Const.LEN_OID);
         if (r == -1) {
@@ -677,6 +684,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         final short oid = bb.getShort(0);
 
         return switch (oid) {
+            case OID.IO_BYTEBUFFER -> readByteBuffer();
             case OID.HEADER -> readHeader();
             case OID.META -> readMetadata();
             case OID.UNSUPPORTED -> readUnsupported();

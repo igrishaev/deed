@@ -1,5 +1,4 @@
 
-- byte-buffer
 - generate OID file
 - track OID enc/dec ?
 - sub-package
