@@ -1,13 +1,9 @@
 
-all: test
+all: install test
 
-repl:
-	lein with-profile +test,+dev repl
-
-.PHONY: clean
-clean:
-	rm -rf target
+install:
+	lein sub with-profile uberjar install
 
 .PHONY: test
-test: clean
-	lein test
+test:
+	lein sub test

@@ -1,17 +1,14 @@
 
-- sub-package
-
 - base64 in/out stream
+
+- vectorz package
+- net.mikera/vectorz-clj
+- net.mikera/core.matrix
+
 - DOS?
 
 - file
 - locking?
-
-- contrib package
-- vectorz package
-
-net.mikera/vectorz-clj
-net.mikera/core.matrix
 
 - make: linter
 
