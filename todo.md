@@ -1,7 +1,6 @@
 
-- generate OID file
-- track OID enc/dec ?
 - sub-package
+
 - base64 in/out stream
 - DOS?
 

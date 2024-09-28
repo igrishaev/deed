@@ -108,7 +108,6 @@
     JVM_BIG_INT                           ;; +
     CLJ_BIG_INT                           ;; +
     CLJ_RATIO                             ;; +
-
     ])
 
 
@@ -117,6 +116,10 @@
 
 (defn generateClass []
 
+  (println "//")
+  (println "// Generated! See the oids.clj file")
+  (println "//")
+  (println)
   (println "package deed;")
   (println)
   (println "public class OID {")
@@ -127,6 +130,4 @@
   (println)
   (println "}")
   (println)
-
-
   )
