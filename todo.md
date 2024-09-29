@@ -1,9 +1,5 @@
 
-- remove base64 lexem?
-
 - DOS?
-
-- linter
 
 - readme
 - benchmarks

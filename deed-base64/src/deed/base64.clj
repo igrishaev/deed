@@ -1,8 +1,7 @@
 (ns deed.base64
   (:import
    (java.nio.charset StandardCharsets)
-   (java.io ByteArrayOutputStream
-            ByteArrayInputStream)
+   (java.io ByteArrayOutputStream)
    (org.apache.commons.codec.binary
     Base64OutputStream
     Base64InputStream)

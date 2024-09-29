@@ -44,3 +44,4 @@ build/
 *.deed
 
 .idea
+.clj-kondo

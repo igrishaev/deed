@@ -1001,7 +1001,7 @@
 (def MyOID 6666)
 
 
-(d/expand-encode [MyOID AnotherType at e]
+(d/expand-encode [MyOID AnotherType e at]
   (d/encode e (.-x at))
   (d/encode e (.-y at))
   (d/encode e (.-z at)))

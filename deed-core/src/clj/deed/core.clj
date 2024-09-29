@@ -6,15 +6,10 @@
    (java.nio ByteBuffer)
    (java.io IOException
             InputStream
-            OutputStream
             ByteArrayOutputStream
-            ByteArrayInputStream
             Writer)
-   (clojure.lang IPersistentVector
-                 APersistentVector
+   (clojure.lang APersistentVector
                  ITransientVector
-                 PersistentVector
-                 IPersistentSet
                  APersistentSet
                  APersistentMap
                  PersistentList
@@ -51,7 +46,6 @@
               Period
               ZoneId)
    (java.util UUID
-              AbstractCollection
               Map
               Map$Entry
               List
@@ -64,7 +58,6 @@
          Err
          Header
          EOF
-         OID
          Options
          IOTool
          Unsupported)))
@@ -72,7 +65,7 @@
 (set! *warn-on-reflection* true)
 
 (defprotocol IEncode
-  (-encode [this ^Encoder encoder]))
+  (-encode [_this ^Encoder encoder]))
 
 (extend-protocol IEncode
 
@@ -81,7 +74,7 @@
   ;;
 
   nil
-  (-encode [this ^Encoder encoder]
+  (-encode [_this ^Encoder encoder]
     (.encodeNULL encoder))
 
   Object
@@ -332,7 +325,7 @@
   ;; SQL
   ;;
 
-  java.sql.Date
+  Date
   (-encode [this ^Encoder encoder]
     (.encodeSqlDate encoder this))
 
@@ -451,11 +444,11 @@
 
 
 (defmulti -decode
-  (fn [oid decoder]
+  (fn [oid _decoder]
     oid))
 
 (defmethod -decode :default
-  [oid decoder]
+  [oid _decoder]
   (throw
    (Err/error nil
               "cannot decode a custom object, oid: 0x%04x"
@@ -569,11 +562,11 @@
                    (->options options))))
 
 
-(defn ^Short version
+(defn version
   "
   Return a version number used in the decoder.
   "
-  [^Decoder decoder]
+  ^short [^Decoder decoder]
   (.version decoder))
 
 
@@ -754,16 +747,17 @@
   Arguments:
   - the `OID` is a Short unique number describing the type;
   - the `Type` is a class;
-  - the `value` is a symbol bound to the value of this class;
   - the `encoder` is a symbol bound to the current `Encoder`
-    instance.
+    instance;
+  - the `value` is a symbol bound to the current instance
+    of class `Type`.
 
   The body must encode inner fields of the object using
   ether top-level `encode` function or by calling the low-level
   `.writeInt`, `.writeString`, and other methods.
 
   "
-  [[OID Type value encoder] & body]
+  [[OID Type encoder value] & body]
   (let [e (with-meta encoder {:tag 'deed.Encoder})]
     `(do
        (extend-protocol IEncode
