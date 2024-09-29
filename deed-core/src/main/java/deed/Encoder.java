@@ -601,7 +601,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeAPersistentMap(final APersistentMap m) {
-        if (m.isEmpty()) {
+        if (m.count() == 0) {
             writeOID(OID.CLJ_MAP_EMPTY);
         } else {
             encodeAsMap(OID.CLJ_MAP, m);
@@ -689,7 +689,7 @@ public final class Encoder implements AutoCloseable {
 
     @SuppressWarnings("unused")
     public void encodeSortedMap(final PersistentTreeMap s) {
-        if (s.isEmpty()) {
+        if (s.count() == 0) {
             writeOID(OID.CLJ_SORTED_MAP_EMPTY);
         } else {
             encodeAsMap(OID.CLJ_SORTED_MAP, s);

@@ -43,6 +43,9 @@
    ;; base64
    [commons-codec/commons-codec "1.17.1"]
 
+   ;; vectorz
+   [net.mikera/vectorz "0.67.0"]
+
    ;; bench
    [criterium "0.4.6"]
    [com.taoensso/nippy "3.4.2"]
