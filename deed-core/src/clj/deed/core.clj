@@ -566,7 +566,7 @@
   "
   Return a version number used in the decoder.
   "
-  ^short [^Decoder decoder]
+  ^Short [^Decoder decoder]
   (.version decoder))
 
 
