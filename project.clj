@@ -70,7 +70,10 @@
   :profiles
   {:dev
    {:source-paths ["dev"]
-    :dependencies [[org.clojure/clojure]]
+    :dependencies [[org.clojure/clojure]
+                   [com.taoensso/nippy]
+                   [criterium]
+                   [com.alpha-prosoft/jsonista]]
     :global-vars
     {*warn-on-reflection* true
      *assert* true}}
