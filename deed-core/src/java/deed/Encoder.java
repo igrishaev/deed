@@ -22,9 +22,7 @@ import java.util.stream.Stream;
 public final class Encoder implements AutoCloseable {
 
     private final Header header;
-    private final OutputStream outputStream;
-    private final byte[] bytes;
-    private final ByteBuffer bb;
+    private final DataOutputStream outputStream;
     private final Options options;
     private final IFn protoEncode;
 
@@ -40,11 +38,9 @@ public final class Encoder implements AutoCloseable {
 
     private Encoder(final IFn protoEncode, final OutputStream outputStream, final Options options) {
         this.header = Header.of(Const.HEADER_VERSION);
-        this.bytes = new byte[8];
-        this.bb = ByteBuffer.wrap(this.bytes);
         this.protoEncode = protoEncode;
         this.options = options;
-        this.outputStream = outputStream;
+        this.outputStream = new DataOutputStream(outputStream);
     }
 
     private Encoder initHeader() {
@@ -52,14 +48,6 @@ public final class Encoder implements AutoCloseable {
             encodeHeader(header);
         }
         return this;
-    }
-
-    private void dumpBuffer(final int len) {
-        try {
-            this.outputStream.write(this.bytes, 0, len);
-        } catch (IOException e) {
-            throw Err.error(e, "could not read %s bytes from the input stream", len);
-        }
     }
 
     public void writeGap(final int len) {
@@ -71,45 +59,69 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void writeInt(final int i) {
-        bb.putInt(0, i);
-        dumpBuffer(Const.LEN_INT);
+        try {
+            outputStream.writeInt(i);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeOID(final short oid) {
-        bb.putShort(0, oid);
-        dumpBuffer(Const.LEN_OID);
+        try {
+            outputStream.writeShort(oid);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeShort(final short s) {
-        bb.putShort(0, s);
-        dumpBuffer(Const.LEN_SHORT);
+        try {
+            outputStream.writeShort(s);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeLong(final long l) {
-        bb.putLong(0, l);
-        dumpBuffer(Const.LEN_LONG);
+        try {
+            outputStream.writeLong(l);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unused")
     public void writeFloat(final float f) {
-        bb.putFloat(0, f);
-        dumpBuffer(Const.LEN_FLOAT);
+        try {
+            outputStream.writeFloat(f);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unused")
     public void writeDouble(final double d) {
-        bb.putDouble(0, d);
-        dumpBuffer(Const.LEN_DOUBLE);
+        try {
+            outputStream.writeDouble(d);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeByte(final byte b) {
-        bb.put(0, b);
-        dumpBuffer(Const.LEN_BYTE);
+        try {
+            outputStream.writeByte(b);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeCharacter(final char c) {
-        bb.putChar(0, c);
-        dumpBuffer(Const.LEN_CHAR);
+        try {
+            outputStream.writeChar(c);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeBytes(final byte[] bytes) {
