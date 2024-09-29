@@ -50,8 +50,7 @@
               Map$Entry
               List
               Vector
-              Iterator
-              Date)
+              Iterator)
    (java.util.regex Pattern)
    (deed Encoder
          Decoder
@@ -325,7 +324,7 @@
   ;; SQL
   ;;
 
-  Date
+  java.sql.Date
   (-encode [this ^Encoder encoder]
     (.encodeSqlDate encoder this))
 
