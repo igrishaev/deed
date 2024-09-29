@@ -12,7 +12,7 @@
 (set! *warn-on-reflection* true)
 
 
-(d/expand-encode [OID/MIKERA_IVECTOR ;; TODO: AVECTOR
+(d/expand-encode [OID/VECTORZ_AVECTOR
                   AVector
                   iv
                   ^Encoder encoder]
@@ -26,7 +26,7 @@
           (recur (inc i)))))))
 
 
-(d/expand-decode [OID/MIKERA_IVECTOR
+(d/expand-decode [OID/VECTORZ_AVECTOR
                   ^Decoder decoder]
   (let [len (.readInteger decoder)
         res (Vectorz/newVector len)]

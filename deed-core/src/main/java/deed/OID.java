@@ -111,5 +111,5 @@ public class OID {
     public static final short JVM_BIG_INT               = 0x0067;
     public static final short CLJ_BIG_INT               = 0x0068;
     public static final short CLJ_RATIO                 = 0x0069;
-    public static final short MIKERA_IVECTOR            = 0x0201;
+    public static final short VECTORZ_AVECTOR           = 0x006A;
 }

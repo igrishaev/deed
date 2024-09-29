@@ -108,7 +108,7 @@
     JVM_BIG_INT                           ;; +
     CLJ_BIG_INT                           ;; +
     CLJ_RATIO                             ;; +
-    MIKERA_IVECTOR
+    VECTORZ_AVECTOR                       ;; +
     ])
 
 

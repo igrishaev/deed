@@ -97,6 +97,11 @@
         <version>1.17.1</version>
       </dependency>
       <dependency>
+        <groupId>net.mikera</groupId>
+        <artifactId>vectorz</artifactId>
+        <version>0.67.0</version>
+      </dependency>
+      <dependency>
         <groupId>criterium</groupId>
         <artifactId>criterium</artifactId>
         <version>0.4.6</version>

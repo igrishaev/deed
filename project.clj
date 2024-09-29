@@ -53,7 +53,8 @@
 
   :sub
   ["deed-core"
-   "deed-base64"]
+   "deed-base64"
+   "deed-vectorz"]
 
   :profiles
   {:dev
