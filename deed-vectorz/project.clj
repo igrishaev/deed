@@ -8,11 +8,12 @@
   :plugins
   [[lein-parent "0.3.8"]]
 
+  :source-paths ["src/clj"]
+  :java-source-paths ["src/java"]
+
   :dependencies
   [[com.github.igrishaev/deed-core]
    [net.mikera/vectorz]]
-
-  :source-paths ["src"]
 
   :parent-project
   {:path "../project.clj"
@@ -22,6 +23,8 @@
              :managed-dependencies
              :plugins
              :repositories
+             :pom-addition
+             :javac-options
              :url
              [:profiles :dev]
              [:profiles :test]]})
