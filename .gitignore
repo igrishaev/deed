@@ -44,4 +44,4 @@ build/
 *.deed
 
 .idea
-.clj-kondo
+.clj-kondo/.cache
