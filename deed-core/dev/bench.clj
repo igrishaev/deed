@@ -48,8 +48,7 @@
 
   ;; mem
   (quick-bench
-      (deed/with-encoder [e (new ByteArrayOutputStream 0xFFFF)]
-        (deed/encode e DATA)))
+      (do (deed/encode-to-bytes DATA) nil))
 
   ;; json mem
   (quick-bench

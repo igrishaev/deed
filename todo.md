@@ -1,6 +1,4 @@
 
-- DOS?
-
 - readme
 - benchmarks
 
