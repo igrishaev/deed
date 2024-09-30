@@ -49,7 +49,7 @@
   :managed-dependencies
   [[com.github.igrishaev/deed-core :version]
    [com.github.igrishaev/deed-bas64 :version]
-   [org.clojure/clojure "1.11.1"]
+   [org.clojure/clojure "1.9.0"]
 
    ;; base64
    [commons-codec/commons-codec "1.17.1"]

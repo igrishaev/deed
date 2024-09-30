@@ -1,4 +1,7 @@
 (ns deed.test-core
+  (:refer-clojure :exclude [random-uuid
+                            ex-message
+                            ex-cause])
   (:import
    (java.math BigInteger
               BigDecimal)
@@ -17,6 +20,7 @@
              Timestamp)
    (java.util.stream Stream)
    (java.util Date
+              UUID
               List
               ArrayList
               Vector
@@ -58,6 +62,19 @@
                   io/input-stream)]
        (d/with-decoder [d in options]
          (d/decode d))))))
+
+(defn ex-message
+  ^String [ex]
+  (when (instance? Throwable ex)
+    (.getMessage ^Throwable ex)))
+
+(defn ex-cause
+  ^Throwable [ex]
+  (when (instance? Throwable ex)
+    (.getCause ^Throwable ex)))
+
+(defn random-uuid
+  ^java.util.UUID [] (java.util.UUID/randomUUID))
 
 (defn Short? [x]
   (instance? Short x))
@@ -402,11 +419,14 @@
       (is (instance? HashMap b))))
 
   (testing "java list"
-    (let [a (List/of 1 2 3)
+    (let [a (doto (new ArrayList)
+              (.add 1)
+              (.add 2)
+              (.add 3))
           b (enc-dec a)]
       (is (= a b))
       (is (= "java.util.ArrayList" (-> b class .getName))))
-    (let [a (List/of)
+    (let [a (new ArrayList)
           b (enc-dec a)]
       (is (= a b))
       (is (instance? List b))))
