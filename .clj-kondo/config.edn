@@ -1,0 +1,5 @@
+{:linters
+ {:unresolved-symbol
+  {:exclude
+   [(deed.core/with-encoder [e d encode-multi])
+    (deed.core/with-decoder [e d])]}}}
