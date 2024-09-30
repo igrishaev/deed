@@ -62,7 +62,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeInt(i);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write int: %s", i);
         }
     }
 
@@ -70,7 +70,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeShort(oid);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write OID: %s", oid);
         }
     }
 
@@ -78,7 +78,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeShort(s);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write short: %s", s);
         }
     }
 
@@ -86,7 +86,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeLong(l);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write long: %s", l);
         }
     }
 
@@ -95,7 +95,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeFloat(f);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write float: %s", f);
         }
     }
 
@@ -104,7 +104,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeDouble(d);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write double: %s", d);
         }
     }
 
@@ -112,7 +112,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeByte(b);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write byte: %s", b);
         }
     }
 
@@ -120,7 +120,7 @@ public final class Encoder implements AutoCloseable {
         try {
             outputStream.writeChar(c);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Err.error(e, "cannot write char: %s", c);
         }
     }
 
@@ -150,7 +150,11 @@ public final class Encoder implements AutoCloseable {
     }
 
     public void writeBoolean(final boolean b) {
-        writeByte(b ? (byte) 1 : 0);
+        try {
+            outputStream.writeBoolean(b);
+        } catch (IOException e) {
+            throw Err.error(e, "cannot write bool: %s", b);
+        }
     }
 
     public void writeBigInteger(final BigInteger bi) {

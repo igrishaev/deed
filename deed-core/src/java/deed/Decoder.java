@@ -18,9 +18,7 @@ import java.util.regex.Pattern;
 public final class Decoder implements Iterable<Object>, AutoCloseable {
 
     private Header header = null;
-    private final InputStream inputStream;
-    private final byte[] bytes;
-    private final ByteBuffer bb;
+    private final DataInputStream inputStream;
     private final MultiFn mmDecode;
     private final EOF EOF;
     private final Options options;
@@ -39,9 +37,7 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         this.EOF = new EOF();
         this.options = options;
         this.mmDecode = mmDecode;
-        this.inputStream = inputStream;
-        this.bytes = new byte[8];
-        this.bb = ByteBuffer.wrap(this.bytes);
+        this.inputStream = new DataInputStream(inputStream);
     }
 
     @SuppressWarnings("unused")
@@ -67,42 +63,52 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
         return this;
     }
 
-    private int fillBuffer(final int len) {
+    public short readShort() {
         try {
-            return inputStream.read(this.bytes, 0, len);
+            return inputStream.readShort();
         } catch (IOException e) {
-            throw Err.error(e, "could not fill buffer, len: %s", len);
+            throw Err.error(e, "cannot read short");
         }
     }
 
-    public short readShort() {
-        fillBuffer(Const.LEN_SHORT);
-        return bb.getShort(0);
-    }
-
     public long readLong() {
-        fillBuffer(Const.LEN_LONG);
-        return bb.getLong(0);
+        try {
+            return inputStream.readLong();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read long");
+        }
     }
 
     public int readInteger() {
-        fillBuffer(Const.LEN_INT);
-        return bb.getInt(0);
+        try {
+            return inputStream.readInt();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read integer");
+        }
     }
 
     public boolean readBoolean() {
-        final byte b = readByte();
-        return b != 0;
+        try {
+            return inputStream.readBoolean();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read boolean");
+        }
     }
 
     public double readDouble() {
-        fillBuffer(Const.LEN_DOUBLE);
-        return bb.getDouble(0);
+        try {
+            return inputStream.readDouble();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read double");
+        }
     }
 
     public float readFloat() {
-        fillBuffer(Const.LEN_FLOAT);
-        return bb.getFloat(0);
+        try {
+            return inputStream.readFloat();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read float");
+        }
     }
 
     public Atom readAtom() {
@@ -148,8 +154,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public byte readByte() {
-        fillBuffer(Const.LEN_BYTE);
-        return bb.get(0);
+        try {
+            return inputStream.readByte();
+        } catch (IOException e) {
+            throw Err.error("cannot read byte");
+        }
     }
 
     public BigInteger readBigInteger() {
@@ -340,8 +349,11 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public char readCharacter() {
-        fillBuffer(Const.LEN_CHAR);
-        return bb.getChar(0);
+        try {
+            return inputStream.readChar();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read character");
+        }
     }
 
     public UUID readUUID() {
@@ -677,11 +689,15 @@ public final class Decoder implements Iterable<Object>, AutoCloseable {
     }
 
     public Object decode() {
-        final int r = fillBuffer(Const.LEN_OID);
-        if (r == -1) {
+        short oid;
+
+        try {
+            oid = inputStream.readShort();
+        } catch (EOFException e) {
             return EOF;
+        } catch (IOException e) {
+            throw Err.error(e, "cannot read short");
         }
-        final short oid = bb.getShort(0);
 
         return switch (oid) {
             case OID.IO_BYTEBUFFER -> readByteBuffer();
