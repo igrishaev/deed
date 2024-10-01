@@ -20,13 +20,4 @@ public class Const {
     public static double DOUBLE_ONE = 1;
     public static double DOUBLE_MINUS_ONE = -1;
     public static double DOUBLE_ZERO = 0;
-
-    public static int LEN_INT = 4;
-    public static int LEN_OID = 2;
-    public static int LEN_SHORT = 2;
-    public static int LEN_LONG = 8;
-    public static int LEN_DOUBLE = 8;
-    public static int LEN_FLOAT = 4;
-    public static int LEN_BYTE = 1;
-    public static int LEN_CHAR = 2;
 }

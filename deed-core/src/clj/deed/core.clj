@@ -468,9 +468,7 @@
                   encode-unsupported?
                   io-temp-file?
                   save-meta?
-                  append?
-                  cipher-algorithm
-                  cipher-secret]}
+                  append?]}
           opts]
 
       (cond-> (Options/builder)
@@ -498,12 +496,6 @@
 
         (boolean? append?)
         (.append append?)
-
-        cipher-algorithm
-        (.cipherAlgorithm cipher-algorithm)
-
-        cipher-secret
-        (.cipherSecret cipher-secret)
 
         :finally
         (.build)))))
