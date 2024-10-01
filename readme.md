@@ -402,16 +402,17 @@ encoding and decoding.
 Most of the functions accept an optional map of parameters. Here is a list of
 ones available at the moment:
 
-
-deref-timeout-ms
-object-chunk-size
-byte-chunk-size
-uncountable-max-items
-encode-unsupported?
-io-temp-file?
-save-meta?
-append?
-
+| Name                     | Default           | Meaning                                                                              |
+|--------------------------|-------------------|--------------------------------------------------------------------------------------|
+| `:deref-timeout-ms`      | 5000              | The number of milliseconds to wait when derefing futures.                            |
+| `:object-chunk-size`     | 0xFF              | The number of object chunk when encoding uncountable collections (e.g. lazy).        |
+| `:byte-chunk-size`       | 0xFFFF            | The number of byte chunk when encoding input streams.                                |
+| `:uncountable-max-items` | Integer.MAX_VALUE | The max number of items to encode when encoding uncountable collections (e.g. lazy). |
+| `:encode-unsupported?`   |                   |                                                                                      |
+| `:io-temp-file?`         |                   |                                                                                      |
+| `:save-meta?`            |                   |                                                                                      |
+| `:append?`               |                   |                                                                                      |
+|                          |                   |                                                                                      |
 
 ## GZip
 
