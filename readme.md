@@ -47,6 +47,14 @@ mind while working on Deed:
    Nippi's. Namely, it allows to lazily iterate by a series of encoded data
    instead of reading the whole dump at once.
 
+6. Why not using popular and cross-platform formats like JSON, Message Pack, or
+   YAML? Well, because of poor types support. JSON has only primitive types and
+   collections, and nothing else. Extending it with custom types is always a
+   pain. At the same time, I want my decoded data be as close to the origin data
+   as possible, say, `LocalDateTime` be an instance of `LocalDateTime` but not a
+   string nor `java.util.Date`. Sometimes, preserving metadata is crucial. To
+   haldle all of these cases, there is only one solution: make your own library.
+
 ## Installation & Requirements
 
 Deed requires Java version at least 16 to run. Tested with Clojure 1.9.0.
@@ -235,7 +243,93 @@ file.
 
 ### Encoding to Memory
 
+The functions below rely on external IO resources. If you want to dump the data
+into memory, use the `encode-to-bytes` function. It returns a byte array without
+any IO interaction:
+
+~~~clojure
+(def buf
+  (deed/encode-to-bytes {:test 123}))
+
+(println (vec buf))
+
+[0 1 0 1 0 0 ...  59 0 0 0 1 0 74 0 0 0 4 116 101 115 116 0 12 0 0 0 0 0 0 0 123]
+~~~
+
+There is no an opposite `decode-from-bytes` function because a byte array is
+already a data source for the `decode-from` function. Just pass the result into
+it:
+
+~~~clojure
+(deed/decode-from buf)
+;; {:test 123}
+~~~
+
 ### Sequential Encoding and Decoding
+
+Often, we dump vast collections to explore them afterwards. Say, you're going to
+write 10M of database rows into a file to find broken rows with a script.
+
+The functions above encode and decode a single value. That's OK for primitive
+types and maps but not good for vast collections. For example, if you encode a
+vector of 10M items into a file and read it back, you'll get the same vector of
+10M items back. Most likely you don't need all of these read at once: you would
+better to iterate on them one by one.
+
+This is the case that `encode-seq-to` and `decode-seq-from` functions cover. The
+first function accepts a collection of items and writes them sequentially. It's
+not a vector any longer but a series of items written one after another. The
+`encode-seq-to` invocation returns the number of items written:
+
+~~~clojure
+(deed/encode-seq-to [1 2 3] "test.deed")
+;; 3
+~~~
+
+Instead of vector, there might be a lazy sequence, or anything that can be
+iterated.
+
+If you read the dump using `decode-from`, you'll get the first item only:
+
+~~~clojure
+(deed/decode-from "test.deed")
+1
+~~~
+
+To read all of them, use `decode-seq-from`:
+
+~~~clojure
+(deed/decode-seq-from "test.deed")
+[1 2 3]
+~~~
+
+What is the point to use sequential encoding? Because with a special API, you
+can read them lazily one by one:
+
+~~~clojure
+(deed/with-decoder [d "test.deed"]
+  (doseq [item (deed/decode-seq d)]
+    (println item)))
+;; 1
+;; 2
+;; 3
+~~~
+
+~~~clojure
+(deed/with-decoder [d "test.deed"]
+  (doseq [item d]
+    (println item)))
+;; 1
+;; 2
+;; 3
+~~~
+
+~~~clojure
+(deed/with-decoder [d "test.deed"]
+  (->> d
+       (deed/decode-seq)
+       (mapv inc)))
+~~~
 
 ### Low-Level API
 
@@ -246,5 +340,7 @@ file.
 ## Custom Types
 
 ## Contrib
+
+## Binary Format
 
 ## Benchmarks

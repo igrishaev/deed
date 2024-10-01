@@ -89,3 +89,28 @@ true
                       io/file
                       io/input-stream))
 ;; {:foo 123}
+
+(def buf
+  (deed/encode-to-bytes {:test 123}))
+
+
+(deed/decode-from buf)
+
+(deed/encode-seq-to [1 2 3] "test.deed")
+
+(deed/decode-from "test.deed")
+
+(deed/decode-seq-from "test.deed")
+
+(deed/with-decoder [d "test.deed"]
+  (doseq [item (deed/decode-seq d)]
+    (println item)))
+
+(deed/with-decoder [d "test.deed"]
+  (->> d
+       (deed/decode-seq)
+       (mapv inc)))
+
+(deed/with-decoder [d "test.deed"]
+  (doseq [item d]
+    (println item)))
