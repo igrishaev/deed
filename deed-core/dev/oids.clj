@@ -1,114 +1,114 @@
 (ns oids)
 
-(def OIDS                                 ;; tested?
+(def OIDS
   '[
-    NULL                                  ;; +
-    HEADER                                ;; +
-    UNSUPPORTED                           ;; +
-    META                                  ;; +
-    INT                                   ;; +
-    INT_ZERO                              ;; +
-    INT_ONE                               ;; +
-    INT_MINUS_ONE                         ;; +
-    SHORT                                 ;; +
-    SHORT_ZERO                            ;; +
-    SHORT_ONE                             ;; +
-    SHORT_MINUS_ONE                       ;; +
-    LONG                                  ;; +
-    LONG_ZERO                             ;; +
-    LONG_ONE                              ;; +
-    LONG_MINUS_ONE                        ;; +
-    IO_INPUT_STREAM                       ;; +
-    IO_READER
-    IO_FILE
-    IO_BYTEBUFFER                         ;; +
-    ARR_BYTE                              ;; +
-    ARR_INT                               ;; +
-    ARR_SHORT                             ;; +
-    ARR_BOOL                              ;; +
-    ARR_FLOAT                             ;; +
-    ARR_DOUBLE                            ;; +
-    ARR_OBJ                               ;; +
-    ARR_LONG                              ;; +
-    ARR_CHAR                              ;; +
-    REGEX                                 ;; +
-    CLJ_SORTED_SET                        ;; +
-    CLJ_SORTED_SET_EMPTY                  ;; +
-    CLJ_SORTED_MAP                        ;; +
-    CLJ_SORTED_MAP_EMPTY                  ;; +
-    URI                                   ;; +
-    URL                                   ;; +
-    EXCEPTION                             ;; +
-    IO_EXCEPTION                          ;; +
-    THROWABLE                             ;; +
-    EX_INFO                               ;; +
-    EX_NPE                                ;; +
-    BOOL_TRUE                             ;; +
-    BOOL_FALSE                            ;; +
-    STRING                                ;; +
-    STRING_EMPTY                          ;; +
-    CHAR                                  ;; +
-    CLJ_VEC                               ;; +
-    CLJ_VEC_EMPTY                         ;; +
-    CLJ_ATOM                              ;; +
-    CLJ_REF                               ;; +
-    FUTURE                                ;; +
-    CLJ_SET                               ;; +
-    CLJ_SET_EMPTY                         ;; +
-    CLJ_LAZY_SEQ                          ;; +
-    CLJ_SEQ                               ;; +
-    CLJ_LIST                              ;; +
-    CLJ_LIST_EMPTY                        ;; +
-    CLJ_QUEUE                             ;; +
-    CLJ_QUEUE_EMPTY                       ;; +
-    CLJ_MAP                               ;; +
-    CLJ_MAP_EMPTY                         ;; +
-    CLJ_MAP_ENTRY                         ;; +
-    CLJ_RECORD                            ;; +
-    CLJ_TR_VEC                            ;; +
-    JVM_MAP                               ;; +
-    JVM_MAP_ENTRY                         ;; +
-    UUID                                  ;; +
-    JVM_LIST                              ;; +
-    JVM_LIST_EMPTY                        ;; +
-    JVM_VECTOR                            ;; +
-    JVM_VECTOR_EMPTY                      ;; +
-    JVM_ITERABLE                          ;; +
-    JVM_ITERATOR                          ;; +
-    JVM_STREAM                            ;; +
-    CLJ_KEYWORD                           ;; +
-    CLJ_SYMBOL                            ;; +
-    UTIL_DATE                             ;; +
-    DT_LOCAL_DATE                         ;; +
-    DT_LOCAL_TIME                         ;; +
-    DT_LOCAL_DATETIME                     ;; +
-    DT_OFFSET_DATETIME                    ;; +
-    DT_OFFSET_TIME                        ;; +
-    DT_DURATION                           ;; +
-    DT_PERIOD                             ;; +
-    DT_ZONED_DATETIME                     ;; +
-    DT_ZONE_ID                            ;; +
-    DT_INSTANT                            ;; +
-    SQL_TIMESTAMP                         ;; +
-    SQL_TIME                              ;; +
-    SQL_DATE                              ;; +
-    BYTE                                  ;; +
-    BYTE_ZERO                             ;; +
-    BYTE_ONE                              ;; +
-    BYTE_MINUS_ONE                        ;; +
-    FLOAT                                 ;; +
-    FLOAT_ZERO                            ;; +
-    FLOAT_ONE                             ;; +
-    FLOAT_MINUS_ONE                       ;; +
-    DOUBLE                                ;; +
-    DOUBLE_ZERO                           ;; +
-    DOUBLE_ONE                            ;; +
-    DOUBLE_MINUS_ONE                      ;; +
-    JVM_BIG_DEC                           ;; +
-    JVM_BIG_INT                           ;; +
-    CLJ_BIG_INT                           ;; +
-    CLJ_RATIO                             ;; +
-    VECTORZ_AVECTOR                       ;; +
+    NULL                    "null (nil)"                        nil
+    HEADER                  "deed.Header"                       "A leading object with metadata about encoding"
+    UNSUPPORTED             "deed.Unsupported"                  "A wrapper for unsupported objects"
+    META                    nil                                 "Specifies an object that has metadata"
+    INT                     "int, java.lang.Integer"            nil
+    INT_ZERO                nil                                 "A special OID for 0 int"
+    INT_ONE                 nil                                 "A special OID for 1 int"
+    INT_MINUS_ONE           nil                                 "A special OID for -1 int"
+    SHORT                   "short, java.lang.Short"            nil
+    SHORT_ZERO              nil                                 "A special OID for 0 short"
+    SHORT_ONE               nil                                 "A special OID for 1 short"
+    SHORT_MINUS_ONE         nil                                 "A special OID for -1 short"
+    LONG                    "long, java.lang.Long"              nil
+    LONG_ZERO               nil                                 nil
+    LONG_ONE                nil                                 nil
+    LONG_MINUS_ONE          nil                                 nil
+    IO_INPUT_STREAM         "java.io.InputStream"               "When decoding, the bytes are put into a ByteArrayInputStream. It's also possible to put them into a temp file and obtain a FileInputStream"
+    IO_READER               "-"                                 "Not implemented"
+    IO_FILE                 "-"                                 "Not implemented"
+    IO_BYTEBUFFER           "java.nio.ByteBuffer"               nil
+    ARR_BYTE                "byte[]"                            nil
+    ARR_INT                 "int[]"                             nil
+    ARR_SHORT               "short[]"                           nil
+    ARR_BOOL                "bool[]"                            nil
+    ARR_FLOAT               "float[]"                           nil
+    ARR_DOUBLE              "double[]"                          nil
+    ARR_OBJ                 "Object[]"                          nil
+    ARR_LONG                "long[]"                            nil
+    ARR_CHAR                "char[]"                            nil
+    REGEX                   "java.util.regex.Pattern"           nil
+    CLJ_SORTED_SET          "clojure.lang.PersistentTreeSet"    "A sorted set usually created with `(sorted-set ...)`"
+    CLJ_SORTED_SET_EMPTY    nil                                 "A special OID for an empty sorted set"
+    CLJ_SORTED_MAP          "clojure.lang.PersistentTreeMap"    "A sorted map usually created with `(sorted-map ...)`"
+    CLJ_SORTED_MAP_EMPTY    nil                                 "An empty sorted map"
+    URI                     "java.net.URI"                      nil
+    URL                     "java.net.URL"                      nil
+    EXCEPTION               "java.lang.Exception"               "Keeps message, class name, stack trace, cause (recursively encoded), and all the suppressed exceptions"
+    IO_EXCEPTION            nil                                 nil
+    THROWABLE               nil                                 nil
+    EX_INFO                 nil                                 nil
+    EX_NPE                  nil                                 nil
+    BOOL_TRUE               nil                                 nil
+    BOOL_FALSE              nil                                 nil
+    STRING                  nil                                 nil
+    STRING_EMPTY            nil                                 nil
+    CHAR                    nil                                 nil
+    CLJ_VEC                 nil                                 nil
+    CLJ_VEC_EMPTY           nil                                 nil
+    CLJ_ATOM                nil                                 nil
+    CLJ_REF                 nil                                 nil
+    FUTURE                  nil                                 nil
+    CLJ_SET                 nil                                 nil
+    CLJ_SET_EMPTY           nil                                 nil
+    CLJ_LAZY_SEQ            nil                                 nil
+    CLJ_SEQ                 nil                                 nil
+    CLJ_LIST                nil                                 nil
+    CLJ_LIST_EMPTY          nil                                 nil
+    CLJ_QUEUE               nil                                 nil
+    CLJ_QUEUE_EMPTY         nil                                 nil
+    CLJ_MAP                 nil                                 nil
+    CLJ_MAP_EMPTY           nil                                 nil
+    CLJ_MAP_ENTRY           nil                                 nil
+    CLJ_RECORD              nil                                 nil
+    CLJ_TR_VEC              nil                                 nil
+    JVM_MAP                 nil                                 nil
+    JVM_MAP_ENTRY           nil                                 nil
+    UUID                    nil                                 nil
+    JVM_LIST                nil                                 nil
+    JVM_LIST_EMPTY          nil                                 nil
+    JVM_VECTOR              nil                                 nil
+    JVM_VECTOR_EMPTY        nil                                 nil
+    JVM_ITERABLE            nil                                 nil
+    JVM_ITERATOR            nil                                 nil
+    JVM_STREAM              nil                                 nil
+    CLJ_KEYWORD             nil                                 nil
+    CLJ_SYMBOL              nil                                 nil
+    UTIL_DATE               nil                                 nil
+    DT_LOCAL_DATE           nil                                 nil
+    DT_LOCAL_TIME           nil                                 nil
+    DT_LOCAL_DATETIME       nil                                 nil
+    DT_OFFSET_DATETIME      nil                                 nil
+    DT_OFFSET_TIME          nil                                 nil
+    DT_DURATION             nil                                 nil
+    DT_PERIOD               nil                                 nil
+    DT_ZONED_DATETIME       nil                                 nil
+    DT_ZONE_ID              nil                                 nil
+    DT_INSTANT              nil                                 nil
+    SQL_TIMESTAMP           nil                                 nil
+    SQL_TIME                nil                                 nil
+    SQL_DATE                nil                                 nil
+    BYTE                    nil                                 nil
+    BYTE_ZERO               nil                                 nil
+    BYTE_ONE                nil                                 nil
+    BYTE_MINUS_ONE          nil                                 nil
+    FLOAT                   nil                                 nil
+    FLOAT_ZERO              nil                                 nil
+    FLOAT_ONE               nil                                 nil
+    FLOAT_MINUS_ONE         nil                                 nil
+    DOUBLE                  nil                                 nil
+    DOUBLE_ZERO             nil                                 nil
+    DOUBLE_ONE              nil                                 nil
+    DOUBLE_MINUS_ONE        nil                                 nil
+    JVM_BIG_DEC             nil                                 nil
+    JVM_BIG_INT             nil                                 nil
+    CLJ_BIG_INT             nil                                 nil
+    CLJ_RATIO               nil                                 nil
+    VECTORZ_AVECTOR         nil                                 nil
     ])
 
 
@@ -125,10 +125,23 @@
   (println)
   (println "public class OID {")
   (println)
-  (doseq [[i oid] (enumerate OIDS)]
+  (doseq [[i [oid]] (enumerate (partition 3 OIDS))]
     (println (format "    public static final short %-25s = 0x%04X;"
                      oid i)))
   (println)
   (println "}")
+  (println)
+  )
+
+(defn line [n]
+  (apply str (repeat n "-")))
+
+(defn generateTable []
+
+  (println)
+  (println (format "| %-6s | %-25s | %-30s | %-150s |" "OID" "TAG" "Class" "Comment"))
+  (println (format "|%s|%s|%s|%s|" (line 8) (line 27) (line 32) (line 152)))
+  (doseq [[i [oid Type doc]] (enumerate (partition 3 OIDS))]
+    (println (format "| 0x%04X | %-25s | %-30s | %-150s |" i oid (str Type) (str doc))))
   (println)
   )
