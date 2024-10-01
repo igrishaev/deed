@@ -71,7 +71,7 @@ com.github.igrishaev/deed-core {:mvn/version "0.1.0-SNAPSHOT"}
 com.github.igrishaev/deed-base64 {:mvn/version "0.1.0-SNAPSHOT"}
 ~~~
 
-**Vectorz module** with extends Deed with a number of `Vector*` classes from the
+**Vectorz module** wich extends Deed with a number of `Vector*` classes from the
 [mikera/vectorz][vectorz] library:
 
 ~~~clojure
