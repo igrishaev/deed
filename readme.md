@@ -253,7 +253,7 @@ any IO interaction:
 
 (println (vec buf))
 
-[0 1 0 1 0 0 ...  59 0 0 0 1 0 74 0 0 0 4 116 101 115 116 0 12 0 0 0 0 0 0 0 123]
+[0 1 0 1 0 0 ... 59 0 0 0 1 0 74 0 0 0 4 116 101 115 116 0 12 0 0 0 0 0 0 0 123]
 ~~~
 
 There is no an opposite `decode-from-bytes` function because a byte array is
@@ -304,7 +304,12 @@ To read all of them, use `decode-seq-from`:
 ~~~
 
 What is the point to use sequential encoding? Because with a special API, you
-can read them lazily one by one:
+can read them lazily one by one.
+
+The `with-decoder` macro takes two parameters: the binding symbol and the
+input. Internally, it creates a `Decoder` instance and binds it to the first
+symbol. The `decode-seq` function returns a lazy sequence of items from a
+decoder:
 
 ~~~clojure
 (deed/with-decoder [d "test.deed"]
@@ -315,23 +320,38 @@ can read them lazily one by one:
 ;; 3
 ~~~
 
+The form above might be also written using the `with-open` macro. Since the
+`Decoder` object implements `AutoCloseable` interface, it handles the `.close`
+method which in turn closes the origin stream.
+
 ~~~clojure
+(with-open [d (deed/decoder "test.deed")]
+  (doseq [item (deed/decode-seq d)]
+    (println item)))
+~~~
+
+In fact, you don't even need to pass the decoder object into `decode-seq`
+because it implements the `Iterable` Java interface. Just iterate over the
+decoder:
+
+~~~clojure
+(deed/with-decoder [d "test.deed"]
+  (mapv inc d))
+;; [2 3 3]
+
 (deed/with-decoder [d "test.deed"]
   (doseq [item d]
-    (println item)))
-;; 1
-;; 2
-;; 3
+    (println "item is" item)))
+;; item is 1
+;; item is 2
+;; item is 3
 ~~~
 
-~~~clojure
-(deed/with-decoder [d "test.deed"]
-  (->> d
-       (deed/decode-seq)
-       (mapv inc)))
-~~~
+Pay attention that items are read lazily so you won't saturate memory.
 
 ### Low-Level API
+
+TODO
 
 ### API Options
 

@@ -114,3 +114,20 @@ true
 (deed/with-decoder [d "test.deed"]
   (doseq [item d]
     (println item)))
+
+
+(with-open [in (io/input-stream "test.deed")
+            d (deed/decoder in)]
+  (doseq [item (deed/decode-seq d)]
+    (println item)))
+
+(with-open [d (deed/decoder "test.deed")]
+  (doseq [item (deed/decode-seq d)]
+    (println item)))
+
+(deed/with-decoder [d "test.deed"]
+  (mapv inc d))
+
+(deed/with-decoder [d "test.deed"]
+  (doseq [item d]
+    (println "item is" item)))
