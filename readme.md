@@ -351,9 +351,71 @@ Pay attention that items are read lazily so you won't saturate memory.
 
 ### Low-Level API
 
-TODO
+Deed provides low-level API for conditional or imperative encoding. The `encode`
+function writes a value into an instance of the `Encoder` class. You can use it
+in a cycle with some condition:
+
+~~~clojure
+(deed/with-encoder [e "test.deed"]
+  (doseq [x (range 1 32)]
+    (when (even? x)
+      (deed/encode e x))))
+~~~
+
+The `decode` function reads an object from the `Decoder` instance. When the end
+of the stream is met, you'll get a special `EOF` object that you can check with
+the `eof?` preficate:
+
+~~~clojure
+(deed/with-decoder [d "test.deed"]
+  (loop [i 0]
+    (let [item (deed/decode d)]
+      (if (deed/eof? item)
+        (println "EOF")
+        (do
+          (println "item" i item)
+          (recur (inc i)))))))
+
+;; item 0 2
+;; item 1 4
+;; item 2 6
+;; item 3 8
+;; item 4 10
+;; item 5 12
+;; item 6 14
+;; item 7 16
+;; item 8 18
+;; item 9 20
+;; item 10 22
+;; item 11 24
+;; item 12 26
+;; item 13 28
+;; item 14 30
+;; EOF
+~~~
+
+The low-level might be useful when you need precise control on what you're
+encoding and decoding.
 
 ### API Options
+
+Most of the functions accept an optional map of parameters. Here is a list of
+ones available at the moment:
+
+
+deref-timeout-ms
+object-chunk-size
+byte-chunk-size
+uncountable-max-items
+encode-unsupported?
+io-temp-file?
+save-meta?
+append?
+
+
+## GZip
+
+## Handle Unsupported Types
 
 ## Supported Types
 

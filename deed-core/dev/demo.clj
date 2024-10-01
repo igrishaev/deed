@@ -131,3 +131,17 @@ true
 (deed/with-decoder [d "test.deed"]
   (doseq [item d]
     (println "item is" item)))
+
+(deed/with-encoder [e "test.deed"]
+  (doseq [x (range 1 32)]
+    (when (even? x)
+      (deed/encode e x))))
+
+(deed/with-decoder [d "test.deed"]
+  (loop [i 0]
+    (let [item (deed/decode d)]
+      (if (deed/eof? item)
+        (println "EOF")
+        (do
+          (println "item" i item)
+          (recur (inc i)))))))
