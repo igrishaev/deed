@@ -402,25 +402,97 @@ encoding and decoding.
 Most of the functions accept an optional map of parameters. Here is a list of
 ones available at the moment:
 
-| Name                     | Default           | Meaning                                                                              |
-|--------------------------|-------------------|--------------------------------------------------------------------------------------|
-| `:deref-timeout-ms`      | 5000              | The number of milliseconds to wait when derefing futures.                            |
-| `:object-chunk-size`     | 0xFF              | The number of object chunk when encoding uncountable collections (e.g. lazy).        |
-| `:byte-chunk-size`       | 0xFFFF            | The number of byte chunk when encoding input streams.                                |
-| `:uncountable-max-items` | Integer.MAX_VALUE | The max number of items to encode when encoding uncountable collections (e.g. lazy). |
-| `:encode-unsupported?`   |                   |                                                                                      |
-| `:io-temp-file?`         |                   |                                                                                      |
-| `:save-meta?`            |                   |                                                                                      |
-| `:append?`               |                   |                                                                                      |
-|                          |                   |                                                                                      |
+| Name                     | Default           | Meaning                                                                                                                   |
+|--------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `:deref-timeout-ms`      | 5000              | The number of milliseconds to wait when derefing futures.                                                                 |
+| `:object-chunk-size`     | 0xFF              | The number of object chunk when encoding uncountable collections (e.g. lazy seqs).                                        |
+| `:byte-chunk-size`       | 0xFFFF            | The number of byte chunk when encoding input streams.                                                                     |
+| `:uncountable-max-items` | Integer.MAX_VALUE | The max number of items to process when encoding uncountable collections (e.g. lazy seqs).                                |
+| `:encode-unsupported?`   | true              | If true, dump every unsupported object into a string ([see below](#handle-unsupported-types)). Otherwise, throw an error. |
+| `:io-temp-file?`         | false             | When deciding previously encoded input stream, write its payload into a temp file.                                        |
+| `:save-meta?`            | true              | Preserve metadata for objects what have it.                                                                               |
+| `:append?`               | false             | Write at the end of an existing dump ([see below](#appending)).                                                           |
+
+
+That's unlikely you'll need to change any of these, yet in rare cases they may
+help.
 
 ## GZip
 
+## Appending
+
 ## Handle Unsupported Types
+
+By default, when Deed doesn't know how to encode an object, it turns it into a
+string using the standard `.toString` method. Than it makes a special
+`Unsupported` object that tracks full class name and the text payload. Let's
+show that using a custom `deftype` declaration:
+
+~~~clojure
+(deftype MyType [a b c])
+
+(def mt (new MyType :hello "test" 42))
+
+(deed/encode-to mt "test.deed")
+
+(deed/decode-from "test.deed")
+;; #<Unsupported@b918edf: {:content "demo.MyType@4376ae5c", :class "demo.MyType"}>
+~~~
+
+The `Unsupported` object can be checked with the predicate `unsupported?`:
+
+~~~clojure
+(def mt-back
+  (deed/decode-from "test.deed"))
+
+(deed/unsupported? mt-back)
+;; true
+~~~
+
+To coerce it to Clojure, just deref it:
+
+~~~clojure
+@mt-back
+{:content "demo.MyType@4376ae5c", :class "demo.MyType"}
+~~~
+
+Above, the `"demo.MyType@4376ae5c"` string doesn't say much. This is because the
+default `.toString` implementation for `deftype` lacks fields. That's why it's
+always worth overriding `.toString` for custom types:
+
+~~~clojure
+(deftype MyType [a b c]
+  Object
+  (toString [_]
+    (format "<MyType: %s, %s, %s>" a b c)))
+
+(def mt (new MyType :hello "test" 42))
+
+(deed/encode-to mt "test.deed")
+
+(def mt-back
+  (deed/decode-from "test.deed"))
+
+(str mt-back)
+;; "Unsupported[className=demo.MyType, content=<MyType: :hello, test, 42>]"
+
+@mt-back
+;; {:content "<MyType: :hello, test, 42>", :class "demo.MyType"}
+~~~
+
+When the `:encode-unsupported?` boolean option is false, Deed throws an
+exception by facing an unsupported object:
+
+~~~clojure
+(deed/encode-to mt "test.deed" {:encode-unsupported? false})
+
+;; Execution error at deed.Err/error (Err.java:14).
+;; Cannot encode object, type: demo.MyType, object: <MyType: :hello, test, 42>
+~~~
 
 ## Supported Types
 
-## Custom Types
+## Extending Custom Types
 
 ## Contrib
 

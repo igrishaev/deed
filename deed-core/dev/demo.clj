@@ -145,3 +145,39 @@ true
         (do
           (println "item" i item)
           (recur (inc i)))))))
+
+(deftype MyType [a b c])
+
+(def mt (new MyType :hello "test" 42))
+
+(deed/encode-to mt "test.deed")
+
+(deed/decode-from "test.deed")
+;; #<Unsupported@b918edf: {:content "demo.MyType@4376ae5c", :class "demo.MyType"}>
+
+(def mt-back
+  (deed/decode-from "test.deed"))
+
+(deed/unsupported? mt-back)
+
+@mt-back
+
+(deftype MyType [a b c]
+  Object
+  (toString [_]
+    (format "<MyType: %s, %s, %s>" a b c)))
+
+(def mt (new MyType :hello "test" 42))
+
+(deed/encode-to mt "test.deed")
+
+(def mt-back
+  (deed/decode-from "test.deed"))
+
+(str mt-back)
+"Unsupported[className=demo.MyType, content=<MyType: :hello, test, 42>]"
+
+@mt-back
+{:content "<MyType: :hello, test, 42>", :class "demo.MyType"}
+
+(deed/encode-to mt "test.deed" {:encode-unsupported? false})
