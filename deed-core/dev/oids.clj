@@ -2,26 +2,26 @@
 
 (def OIDS
   '[
-    NULL                    "null (nil)"                        nil
-    HEADER                  "deed.Header"                       "A leading object with metadata about encoding"
-    UNSUPPORTED             "deed.Unsupported"                  "A wrapper for unsupported objects"
-    META                    nil                                 "Specifies an object that has metadata"
+    NULL                    "`null` (`nil`)"                    nil
+    HEADER                  "`deed.Header`"                     "A leading object with metadata about encoding"
+    UNSUPPORTED             "`deed.Unsupported`"                "A wrapper for unsupported objects"
+    META                    nil                                 "Specifies an object with metadata"
     INT                     "int, java.lang.Integer"            nil
     INT_ZERO                nil                                 "A special OID for 0 int"
     INT_ONE                 nil                                 "A special OID for 1 int"
     INT_MINUS_ONE           nil                                 "A special OID for -1 int"
-    SHORT                   "short, java.lang.Short"            nil
+    SHORT                   "`short`, `java.lang.Short`"        nil
     SHORT_ZERO              nil                                 "A special OID for 0 short"
     SHORT_ONE               nil                                 "A special OID for 1 short"
     SHORT_MINUS_ONE         nil                                 "A special OID for -1 short"
-    LONG                    "long, java.lang.Long"              nil
+    LONG                    "`long`, `java.lang.Long`"          nil
     LONG_ZERO               nil                                 nil
     LONG_ONE                nil                                 nil
     LONG_MINUS_ONE          nil                                 nil
-    IO_INPUT_STREAM         "java.io.InputStream"               "When decoding, the bytes are put into a ByteArrayInputStream. It's also possible to put them into a temp file and obtain a FileInputStream"
+    IO_INPUT_STREAM         "`java.io.InputStream`"             "When decoding, the bytes are put into a `ByteArrayInputStream`. It's also possible to put them into a temp file and obtain a `FileInputStream`"
     IO_READER               "-"                                 "Not implemented"
     IO_FILE                 "-"                                 "Not implemented"
-    IO_BYTEBUFFER           "java.nio.ByteBuffer"               nil
+    IO_BYTEBUFFER           "`java.nio.ByteBuffer`"             nil
     ARR_BYTE                "byte[]"                            nil
     ARR_INT                 "int[]"                             nil
     ARR_SHORT               "short[]"                           nil
@@ -43,19 +43,19 @@
     THROWABLE               nil                                 nil
     EX_INFO                 nil                                 nil
     EX_NPE                  nil                                 nil
-    BOOL_TRUE               nil                                 nil
-    BOOL_FALSE              nil                                 nil
-    STRING                  nil                                 nil
-    STRING_EMPTY            nil                                 nil
-    CHAR                    nil                                 nil
-    CLJ_VEC                 nil                                 nil
-    CLJ_VEC_EMPTY           nil                                 nil
-    CLJ_ATOM                nil                                 nil
-    CLJ_REF                 nil                                 nil
-    FUTURE                  nil                                 nil
-    CLJ_SET                 nil                                 nil
-    CLJ_SET_EMPTY           nil                                 nil
-    CLJ_LAZY_SEQ            nil                                 nil
+    BOOL_TRUE               "boolean, java.lang.Boolean"        "True value only"
+    BOOL_FALSE              "boolean, java.lang.Boolean"        "False value only"
+    STRING                  "java.lang.String"                  "Stored as a number of bytes + bytes"
+    STRING_EMPTY            nil                                 "A special OID indicating an empty string"
+    CHAR                    "char, java.lang.Character"         nil
+    CLJ_VEC                 "clojure.lang.APersistentVector"    "A standard Clojure vector"
+    CLJ_VEC_EMPTY           nil                                 "A special OID indicating an empty vector"
+    CLJ_ATOM                "clojure.lang.Atom"                 "Gets deref-ed when encoding"
+    CLJ_REF                 "clojure.lang.Ref"                  "Gets deref-ed when encoding"
+    FUTURE                  "`java.util.concurrent.Future`"     "Deed `.get`s the value using timeout from options. When time is up, an exception is throw. When decoded, it's returned as an instance of `deed.FutureWrapper`: a fake object that mimics a future."
+    CLJ_SET                 "`clojure.lang.APersistentSet`"     "A standard Clojure immutable set"
+    CLJ_SET_EMPTY           nil                                 "A special OID indicating an empty set"
+    CLJ_LAZY_SEQ            "`clojure.lang.LazySeq`"            "Encode a lazy sequence produced with `map`, `for`, etc. Stored as a collection of chunks like `<chunk-len><items...>`. When decoding, read until the chunk of zero length is met."
     CLJ_SEQ                 nil                                 nil
     CLJ_LIST                nil                                 nil
     CLJ_LIST_EMPTY          nil                                 nil
