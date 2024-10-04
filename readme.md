@@ -2,6 +2,35 @@
 
 A fast, zero-deps binary encoding and decoding library for Clojure.
 
+## Table of Contents
+
+<!-- toc -->
+
+- [About](#about)
+- [Motivation](#motivation)
+- [Installation & Requirements](#installation--requirements)
+- [Quick Demo](#quick-demo)
+- [API](#api)
+  * [Simple Encode and Decode](#simple-encode-and-decode)
+  * [Encoding to Memory](#encoding-to-memory)
+  * [Sequential Encoding and Decoding](#sequential-encoding-and-decoding)
+  * [Low-Level API](#low-level-api)
+  * [API Options](#api-options)
+- [GZipped Streams](#gzipped-streams)
+- [Appending to a File](#appending-to-a-file)
+- [Handle Unsupported Types](#handle-unsupported-types)
+- [Supported Types](#supported-types)
+- [Extending Custom Types](#extending-custom-types)
+  * [Encode](#encode)
+  * [Decode](#decode)
+  * [Macros](#macros)
+- [Handling Defrecords](#handling-defrecords)
+- [Contrib](#contrib)
+- [Binary Format](#binary-format)
+- [Benchmarks](#benchmarks)
+
+<!-- tocstop -->
+
 ## About
 
 [vectorz]: https://github.com/mikera/vectorz
@@ -417,9 +446,9 @@ ones available at the moment:
 That's unlikely you'll need to change any of these, yet in rare cases they may
 help.
 
-## GZip
+## GZipped Streams
 
-## Appending
+## Appending to a File
 
 ## Handle Unsupported Types
 
@@ -634,7 +663,7 @@ Then extend the `IEncode` protocol with that type:
 (extend-protocol deed/IEncode
   SomeType
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
@@ -646,7 +675,7 @@ Or vice versa: extend the type with the protocol:
 (extend-type SomeType
   deed/IEncode
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
@@ -664,17 +693,71 @@ z as they were local variables.
 (deftype SomeType [x y z]
   deed/IEncode
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder x)
     (deed/encode encoder y)
     (deed/encode encoder z)))
 ~~~
 
-Since `encode` is a general function, it handles any value type. You won't
+Since `encode` is a general function, it handles any value type. You don't
 bother if `x` is a number, or a string, or a keyword, or a nested `SomeType`
 instance.
 
 ### Decode
+
+Now extend the decoding counterpart by adding implementation to the `-decode`
+multimethod:
+
+~~~clojure
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [x (deed/decode decoder)
+        y (deed/decode decoder)
+        z (deed/decode decoder)]
+    (new SomeType x y z)))
+~~~
+
+Here you retrieve x, y, and z fields back and componse a new instance of
+`SomeType`. Let's check it quckly:
+
+~~~clojure
+(def _buf
+  (deed/encode-to-bytes (new SomeType 1 2 3)))
+
+(deed/decode-from _buf)
+;; #object[demo.SomeType 0x47e19f78 "demo.SomeType@47e19f78"]
+~~~
+
+The order of writing and reading fields matters, of course. If you mix them,
+you'll get a broken object back.
+
+### Macros
+
+There is a couple of macros that make extending protocols and multimethods under
+the hood: `expand-encode` and `expand-decode`. The first one accepts an OID, a
+type (class), and a couple of symbols to bind: the current `Encoder` instance
+and the current value of the class. Then there is a body encodes fields:
+
+~~~clojure
+(deed/expand-encode [MyOID SomeType encoder some-type]
+  (deed/encode encoder (.-x some-type))
+  (deed/encode encoder (.-y some-type))
+  (deed/encode encoder (.-z some-type)))
+~~~
+
+Pay attention, you **don't call** `writeOID` inside the body because it's
+already a part of the macro.
+
+The `expand-decode` macro accepts the OID and a symbol bound to the current
+`Decoder` instance:
+
+~~~clojure
+(deed/expand-decode [MyOID decoder]
+  (let [x (deed/decode decoder)
+        y (deed/decode decoder)
+        z (deed/decode decoder)]
+    (new AnotherType x y z)))
+~~~
 
 ## Handling Defrecords
 

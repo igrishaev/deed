@@ -45,3 +45,7 @@ build/
 
 .idea
 .clj-kondo/.cache
+
+node_modules
+package-lock.json
+package.json

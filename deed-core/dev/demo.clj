@@ -191,7 +191,7 @@ true
 (extend-protocol deed/IEncode
   SomeType
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
@@ -200,7 +200,7 @@ true
 (extend-type SomeType
   deed/IEncode
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
@@ -208,7 +208,19 @@ true
 (deftype SomeType [x y z]
   deed/IEncode
   (-encode [this encoder]
-    (deed/writeOID SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID)
     (deed/encode encoder x)
     (deed/encode encoder y)
     (deed/encode encoder z)))
+
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [x (deed/decode decoder)
+        y (deed/decode decoder)
+        z (deed/decode decoder)]
+    (new SomeType x y z)))
+
+(def _buf
+  (deed/encode-to-bytes (new SomeType 1 2 3)))
+
+(deed/decode-from _buf)
