@@ -3,6 +3,7 @@
                             ex-message
                             ex-cause])
   (:import
+   (deed Encoder)
    (java.math BigInteger
               BigDecimal)
    (java.time LocalDate
@@ -1045,6 +1046,32 @@
     (is (= (.-y a) (.-y b)))
     (is (= (.-z a) (.-z b)))))
 
+
+(def FooBarOID 1666)
+
+(deftype FooBar [a b c]
+
+  d/IEncode
+  (-encode [_ encoder]
+    (d/writeOID encoder FooBarOID)
+    (d/encode encoder a)
+    (d/encode encoder b)
+    (d/encode encoder c)))
+
+(defmethod d/-decode FooBarOID
+  [_ decoder]
+  (let [a (d/decode decoder)
+        b (d/decode decoder)
+        c (d/decode decoder)]
+    (new FooBar a b c)))
+
+(deftest test-type-foo-bar
+  (let [a (new FooBar :test "hello" {:map true})
+        ^FooBar b (enc-dec a)]
+    (is (= "deed.test_core.FooBar" (-> b class .getName)))
+    (is (= (.-a a) (.-a b)))
+    (is (= (.-b a) (.-b b)))
+    (is (= (.-c a) (.-c b))))  )
 
 (deftest test-custom-type-various-fields
   (let [^AnotherType a (new AnotherType

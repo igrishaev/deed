@@ -181,3 +181,34 @@ true
 {:content "<MyType: :hello, test, 42>", :class "demo.MyType"}
 
 (deed/encode-to mt "test.deed" {:encode-unsupported? false})
+
+
+(deftype SomeType [x y z]
+  )
+
+(def SomeTypeOID 4321)
+
+(extend-protocol deed/IEncode
+  SomeType
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder (.-x this))
+    (deed/encode encoder (.-y this))
+    (deed/encode encoder (.-z this))))
+
+
+(extend-type SomeType
+  deed/IEncode
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder (.-x this))
+    (deed/encode encoder (.-y this))
+    (deed/encode encoder (.-z this))))
+
+(deftype SomeType [x y z]
+  deed/IEncode
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder x)
+    (deed/encode encoder y)
+    (deed/encode encoder z)))

@@ -604,6 +604,80 @@ exception by facing an unsupported object:
 
 ## Extending Custom Types
 
+### Encode
+
+Although Deed handles plenty of types, you can easily have a type that is
+unknown to it. Handling such a type is a matter of two things: extending both
+encoding and decoding logic.
+
+Imagine you have a custom `deftype` with three fields:
+
+~~~clojure
+(deftype SomeType [x y z]
+  ...)
+~~~
+
+[oids]: deed-core/src/java/deed/OID.java
+
+Here is how to extend the encoding logic. First, declare a custom OID number for
+it. The number must be short (two bytes) meaning the range from -32768
+to 32767. When declaring such an OID, please ensure it doens't overlap with
+[pre-existing OIDs][oids].
+
+~~~clojure
+(def SomeTypeOID 4321)
+~~~
+
+Then extend the `IEncode` protocol with that type:
+
+~~~clojure
+(extend-protocol deed/IEncode
+  SomeType
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder (.-x this))
+    (deed/encode encoder (.-y this))
+    (deed/encode encoder (.-z this))))
+~~~
+
+Or vice versa: extend the type with the protocol:
+
+~~~clojure
+(extend-type SomeType
+  deed/IEncode
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder (.-x this))
+    (deed/encode encoder (.-y this))
+    (deed/encode encoder (.-z this))))
+~~~
+
+Pay attention that in both cases the first form must be the `writeOID` function
+invocation. The OID is always put first because decoding logic relies on
+it. Then we encode custom fields `x`, `y`, and `z`.
+
+Encoding might be a bit easier if you extend a type with `IEncode` when
+declaring it. In this case, the `-encode` method has direct access to x, y, and
+z as they were local variables.
+
+~~~clojure
+(deftype SomeType [x y z]
+  deed/IEncode
+  (-encode [this encoder]
+    (deed/writeOID SomeTypeOID)
+    (deed/encode encoder x)
+    (deed/encode encoder y)
+    (deed/encode encoder z)))
+~~~
+
+Since `encode` is a general function, it handles any value type. You won't
+bother if `x` is a number, or a string, or a keyword, or a nested `SomeType`
+instance.
+
+### Decode
+
+## Handling Defrecords
+
 ## Contrib
 
 ## Binary Format

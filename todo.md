@@ -1,5 +1,6 @@
 
 - readme
+- toc
 - benchmarks
 
 - future wrapper encode
