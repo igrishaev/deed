@@ -2,7 +2,7 @@
 all: test
 
 repl:
-	lein with-profile +test,+dev repl
+	lein with-profile +test,+dev,+demo,+bench repl
 
 .PHONY: clean
 clean:

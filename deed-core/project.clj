@@ -14,6 +14,17 @@
   :dependencies
   [[org.clojure/clojure]]
 
+  :profiles
+  {:demo
+   {:dependencies
+    [[com.github.igrishaev/deed-base64]
+     [com.github.igrishaev/deed-vectorz]]}
+   :bench
+   {:dependencies
+    [[com.taoensso/nippy]
+     [criterium]
+     [com.alpha-prosoft/jsonista]]}}
+
   :parent-project
   {:path "../project.clj"
    :inherit [:deploy-repositories

@@ -26,6 +26,8 @@ A fast, zero-deps binary encoding and decoding library for Clojure.
   * [Macros](#macros)
 - [Handling Defrecords](#handling-defrecords)
 - [Contrib](#contrib)
+  * [Base64](#base64)
+  * [VectorZ](#vectorz)
 - [Binary Format](#binary-format)
 - [Benchmarks](#benchmarks)
 
@@ -761,7 +763,109 @@ The `expand-decode` macro accepts the OID and a symbol bound to the current
 
 ## Handling Defrecords
 
+By default, records defined with the `defrecord` macro are read as Clojure
+maps. This because they're created at runtime and thus are not known to Deed. To
+preserve the origin type, either you extend a record with the `IEncode` protocol
+and extend the `-decode` multimethod as described above. Another way is to use
+the `handle-record` macro that does the same under the hood. It accepts just two
+arguments: a unique OID and the type:
+
+~~~clojure
+(defrecord Bar [x y])
+
+(deed/handle-record 4321 Bar)
+~~~
+
+The body of the macro is missing, as you don't need to pass anything
+else. Internally, a record is still encoded as a Clojure map but with a special
+OID. When decoding this map, before it gets returned to the user, it's wrapped
+into the `<YourType>/create` invocation which creates a record instance from a
+map.
+
 ## Contrib
+
+Deed comes with some minor packages tham make your life easier when it's come to
+dumping the data.
+
+### Base64
+
+The package `deed-base64` brings functions to encode values into a
+base64-encoded stream, and read them back. This is useful when passing encoded
+data throughout any text-only format, for example JSON. What is important, the
+package does the encoding and decoding logic on the fly. It relies on
+`Base64OutputStream` and `Base64InputStream` classes from the `TODO` library. As
+it leads to a third-party dependency, the functionalty is shipped as a
+sub-package.
+
+A quick example:
+
+~~~clojure
+(ns deed-base64-demo
+  (:require
+   [deed.core :as deed]
+   [deed.base64 :as b64]))
+
+(with-open [out (-> "dump.deed.b64"
+                    (b64/base64-output-stream))]
+  (deed/encode-to [1 2 3] out))
+~~~
+
+The `base64-output-stream` function wraps any source and makes an instance of
+`Base64OutputStream`. As you write to it, the data becomes silently base64
+encoded:
+
+~~~clojure
+(slurp "dump.deed.b64")
+"AAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAwAOAAwAAAAAAAAAAgAMAAAAAAAAAAM="
+~~~
+
+Read it again by wrapping the file into the `base64-input-stream` function:
+
+~~~clojure
+(with-open [in (-> "dump.deed.b64"
+                   (io/file)
+                   (b64/base64-input-stream))]
+  (deed/decode-from in))
+
+;; [1 2 3]
+~~~
+
+The `deed.base64` namespace provides a number of shortcuts, namely:
+
+| Function                        | Comment                                              |
+|---------------------------------|------------------------------------------------------|
+| `encode-to-base64-bytes`        | Encode a single value into base64 byte array         |
+| `encode-seq-to-base64-bytes`    | Encode a sequence of values into a base64 byte array |
+| `encode-to-base64-string`       | Encode a single value into a base64 string           |
+| `encode-seq-to-base64-string`   | Encode a sequence of values into a base64 string     |
+| `decode-from-base64-bytes`      | Decode a single value from a base64 byte array       |
+| `decode-from-base64-string`     | Decode a single value from a base64 string           |
+| `decode-seq-from-base64-bytes`  | Decode a sequence of values from base64 byte array   |
+| `decode-seq-from-base64-string` | Decode a sequence of values from base64 string       |
+
+Their signatures are similar to what we've explained so far.
+
+### VectorZ
+
+<!-- [vectorz]: https://github.com/mikera/vectorz -->
+
+~~~clojure
+(ns demo
+  (:require
+   [deed.core :as deed]
+   [deed.vectorz :as vz])
+  (:import
+   (mikera.vectorz Vectorz)))
+
+(def vz
+  (Vectorz/create (double-array [1.1 2.2 3.3])))
+
+(def dump
+  (deed/encode-to-bytes vz))
+
+(deed/decode-from dump)
+;; #object[mikera.vectorz.Vector3 0x5ecb1a9a "[1.1,2.2,3.3]"]
+~~~
 
 ## Binary Format
 

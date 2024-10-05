@@ -48,7 +48,8 @@
 
   :managed-dependencies
   [[com.github.igrishaev/deed-core :version]
-   [com.github.igrishaev/deed-bas64 :version]
+   [com.github.igrishaev/deed-base64 :version]
+   [com.github.igrishaev/deed-vectorz :version]
    [org.clojure/clojure "1.9.0"]
 
    ;; base64
@@ -70,10 +71,7 @@
   :profiles
   {:dev
    {:source-paths ["dev"]
-    :dependencies [[org.clojure/clojure]
-                   [com.taoensso/nippy]
-                   [criterium]
-                   [com.alpha-prosoft/jsonista]]
+    :dependencies [[org.clojure/clojure]]
     :global-vars
     {*warn-on-reflection* true
      *assert* true}}

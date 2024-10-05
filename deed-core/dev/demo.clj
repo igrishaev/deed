@@ -1,7 +1,11 @@
 (ns demo
   (:require
    [clojure.java.io :as io]
-   [deed.core :as deed]))
+   [deed.core :as deed]
+   [deed.base64 :as b64]
+   [deed.vectorz :as vz])
+  (:import
+   (mikera.vectorz Vectorz)))
 
 (def file
   (io/file "dump.deed"))
@@ -224,3 +228,24 @@ true
   (deed/encode-to-bytes (new SomeType 1 2 3)))
 
 (deed/decode-from _buf)
+
+(with-open [out (-> "dump.deed.b64"
+                    (b64/base64-output-stream))]
+  (deed/encode-to [1 2 3] out))
+
+(slurp "dump.deed.b64")
+
+(with-open [in (-> "dump.deed.b64"
+                   (io/file)
+                   (b64/base64-input-stream))]
+  (deed/decode-from in))
+
+
+(def vz
+  (Vectorz/create (double-array [1.1 2.2 3.3])))
+
+(def dump
+  (deed/encode-to-bytes vz))
+
+(deed/decode-from dump)
+;; #object[mikera.vectorz.Vector3 0x5ecb1a9a "[1.1,2.2,3.3]"]
