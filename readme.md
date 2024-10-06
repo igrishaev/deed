@@ -939,8 +939,8 @@ future. For now, check out the source code: see the
 
 Encoding:
 
-![encoding](charts/encoding.svg)
+![encoding](charts/encoding.svg | width=500)
 
 Decoding:
 
-![decoding](charts/decoding.svg)
+![decoding](charts/decoding.svg | width=500)
