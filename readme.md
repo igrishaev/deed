@@ -939,8 +939,8 @@ future. For now, check out the source code: see the
 
 Encoding:
 
-![encoding](charts/encoding.svg){: width="75%"}
+<img src="charts/encoding.svg" width=75% height=auto>
 
 Decoding:
 
-![decoding](charts/decoding.svg){: width="75%"}
+<img src="charts/decoding.svg" width=75% height=auto>
