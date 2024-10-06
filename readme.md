@@ -450,7 +450,38 @@ help.
 
 ## GZipped Streams
 
+Deed has a couple of functions turn any input or output into `GZIPInputStream`
+and `GZIPOutputStream` instances respectfully. It allows to compress the data on
+the fly.
+
+Here is how you compress:
+
+(with-open [out (deed/gzip-output-stream "dump.deed.gz")]
+  (deed/encode-to [1 2 3] out))
+
+(with-open [in (deed/gzip-input-stream "dump.deed.gz")]
+  (deed/decode-from in))
+;; [1 2 3]
+
 ## Appending to a File
+
+In rare cases, you'd like to append data to an existing dump. This might be done
+with two steps. First, you initiate the `FileOutputStream` object manually and
+pass the `true` boolean flag meaning the content is written to the end of the
+file:
+
+~~~clojure
+(with-open [out (new FileOutputStream file true)]
+  ...)
+~~~
+
+Second, when encoding the data into such an output, specify the `{:append?
+true}` option. In this case, Deed won't emit a leading `deed.Header` object:
+
+~~~clojure
+(with-open [out (new FileOutputStream file true)]
+  (deed/encode-to {:hello 123} out {:append? true}))
+~~~
 
 ## Handle Unsupported Types
 
@@ -847,7 +878,9 @@ Their signatures are similar to what we've explained so far.
 
 ### VectorZ
 
-<!-- [vectorz]: https://github.com/mikera/vectorz -->
+The `deed-vectorz` package extends Deed with classes the from the
+[mikera/vectorz][vectorz] library. These vectors are good for fast
+computations. A brief demo:
 
 ~~~clojure
 (ns demo
@@ -867,6 +900,39 @@ Their signatures are similar to what we've explained so far.
 ;; #object[mikera.vectorz.Vector3 0x5ecb1a9a "[1.1,2.2,3.3]"]
 ~~~
 
+The `Vectorz` class is a general factory for other vector classes like
+`Vector1`, `Vector2` and similar. Deed extends the `AVector` class which is
+common for all of these.
+
 ## Binary Format
+
+The binary payload of Deed is quite simple. It consists from the following
+pattern:
+
+~~~
+<2-byte-OID><content><2-byte-OID><content>...
+~~~
+
+At the beginning, there is always a `deed.Header` object with general
+information about how encoding was made. At the moment, it only tracks the
+version of the protocol and nothing else. The header has constant size of 30
+bytes where unused bytes are reserved. In there future, it might have more data.
+
+The content depend on the nature of type. Say, if it's an integer, there are
+always four bytes. If it's a string, first we have four-byte length of the
+following byte array, and then the array by itself.
+
+Counted collections are encoded whis way too. First, there is a total length of
+a collection, and the items encoded one by one. As the items might be of a
+different type, they have their own OIDs:
+
+~~~
+<2-byte-vector-id><4-byte-vector-length><oid-item-1><payload-item-1><oid-item-2><payload-item-2>
+~~~
+
+This section, perhaps not too detailed at the moment, will be extended in the
+future. For now, check out the source code: see the
+[encoding](deed-core/src/java/deed/Encoder.java) and
+[decoding](deed-core/src/java/deed/Decoder.java) files.
 
 ## Benchmarks
