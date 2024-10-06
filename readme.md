@@ -936,3 +936,11 @@ future. For now, check out the source code: see the
 [decoding](deed-core/src/java/deed/Decoder.java) files.
 
 ## Benchmarks
+
+Encoding:
+
+![encoding](charts/encoding.svg)
+
+Decoding:
+
+![decoding](charts/decoding.svg)
