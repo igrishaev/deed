@@ -86,7 +86,7 @@ had in mind while working on Deed:
    always a pain. At the same time, I want my decoded data be as close to the
    origin data as possible, say, `LocalDateTime` be an instance of
    `LocalDateTime` but not a string or `java.util.Date`. Sometimes, preserving
-   metadata is crucial. To haldle all of these cases, there now a way other than
+   metadata is crucial. To handle all of these cases, there now a way other than
    making your own library.
 
 ## Installation & Requirements
