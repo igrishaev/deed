@@ -97,20 +97,20 @@ Deed requires Java version at least 16 to run. Tested with Clojure 1.9.0.
 
 ~~~clojure
 ;; lein
-[com.github.igrishaev/deed-core "0.1.0-SNAPSHOT"]
+[com.github.igrishaev/deed-core "0.1.0"]
 
 ;; deps
-com.github.igrishaev/deed-core {:mvn/version "0.1.0-SNAPSHOT"}
+com.github.igrishaev/deed-core {:mvn/version "0.1.0"}
 ~~~
 
 **Base64 module** do encode and decode from/into base64 on the fly:
 
 ~~~clojure
 ;; lein
-[com.github.igrishaev/deed-base64 "0.1.0-SNAPSHOT"]
+[com.github.igrishaev/deed-base64 "0.1.0"]
 
 ;; deps
-com.github.igrishaev/deed-base64 {:mvn/version "0.1.0-SNAPSHOT"}
+com.github.igrishaev/deed-base64 {:mvn/version "0.1.0"}
 ~~~
 
 **Vectorz module** extends Deed with a number of `Vector*` classes from the
@@ -118,10 +118,10 @@ com.github.igrishaev/deed-base64 {:mvn/version "0.1.0-SNAPSHOT"}
 
 ~~~clojure
 ;; lein
-[com.github.igrishaev/deed-vectorz "0.1.0-SNAPSHOT"]
+[com.github.igrishaev/deed-vectorz "0.1.0"]
 
 ;; deps
-com.github.igrishaev/deed-vectorz {:mvn/version "0.1.0-SNAPSHOT"}
+com.github.igrishaev/deed-vectorz {:mvn/version "0.1.0"}
 ~~~
 
 ## Quick Demo
