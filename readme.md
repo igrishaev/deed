@@ -929,7 +929,7 @@ version of the protocol and nothing else. The header has constant size of 30
 bytes where unused bytes are reserved. In there future, there might be more data
 in the header.
 
-The content depend on the nature of type. Say, if it's an integer, there are
+The content depend on the nature of a type. Say, if it's an integer, there are
 always four bytes. If it's a string, than we have four-byte length of the
 upcoming byte array, and then the array by itself.
 
