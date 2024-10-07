@@ -4,7 +4,7 @@
   <groupId>com.github.igrishaev</groupId>
   <artifactId>deed-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>deed-core</name>
   <description>Fast, flexible, 0-deps (de)serialization library for Clojure</description>
   <url>https://github.com/igrishaev/deed</url>
@@ -79,17 +79,17 @@
       <dependency>
         <groupId>com.github.igrishaev</groupId>
         <artifactId>deed-core</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
       </dependency>
       <dependency>
         <groupId>com.github.igrishaev</groupId>
         <artifactId>deed-base64</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
       </dependency>
       <dependency>
         <groupId>com.github.igrishaev</groupId>
         <artifactId>deed-vectorz</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.clojure</groupId>

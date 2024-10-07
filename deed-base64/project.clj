@@ -1,4 +1,4 @@
-(defproject com.github.igrishaev/deed-base64 "0.1.0"
+(defproject com.github.igrishaev/deed-base64 "0.1.1-SNAPSHOT"
 
   :description
   "Base64 encoding and decoding support"

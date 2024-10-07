@@ -1,4 +1,4 @@
-(defproject com.github.igrishaev/deed-vectorz "0.1.0"
+(defproject com.github.igrishaev/deed-vectorz "0.1.1-SNAPSHOT"
 
   :description
   "Mikera/vectorz support"
