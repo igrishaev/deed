@@ -1,4 +1,4 @@
-(defproject com.github.igrishaev/deed-core "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/deed-core "0.1.0"
 
   :description
   "Fast, flexible, 0-deps (de)serialization library for Clojure"

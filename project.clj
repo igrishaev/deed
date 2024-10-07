@@ -1,6 +1,6 @@
 (def MIN_JAVA_VERSION "16")
 
-(defproject com.github.igrishaev/_ "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/_ "0.1.0"
 
   :pom-addition
   [:properties
