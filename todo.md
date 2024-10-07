@@ -1,8 +1,4 @@
 
-- readme
-- toc
-- benchmarks
-
 - future wrapper encode
 
 - freeze file v1

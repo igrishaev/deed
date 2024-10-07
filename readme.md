@@ -41,50 +41,53 @@ Deed is a library to dump any value into a byte array and read it back. It
 supports plenty of types out from the box: Java primitives, most of the Clojure
 types, Java collections, date and time, and so on. It supports even such tricky
 types as atoms, refs, and input streams. The full list of supported types is
-shown in the corresponding section below.
+shown in the ["Supported Types"](#supported-types) section below.
 
-Deed can be extended for custom types with ease. There is a contrib package that
-extends encoding and decoding logic for vectors from the the well-known
+Deed can be extended with custom types with ease. There is a contrib package
+that extends encoding and decoding logic for vectors from the the well-known
 [mikera/vectorz][vectorz] library.
 
-Deed is written in pure Java and thus is pretty fast (see the "Benchmarks"
-section). It's about 20% faster than Nippy. It doesn't rely on built-in Java
-`Serializable` interface for security reasons.
+Deed is written in pure Java and thus is pretty fast (see the
+["Benchmarks"](#benchmarks) section). It's about 30-50% faster than Nippy.
 
-Provides convenient API for reading the frozen data lazily one by one.
+It doesn't rely on the built-in Java `Serializable` interface for security
+reasons. Every type is processed manually.
+
+Deep provides convenient API for reading the frozen data lazily one by one.
 
 ## Motivation
 
-Obviously you would ask why doing this if we have Nippy? This is what I had in
-mind while working on Deed:
+Obviously you would ask why doing this if we already have Nippy? This is what I
+had in mind while working on Deed:
 
 1. The library must be **absolutely free** from dependencies. This is true for
    the `deed-core` package: it's written in pure Java with no dependencies at
    all. By adding it into a project, you won't blow up you uberjar, nor you will
    have troubles with building a native image with GraalVM.
 
-2. Any part of Deed that requires 3rd-party stuff must be a sub-library. Thus,
-   you have precise control of what you use and what you don't
+2. Any part of Deed that requires 3rd-party stuff must be a sub-library. So you
+   have precise control of what you use and what you don't
 
-3. Unlike Nippy, Deed never falls back to native Java serialization. There is
-   just no such an option. Thus, you cannot be attacked by reading a forged
-   binary dump.
+3. Unlike Nippy, Deed never falls back to native Java serialization. There is no
+   such an option. Thus, your application cannot be attacked by someone how has
+   forged a binary dump.
 
 4. Deed is simple: it blindly works with input- and output byte streams having
-   no idea what's behind them. It doesn't take compression or encryption into
-   account -- yet there are utilities for corresponding types of streams.
+   no idea what's behind them. It doesn't take compression nor encryption into
+   account -- yet there are utilities for streams.
 
 5. The library provides API which personally I consider more convenient than
-   Nippi's. Namely, it allows to lazily iterate by a series of encoded data
-   instead of reading the whole dump at once.
+   Nippi's. Namely, Deed can lazily iterate on a series of encoded data instead
+   of reading the whole dump at once.
 
-6. Why not using popular and cross-platform formats like JSON, Message Pack, or
-   YAML? Well, because of poor types support. JSON has only primitive types and
-   collections, and nothing else. Extending it with custom types is always a
-   pain. At the same time, I want my decoded data be as close to the origin data
-   as possible, say, `LocalDateTime` be an instance of `LocalDateTime` but not a
-   string nor `java.util.Date`. Sometimes, preserving metadata is crucial. To
-   haldle all of these cases, there is only one solution: make your own library.
+6. Finally, why not using popular and cross-platform formats like JSON, Message
+   Pack, or YAML? Well, because of poor types support. JSON has only primitive
+   types and collections, and nothing else. Extending it with custom types is
+   always a pain. At the same time, I want my decoded data be as close to the
+   origin data as possible, say, `LocalDateTime` be an instance of
+   `LocalDateTime` but not a string or `java.util.Date`. Sometimes, preserving
+   metadata is crucial. To haldle all of these cases, there now a way other than
+   making your own library.
 
 ## Installation & Requirements
 
@@ -110,7 +113,7 @@ com.github.igrishaev/deed-core {:mvn/version "0.1.0-SNAPSHOT"}
 com.github.igrishaev/deed-base64 {:mvn/version "0.1.0-SNAPSHOT"}
 ~~~
 
-**Vectorz module** wich extends Deed with a number of `Vector*` classes from the
+**Vectorz module** extends Deed with a number of `Vector*` classes from the
 [mikera/vectorz][vectorz] library:
 
 ~~~clojure
@@ -159,8 +162,8 @@ Pass them into the `encode-to` function as follows:
 (deed/encode-to data file)
 ~~~
 
-And this is it! If you examine the file with any kind of hex editor, you'll see
-a binary payload:
+And this is it! If you examine the file with any kind of a hex editor, you'll
+see a binary payload:
 
 ~~~clojure
 xxd /path/to/dump.deed
@@ -237,8 +240,8 @@ etc).
 
 The output is anything that can be coerced to the output stream using the
 `io/output-stream` function. It could be a file, another output stream, a byte
-array, or similar. If you pass a string, it's treated as a name of a file which
-will be created.
+array, or similar. If you pass a string, it's treated a file name which will be
+created.
 
 Examples:
 
@@ -252,12 +255,12 @@ Examples:
                                io/output-stream))
 ~~~
 
-All three invocations dump the same map `{:foo 123}` into different files.
+All the three invocations above dump the same map `{:foo 123}` into different
+files.
 
 To read the data back, invoke the `decode-from` function. It accepts anything
-that can be coerced into an input stream using the `io/input-stream` function
-internally. It might be a file, another stream, a byte array, or a name of a
-file.
+that can be coerced into an input stream using the `io/input-stream`
+function. It might be a file, another stream, a byte array, or a name of a file.
 
 ~~~clojure
 (deed/decode-from "test.deed")
@@ -298,14 +301,14 @@ it:
 
 ### Sequential Encoding and Decoding
 
-Often, we dump vast collections to explore them afterwards. Say, you're going to
-write 10M of database rows into a file to find broken rows with a script.
+We often dump vast collections to explore them afterwards. Say, you're going to
+write 10M of database rows into a file to find a broken row with a script.
 
 The functions above encode and decode a single value. That's OK for primitive
 types and maps but not good for vast collections. For example, if you encode a
 vector of 10M items into a file and read it back, you'll get the same vector of
-10M items back. Most likely you don't need all of these read at once: you would
-better to iterate on them one by one.
+10M items back. Most likely you don't need all of these at once: you'd better to
+iterate on them one by one.
 
 This is the case that `encode-seq-to` and `decode-seq-from` functions cover. The
 first function accepts a collection of items and writes them sequentially. It's
@@ -317,7 +320,7 @@ not a vector any longer but a series of items written one after another. The
 ;; 3
 ~~~
 
-Instead of vector, there might be a lazy sequence, or anything that can be
+Instead of a vector, there might be a lazy sequence, or anything that can be
 iterated.
 
 If you read the dump using `decode-from`, you'll get the first item only:
@@ -351,9 +354,11 @@ decoder:
 ;; 3
 ~~~
 
-The form above might be also written using the `with-open` macro. Since the
+You must process items before you exit the `with-decoder` macro.
+
+The form above might be rewritten using the `with-open` macro. Since the
 `Decoder` object implements `AutoCloseable` interface, it handles the `.close`
-method which in turn closes the origin stream.
+method which in turn closes the underlying stream.
 
 ~~~clojure
 (with-open [d (deed/decoder "test.deed")]
@@ -362,8 +367,7 @@ method which in turn closes the origin stream.
 ~~~
 
 In fact, you don't even need to pass the decoder object into `decode-seq`
-because it implements the `Iterable` Java interface. Just iterate over the
-decoder:
+because it implements the `Iterable` Java interface. Just iterate the decoder:
 
 ~~~clojure
 (deed/with-decoder [d "test.deed"]
@@ -378,7 +382,7 @@ decoder:
 ;; item is 3
 ~~~
 
-Pay attention that items are read lazily so you won't saturate memory.
+The items are read lazily so you won't saturate memory.
 
 ### Low-Level API
 
@@ -394,7 +398,7 @@ in a cycle with some condition:
 ~~~
 
 The `decode` function reads an object from the `Decoder` instance. When the end
-of the stream is met, you'll get a special `EOF` object that you can check with
+of the stream is met, you'll get a special `EOF` object that you can check using
 the `eof?` preficate:
 
 ~~~clojure
@@ -425,13 +429,13 @@ the `eof?` preficate:
 ;; EOF
 ~~~
 
-The low-level might be useful when you need precise control on what you're
-encoding and decoding.
+The low-level might be useful when you need precise control on encoding and
+decoding.
 
 ### API Options
 
 Most of the functions accept an optional map of parameters. Here is a list of
-ones available at the moment:
+options supported at the moment:
 
 | Name                     | Default           | Meaning                                                                                                                   |
 |--------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------|
@@ -442,33 +446,39 @@ ones available at the moment:
 | `:encode-unsupported?`   | true              | If true, dump every unsupported object into a string ([see below](#handle-unsupported-types)). Otherwise, throw an error. |
 | `:io-temp-file?`         | false             | When deciding previously encoded input stream, write its payload into a temp file.                                        |
 | `:save-meta?`            | true              | Preserve metadata for objects what have it.                                                                               |
-| `:append?`               | false             | Write at the end of an existing dump ([see below](#appending)).                                                           |
+| `:append?`               | false             | Write at the end of an existing dump ([see below](#appending-to-a-file)).                                                           |
 
 
-That's unlikely you'll need to change any of these, yet in rare cases they may
+That's unlikely you'll need to change any of these, yet in rare cases they might
 help.
 
 ## GZipped Streams
 
-Deed has a couple of functions turn any input or output into `GZIPInputStream`
-and `GZIPOutputStream` instances respectfully. It allows to compress the data on
-the fly.
+Deed has a couple of functions that turn any input or output into
+`GZIPInputStream` and `GZIPOutputStream` instances respectfully. It allows to
+compress the data on the fly. Here is how you compress:
 
-Here is how you compress:
-
+~~~clojure
 (with-open [out (deed/gzip-output-stream "dump.deed.gz")]
   (deed/encode-to [1 2 3] out))
+~~~
 
+And decompress:
+
+~~~clojure
 (with-open [in (deed/gzip-input-stream "dump.deed.gz")]
   (deed/decode-from in))
 ;; [1 2 3]
+~~~
+
+Keep in mind that compression saves disk space but consumes CPU usage.
 
 ## Appending to a File
 
-In rare cases, you'd like to append data to an existing dump. This might be done
-with two steps. First, you initiate the `FileOutputStream` object manually and
-pass the `true` boolean flag meaning the content is written to the end of the
-file:
+In rare cases, you'd like to append data to an existing file. This might be done
+in two steps. First, you initiate the `FileOutputStream` object manually and
+pass the `true` boolean flag meaning put the content at the end of a file, not
+the beginning:
 
 ~~~clojure
 (with-open [out (new FileOutputStream file true)]
@@ -488,7 +498,7 @@ true}` option. In this case, Deed won't emit a leading `deed.Header` object:
 By default, when Deed doesn't know how to encode an object, it turns it into a
 string using the standard `.toString` method. Than it makes a special
 `Unsupported` object that tracks full class name and the text payload. Let's
-show that using a custom `deftype` declaration:
+present it with a custom `deftype` declaration:
 
 ~~~clojure
 (deftype MyType [a b c])
@@ -501,7 +511,7 @@ show that using a custom `deftype` declaration:
 ;; #<Unsupported@b918edf: {:content "demo.MyType@4376ae5c", :class "demo.MyType"}>
 ~~~
 
-The `Unsupported` object can be checked with the predicate `unsupported?`:
+The `Unsupported` object can be checked with the `unsupported?` predicate:
 
 ~~~clojure
 (def mt-back
@@ -511,7 +521,7 @@ The `Unsupported` object can be checked with the predicate `unsupported?`:
 ;; true
 ~~~
 
-To coerce it to Clojure, just deref it:
+To coerce it to Clojure, just `deref` it:
 
 ~~~clojure
 @mt-back
@@ -519,8 +529,8 @@ To coerce it to Clojure, just deref it:
 ~~~
 
 Above, the `"demo.MyType@4376ae5c"` string doesn't say much. This is because the
-default `.toString` implementation for `deftype` lacks fields. That's why it's
-always worth overriding `.toString` for custom types:
+default `.toString` implementation of `deftype` lacks fields. That's why it's
+always worth overriding the `.toString` method for custom types:
 
 ~~~clojure
 (deftype MyType [a b c]
@@ -542,6 +552,8 @@ always worth overriding `.toString` for custom types:
 ;; {:content "<MyType: :hello, test, 42>", :class "demo.MyType"}
 ~~~
 
+Now the content has fields, so at least you can observe them.
+
 When the `:encode-unsupported?` boolean option is false, Deed throws an
 exception by facing an unsupported object:
 
@@ -554,115 +566,117 @@ exception by facing an unsupported object:
 
 ## Supported Types
 
-| OID    | TAG                       | Class                          | Comment                                                                                                                                                |
-|--------|---------------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0x0000 | NULL                      | `null` (`nil`)                 |                                                                                                                                                        |
-| 0x0001 | HEADER                    | `deed.Header`                  | A leading object with metadata about encoding                                                                                                          |
-| 0x0002 | UNSUPPORTED               | `deed.Unsupported`             | A wrapper for unsupported objects                                                                                                                      |
-| 0x0003 | META                      |                                | Specifies an object with metadata                                                                                                                      |
-| 0x0004 | INT                       | int, java.lang.Integer         |                                                                                                                                                        |
-| 0x0005 | INT_ZERO                  |                                | A special OID for 0 int                                                                                                                                |
-| 0x0006 | INT_ONE                   |                                | A special OID for 1 int                                                                                                                                |
-| 0x0007 | INT_MINUS_ONE             |                                | A special OID for -1 int                                                                                                                               |
-| 0x0008 | SHORT                     | `short`, `java.lang.Short`     |                                                                                                                                                        |
-| 0x0009 | SHORT_ZERO                |                                | A special OID for 0 short                                                                                                                              |
-| 0x000A | SHORT_ONE                 |                                | A special OID for 1 short                                                                                                                              |
-| 0x000B | SHORT_MINUS_ONE           |                                | A special OID for -1 short                                                                                                                             |
-| 0x000C | LONG                      | `long`, `java.lang.Long`       |                                                                                                                                                        |
-| 0x000D | LONG_ZERO                 |                                |                                                                                                                                                        |
-| 0x000E | LONG_ONE                  |                                |                                                                                                                                                        |
-| 0x000F | LONG_MINUS_ONE            |                                |                                                                                                                                                        |
-| 0x0010 | IO_INPUT_STREAM           | `java.io.InputStream`          | When decoding, the bytes are put into a `ByteArrayInputStream`. It's also possible to put them into a temp file and obtain a `FileInputStream`         |
-| 0x0011 | IO_READER                 | -                              | Not implemented                                                                                                                                        |
-| 0x0012 | IO_FILE                   | -                              | Not implemented                                                                                                                                        |
-| 0x0013 | IO_BYTEBUFFER             | `java.nio.ByteBuffer`          |                                                                                                                                                        |
-| 0x0014 | ARR_BYTE                  | byte[]                         |                                                                                                                                                        |
-| 0x0015 | ARR_INT                   | int[]                          |                                                                                                                                                        |
-| 0x0016 | ARR_SHORT                 | short[]                        |                                                                                                                                                        |
-| 0x0017 | ARR_BOOL                  | bool[]                         |                                                                                                                                                        |
-| 0x0018 | ARR_FLOAT                 | float[]                        |                                                                                                                                                        |
-| 0x0019 | ARR_DOUBLE                | double[]                       |                                                                                                                                                        |
-| 0x001A | ARR_OBJ                   | Object[]                       |                                                                                                                                                        |
-| 0x001B | ARR_LONG                  | long[]                         |                                                                                                                                                        |
-| 0x001C | ARR_CHAR                  | char[]                         |                                                                                                                                                        |
-| 0x001D | REGEX                     | java.util.regex.Pattern        |                                                                                                                                                        |
-| 0x001E | CLJ_SORTED_SET            | clojure.lang.PersistentTreeSet | A sorted set usually created with `(sorted-set ...)`                                                                                                   |
-| 0x001F | CLJ_SORTED_SET_EMPTY      |                                | A special OID for an empty sorted set                                                                                                                  |
-| 0x0020 | CLJ_SORTED_MAP            | clojure.lang.PersistentTreeMap | A sorted map usually created with `(sorted-map ...)`                                                                                                   |
-| 0x0021 | CLJ_SORTED_MAP_EMPTY      |                                | An empty sorted map                                                                                                                                    |
-| 0x0022 | URI                       | java.net.URI                   |                                                                                                                                                        |
-| 0x0023 | URL                       | java.net.URL                   |                                                                                                                                                        |
-| 0x0024 | EXCEPTION                 | java.lang.Exception            | Keeps message, class name, stack trace, cause (recursively encoded), and all the suppressed exceptions                                                 |
-| 0x0025 | IO_EXCEPTION              |                                |                                                                                                                                                        |
-| 0x0026 | THROWABLE                 |                                |                                                                                                                                                        |
-| 0x0027 | EX_INFO                   |                                |                                                                                                                                                        |
-| 0x0028 | EX_NPE                    |                                |                                                                                                                                                        |
-| 0x0029 | BOOL_TRUE                 | boolean, java.lang.Boolean     | True value only                                                                                                                                        |
-| 0x002A | BOOL_FALSE                | boolean, java.lang.Boolean     | False value only                                                                                                                                       |
-| 0x002B | STRING                    | java.lang.String               | Stored as a number of bytes + bytes                                                                                                                    |
-| 0x002C | STRING_EMPTY              |                                | A special OID indicating an empty string                                                                                                               |
-| 0x002D | CHAR                      | char, java.lang.Character      |                                                                                                                                                        |
-| 0x002E | CLJ_VEC                   | clojure.lang.APersistentVector | A standard Clojure vector                                                                                                                              |
-| 0x002F | CLJ_VEC_EMPTY             |                                | A special OID indicating an empty vector                                                                                                               |
-| 0x0030 | CLJ_ATOM                  | clojure.lang.Atom              | Gets deref-ed when encoding                                                                                                                            |
-| 0x0031 | CLJ_REF                   | clojure.lang.Ref               | Gets deref-ed when encoding                                                                                                                            |
-| 0x0032 | FUTURE                    | `java.util.concurrent.Future`  | Deed `.get`s the value using timeout from options. When time is up, an exception is throw. When decoded, it's returned as an instance of `deed.FutureWrapper`: a fake object that mimics a future. |
-| 0x0033 | CLJ_SET                   | `clojure.lang.APersistentSet`  | A standard Clojure immutable set                                                                                                                       |
-| 0x0034 | CLJ_SET_EMPTY             |                                | A special OID indicating an empty set                                                                                                                  |
-| 0x0035 | CLJ_LAZY_SEQ              | `clojure.lang.LazySeq`         | Encode a lazy sequence produced with `map`, `for`, etc. Stored as a collection of chunks like `<chunk-len><items...>`. When decoding, read until the chunk of zero length is met. |
-| 0x0036 | CLJ_SEQ                   |                                |                                                                                                                                                        |
-| 0x0037 | CLJ_LIST                  |                                |                                                                                                                                                        |
-| 0x0038 | CLJ_LIST_EMPTY            |                                |                                                                                                                                                        |
-| 0x0039 | CLJ_QUEUE                 |                                |                                                                                                                                                        |
-| 0x003A | CLJ_QUEUE_EMPTY           |                                |                                                                                                                                                        |
-| 0x003B | CLJ_MAP                   |                                |                                                                                                                                                        |
-| 0x003C | CLJ_MAP_EMPTY             |                                |                                                                                                                                                        |
-| 0x003D | CLJ_MAP_ENTRY             |                                |                                                                                                                                                        |
-| 0x003E | CLJ_RECORD                |                                |                                                                                                                                                        |
-| 0x003F | CLJ_TR_VEC                |                                |                                                                                                                                                        |
-| 0x0040 | JVM_MAP                   |                                |                                                                                                                                                        |
-| 0x0041 | JVM_MAP_ENTRY             |                                |                                                                                                                                                        |
-| 0x0042 | UUID                      |                                |                                                                                                                                                        |
-| 0x0043 | JVM_LIST                  |                                |                                                                                                                                                        |
-| 0x0044 | JVM_LIST_EMPTY            |                                |                                                                                                                                                        |
-| 0x0045 | JVM_VECTOR                |                                |                                                                                                                                                        |
-| 0x0046 | JVM_VECTOR_EMPTY          |                                |                                                                                                                                                        |
-| 0x0047 | JVM_ITERABLE              |                                |                                                                                                                                                        |
-| 0x0048 | JVM_ITERATOR              |                                |                                                                                                                                                        |
-| 0x0049 | JVM_STREAM                |                                |                                                                                                                                                        |
-| 0x004A | CLJ_KEYWORD               |                                |                                                                                                                                                        |
-| 0x004B | CLJ_SYMBOL                |                                |                                                                                                                                                        |
-| 0x004C | UTIL_DATE                 |                                |                                                                                                                                                        |
-| 0x004D | DT_LOCAL_DATE             |                                |                                                                                                                                                        |
-| 0x004E | DT_LOCAL_TIME             |                                |                                                                                                                                                        |
-| 0x004F | DT_LOCAL_DATETIME         |                                |                                                                                                                                                        |
-| 0x0050 | DT_OFFSET_DATETIME        |                                |                                                                                                                                                        |
-| 0x0051 | DT_OFFSET_TIME            |                                |                                                                                                                                                        |
-| 0x0052 | DT_DURATION               |                                |                                                                                                                                                        |
-| 0x0053 | DT_PERIOD                 |                                |                                                                                                                                                        |
-| 0x0054 | DT_ZONED_DATETIME         |                                |                                                                                                                                                        |
-| 0x0055 | DT_ZONE_ID                |                                |                                                                                                                                                        |
-| 0x0056 | DT_INSTANT                |                                |                                                                                                                                                        |
-| 0x0057 | SQL_TIMESTAMP             |                                |                                                                                                                                                        |
-| 0x0058 | SQL_TIME                  |                                |                                                                                                                                                        |
-| 0x0059 | SQL_DATE                  |                                |                                                                                                                                                        |
-| 0x005A | BYTE                      |                                |                                                                                                                                                        |
-| 0x005B | BYTE_ZERO                 |                                |                                                                                                                                                        |
-| 0x005C | BYTE_ONE                  |                                |                                                                                                                                                        |
-| 0x005D | BYTE_MINUS_ONE            |                                |                                                                                                                                                        |
-| 0x005E | FLOAT                     |                                |                                                                                                                                                        |
-| 0x005F | FLOAT_ZERO                |                                |                                                                                                                                                        |
-| 0x0060 | FLOAT_ONE                 |                                |                                                                                                                                                        |
-| 0x0061 | FLOAT_MINUS_ONE           |                                |                                                                                                                                                        |
-| 0x0062 | DOUBLE                    |                                |                                                                                                                                                        |
-| 0x0063 | DOUBLE_ZERO               |                                |                                                                                                                                                        |
-| 0x0064 | DOUBLE_ONE                |                                |                                                                                                                                                        |
-| 0x0065 | DOUBLE_MINUS_ONE          |                                |                                                                                                                                                        |
-| 0x0066 | JVM_BIG_DEC               |                                |                                                                                                                                                        |
-| 0x0067 | JVM_BIG_INT               |                                |                                                                                                                                                        |
-| 0x0068 | CLJ_BIG_INT               |                                |                                                                                                                                                        |
-| 0x0069 | CLJ_RATIO                 |                                |                                                                                                                                                        |
-| 0x006A | VECTORZ_AVECTOR           |                                |                                                                                                                                                        |
+The table below renders types supported by Deed out from the box:
+
+| OID    | TAG                  | Class                                  | Comment                                                                                                                                                                                            |
+|--------|----------------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0x0000 | NULL                 | `null` (`nil`)                         |                                                                                                                                                                                                    |
+| 0x0001 | HEADER               | `deed.Header`                          | A leading object with general info about encoding                                                                                                                                                  |
+| 0x0002 | UNSUPPORTED          | `deed.Unsupported`                     | A wrapper for unsupported objects                                                                                                                                                                  |
+| 0x0003 | META                 |                                        | Specifies an object with metadata                                                                                                                                                                  |
+| 0x0004 | INT                  | `int`, `java.lang.Integer`             |                                                                                                                                                                                                    |
+| 0x0005 | INT_ZERO             |                                        | A special OID for 0 int                                                                                                                                                                            |
+| 0x0006 | INT_ONE              |                                        | A special OID for 1 int                                                                                                                                                                            |
+| 0x0007 | INT_MINUS_ONE        |                                        | A special OID for -1 int                                                                                                                                                                           |
+| 0x0008 | SHORT                | `short`, `java.lang.Short`             |                                                                                                                                                                                                    |
+| 0x0009 | SHORT_ZERO           |                                        | A special OID for 0 short                                                                                                                                                                          |
+| 0x000A | SHORT_ONE            |                                        | A special OID for 1 short                                                                                                                                                                          |
+| 0x000B | SHORT_MINUS_ONE      |                                        | A special OID for -1 short                                                                                                                                                                         |
+| 0x000C | LONG                 | `long`, `java.lang.Long`               |                                                                                                                                                                                                    |
+| 0x000D | LONG_ZERO            |                                        |                                                                                                                                                                                                    |
+| 0x000E | LONG_ONE             |                                        |                                                                                                                                                                                                    |
+| 0x000F | LONG_MINUS_ONE       |                                        |                                                                                                                                                                                                    |
+| 0x0010 | IO_INPUT_STREAM      | `java.io.InputStream`                  | When decoding, the bytes are put into a `ByteArrayInputStream`. It's also possible to put them into a temp file and obtain a `FileInputStream`                                                     |
+| 0x0011 | IO_READER            | -                                      | Not implemented                                                                                                                                                                                    |
+| 0x0012 | IO_FILE              | -                                      | Not implemented                                                                                                                                                                                    |
+| 0x0013 | IO_BYTEBUFFER        | `java.nio.ByteBuffer`                  |                                                                                                                                                                                                    |
+| 0x0014 | ARR_BYTE             | `byte[]`                               |                                                                                                                                                                                                    |
+| 0x0015 | ARR_INT              | `int[]`                                |                                                                                                                                                                                                    |
+| 0x0016 | ARR_SHORT            | `short[]`                              |                                                                                                                                                                                                    |
+| 0x0017 | ARR_BOOL             | `boolean[]`                            |                                                                                                                                                                                                    |
+| 0x0018 | ARR_FLOAT            | `float[]`                              |                                                                                                                                                                                                    |
+| 0x0019 | ARR_DOUBLE           | `double[]`                             |                                                                                                                                                                                                    |
+| 0x001A | ARR_OBJ              | `Object[]`                             |                                                                                                                                                                                                    |
+| 0x001B | ARR_LONG             | `long[]`                               |                                                                                                                                                                                                    |
+| 0x001C | ARR_CHAR             | `char[]`                               |                                                                                                                                                                                                    |
+| 0x001D | REGEX                | `java.util.regex.Pattern`              |                                                                                                                                                                                                    |
+| 0x001E | CLJ_SORTED_SET       | `clojure.lang.PersistentTreeSet`       | A sorted set usually created with `(sorted-set ...)`                                                                                                                                               |
+| 0x001F | CLJ_SORTED_SET_EMPTY |                                        | A special OID for an empty sorted set                                                                                                                                                              |
+| 0x0020 | CLJ_SORTED_MAP       | `clojure.lang.PersistentTreeMap`       | A sorted map usually created with `(sorted-map ...)`                                                                                                                                               |
+| 0x0021 | CLJ_SORTED_MAP_EMPTY |                                        | An empty sorted map                                                                                                                                                                                |
+| 0x0022 | URI                  | `java.net.URI`                         |                                                                                                                                                                                                    |
+| 0x0023 | URL                  | `java.net.URL`                         |                                                                                                                                                                                                    |
+| 0x0024 | EXCEPTION            | `java.lang.Exception`                  | Keeps message, class name, stack trace, cause (recursively encoded), and all the suppressed exceptions                                                                                             |
+| 0x0025 | IO_EXCEPTION         |                                        |                                                                                                                                                                                                    |
+| 0x0026 | THROWABLE            |                                        |                                                                                                                                                                                                    |
+| 0x0027 | EX_INFO              |                                        |                                                                                                                                                                                                    |
+| 0x0028 | EX_NPE               |                                        |                                                                                                                                                                                                    |
+| 0x0029 | BOOL_TRUE            | `boolean`, `java.lang.Boolean`         | True value only                                                                                                                                                                                    |
+| 0x002A | BOOL_FALSE           | `boolean`, `java.lang.Boolean`         | False value only                                                                                                                                                                                   |
+| 0x002B | STRING               | `java.lang.String`                     | Stored as a number of bytes + bytes                                                                                                                                                                |
+| 0x002C | STRING_EMPTY         |                                        | A special OID indicating an empty string                                                                                                                                                           |
+| 0x002D | CHAR                 | `char`, `java.lang.Character`          |                                                                                                                                                                                                    |
+| 0x002E | CLJ_VEC              | `clojure.lang.APersistentVector`       | A standard Clojure vector                                                                                                                                                                          |
+| 0x002F | CLJ_VEC_EMPTY        |                                        | A special OID indicating an empty vector                                                                                                                                                           |
+| 0x0030 | CLJ_ATOM             | `clojure.lang.Atom`                    | Gets deref-ed when encoding                                                                                                                                                                        |
+| 0x0031 | CLJ_REF              | `clojure.lang.Ref`                     | Gets deref-ed when encoding                                                                                                                                                                        |
+| 0x0032 | FUTURE               | `java.util.concurrent.Future`          | Deed `.get`s the value using timeout from options. When time is up, an exception is throw. When decoded, it's returned as an instance of `deed.FutureWrapper`: a fake object that mimics a future. |
+| 0x0033 | CLJ_SET              | `clojure.lang.APersistentSet`          | A standard Clojure immutable set                                                                                                                                                                   |
+| 0x0034 | CLJ_SET_EMPTY        |                                        | A special OID indicating an empty set                                                                                                                                                              |
+| 0x0035 | CLJ_LAZY_SEQ         | `clojure.lang.LazySeq`                 | Encode a lazy sequence produced with `map`, `for`, etc. Stored as a collection of chunks like `<chunk-len><items...>`. When decoding, read until the chunk of zero length is met.                  |
+| 0x0036 | CLJ_SEQ              | Type depends on the origin collection  | Becomes a vector when decoding                                                                                                                                                                     |
+| 0x0037 | CLJ_LIST             | `clojure.lang.PersistentList`          |                                                                                                                                                                                                    |
+| 0x0038 | CLJ_LIST_EMPTY       |                                        | A special OID indicating an empty list                                                                                                                                                             |
+| 0x0039 | CLJ_QUEUE            | `clojure.lang.PersistentQueue`         |                                                                                                                                                                                                    |
+| 0x003A | CLJ_QUEUE_EMPTY      |                                        | A special OID indicating an empty queue                                                                                                                                                            |
+| 0x003B | CLJ_MAP              | `clojure.lang.APersistentMap`          |                                                                                                                                                                                                    |
+| 0x003C | CLJ_MAP_EMPTY        | `clojure.lang.APersistentMap`          | An empty Clojure map                                                                                                                                                                               |
+| 0x003D | CLJ_MAP_ENTRY        | `clojure.lang.MapEntry`                | A pair of key and value                                                                                                                                                                            |
+| 0x003E | CLJ_RECORD           | `clojure.lang.IRecord`                 | An instance of `defrecord` object. When decoding, becomes an ordinary map. To preserve the origin type, use the `handle-record` macro (see below).                                                 |
+| 0x003F | CLJ_TR_VEC           | `c.l.PersistentVector$TransientVector` | A transient Clojure vector.                                                                                                                                                                        |
+| 0x0040 | JVM_MAP              | `java.util.Map`                        | A Java map, usually an instance of `HashMap`.                                                                                                                                                      |
+| 0x0041 | JVM_MAP_ENTRY        | `java.util.Map$Entry`                  |                                                                                                                                                                                                    |
+| 0x0042 | UUID                 | `java.util.UUID`                       |                                                                                                                                                                                                    |
+| 0x0043 | JVM_LIST             | `java.util.List`                       | When decoding, becomes an instance of `ArrayList`.                                                                                                                                                 |
+| 0x0044 | JVM_LIST_EMPTY       | `java.util.List`                       | A stub for an empty list.                                                                                                                                                                          |
+| 0x0045 | JVM_VECTOR           | `java.util.Vector`                     |                                                                                                                                                                                                    |
+| 0x0046 | JVM_VECTOR_EMPTY     |                                        | An empty Java vector.                                                                                                                                                                              |
+| 0x0047 | JVM_ITERABLE         | `java.lang.Iterable`                   | Encoded as uncounted chunked sequence of objects                                                                                                                                                   |
+| 0x0048 | JVM_ITERATOR         |                                        | When decoding, becomes an instance of `ArrayList`.                                                                                                                                                 |
+| 0x0049 | JVM_STREAM           | `java.util.stream.Stream`              |                                                                                                                                                                                                    |
+| 0x004A | CLJ_KEYWORD          | `clojure.lang.Keyword`                 |                                                                                                                                                                                                    |
+| 0x004B | CLJ_SYMBOL           | `clojure.lang.Symbol`                  |                                                                                                                                                                                                    |
+| 0x004C | UTIL_DATE            | `java.util.Date`                       |                                                                                                                                                                                                    |
+| 0x004D | DT_LOCAL_DATE        | `java.time.LocalDate`                  |                                                                                                                                                                                                    |
+| 0x004E | DT_LOCAL_TIME        | `java.time.LocalTime`                  |                                                                                                                                                                                                    |
+| 0x004F | DT_LOCAL_DATETIME    | `java.time.LocalDateTime`              |                                                                                                                                                                                                    |
+| 0x0050 | DT_OFFSET_DATETIME   | `java.time.OffsetDateTime`             |                                                                                                                                                                                                    |
+| 0x0051 | DT_OFFSET_TIME       | `java.time.OffsetTime`                 |                                                                                                                                                                                                    |
+| 0x0052 | DT_DURATION          | `java.time.Duration`                   |                                                                                                                                                                                                    |
+| 0x0053 | DT_PERIOD            | `java.time.Period`                     |                                                                                                                                                                                                    |
+| 0x0054 | DT_ZONED_DATETIME    | `java.time.ZonedDateTime`              |                                                                                                                                                                                                    |
+| 0x0055 | DT_ZONE_ID           | `java.time.ZoneId`                     |                                                                                                                                                                                                    |
+| 0x0056 | DT_INSTANT           | `java.time.Instant`                    |                                                                                                                                                                                                    |
+| 0x0057 | SQL_TIMESTAMP        | `java.sql.Timestamp`                   |                                                                                                                                                                                                    |
+| 0x0058 | SQL_TIME             | `java.sql.Time`                        |                                                                                                                                                                                                    |
+| 0x0059 | SQL_DATE             | `java.sql.Date`                        |                                                                                                                                                                                                    |
+| 0x005A | BYTE                 | `byte`, `java.lang.Byte`               |                                                                                                                                                                                                    |
+| 0x005B | BYTE_ZERO            |                                        | A stub for byte 0                                                                                                                                                                                  |
+| 0x005C | BYTE_ONE             |                                        | A stub for byte 1                                                                                                                                                                                  |
+| 0x005D | BYTE_MINUS_ONE       |                                        | A stub for byte -1                                                                                                                                                                                 |
+| 0x005E | FLOAT                | `float`, `java.lang.Float`             |                                                                                                                                                                                                    |
+| 0x005F | FLOAT_ZERO           |                                        | A stub for float 0                                                                                                                                                                                 |
+| 0x0060 | FLOAT_ONE            |                                        | A stub for float 1                                                                                                                                                                                 |
+| 0x0061 | FLOAT_MINUS_ONE      |                                        | A stub for float -1                                                                                                                                                                                |
+| 0x0062 | DOUBLE               | `double`, `java.lang.Double`           |                                                                                                                                                                                                    |
+| 0x0063 | DOUBLE_ZERO          |                                        | A stub for double 0                                                                                                                                                                                |
+| 0x0064 | DOUBLE_ONE           |                                        | A stub for double 1                                                                                                                                                                                |
+| 0x0065 | DOUBLE_MINUS_ONE     |                                        | A stub for double -1                                                                                                                                                                               |
+| 0x0066 | JVM_BIG_DEC          | `java.math.BigDecimal`                 |                                                                                                                                                                                                    |
+| 0x0067 | JVM_BIG_INT          | `java.math.BigInteger`                 |                                                                                                                                                                                                    |
+| 0x0068 | CLJ_BIG_INT          | `clojure.lang.BigInt`                  |                                                                                                                                                                                                    |
+| 0x0069 | CLJ_RATIO            | `clojure.lang.Ratio`                   |                                                                                                                                                                                                    |
+| 0x006A | VECTORZ_AVECTOR      | `mikera.vectorz.AVector`               | See the `deed-vectorz` package                                                                                                                                                                     |
 
 ## Extending Custom Types
 
@@ -681,8 +695,8 @@ Imagine you have a custom `deftype` with three fields:
 
 [oids]: deed-core/src/java/deed/OID.java
 
-Here is how to extend the encoding logic. First, declare a custom OID number for
-it. The number must be short (two bytes) meaning the range from -32768
+Here is how you extend the encoding logic. First, declare a custom OID number
+for it. The number must be `short` (two bytes) meaning the range from -32768
 to 32767. When declaring such an OID, please ensure it doens't overlap with
 [pre-existing OIDs][oids].
 
@@ -696,7 +710,7 @@ Then extend the `IEncode` protocol with that type:
 (extend-protocol deed/IEncode
   SomeType
   (-encode [this encoder]
-    (deed/writeOID encoder SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID) ;; !
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
@@ -708,19 +722,19 @@ Or vice versa: extend the type with the protocol:
 (extend-type SomeType
   deed/IEncode
   (-encode [this encoder]
-    (deed/writeOID encoder SomeTypeOID)
+    (deed/writeOID encoder SomeTypeOID) ;; !
     (deed/encode encoder (.-x this))
     (deed/encode encoder (.-y this))
     (deed/encode encoder (.-z this))))
 ~~~
 
-Pay attention that in both cases the first form must be the `writeOID` function
+Pay attention that in both cases the first expression must be the `writeOID`
 invocation. The OID is always put first because decoding logic relies on
 it. Then we encode custom fields `x`, `y`, and `z`.
 
 Encoding might be a bit easier if you extend a type with `IEncode` when
-declaring it. In this case, the `-encode` method has direct access to x, y, and
-z as they were local variables.
+declaring it. In this case, the `-encode` method has direct access to `x`, `y`,
+and `z` as they were local variables.
 
 ~~~clojure
 (deftype SomeType [x y z]
@@ -732,13 +746,12 @@ z as they were local variables.
     (deed/encode encoder z)))
 ~~~
 
-Since `encode` is a general function, it handles any value type. You don't
-bother if `x` is a number, or a string, or a keyword, or a nested `SomeType`
-instance.
+Since `encode` is a general function, it handles any types. You don't bother if
+`x` is a number, or a string, or a keyword, or a nested `SomeType` instance.
 
 ### Decode
 
-Now extend the decoding counterpart by adding implementation to the `-decode`
+Extend the decoding counterpart by adding implementation to the `-decode`
 multimethod:
 
 ~~~clojure
@@ -750,7 +763,7 @@ multimethod:
     (new SomeType x y z)))
 ~~~
 
-Here you retrieve x, y, and z fields back and componse a new instance of
+Here you retrieve `x`, `y`, and `z` fields back and componse a new instance of
 `SomeType`. Let's check it quckly:
 
 ~~~clojure
@@ -761,15 +774,15 @@ Here you retrieve x, y, and z fields back and componse a new instance of
 ;; #object[demo.SomeType 0x47e19f78 "demo.SomeType@47e19f78"]
 ~~~
 
-The order of writing and reading fields matters, of course. If you mix them,
+The order of written and read fields does matter, of course. If you mix them,
 you'll get a broken object back.
 
 ### Macros
 
-There is a couple of macros that make extending protocols and multimethods under
-the hood: `expand-encode` and `expand-decode`. The first one accepts an OID, a
-type (class), and a couple of symbols to bind: the current `Encoder` instance
-and the current value of the class. Then there is a body encodes fields:
+There is a couple of macros that extend protocols and multimethods under the
+hood: `expand-encode` and `expand-decode`. The first one accepts an OID, a type
+(class), and a couple of symbols to bind: the current `Encoder` instance and the
+current value you process. Then there is a body that encodes fields:
 
 ~~~clojure
 (deed/expand-encode [MyOID SomeType encoder some-type]
@@ -781,8 +794,8 @@ and the current value of the class. Then there is a body encodes fields:
 Pay attention, you **don't call** `writeOID` inside the body because it's
 already a part of the macro.
 
-The `expand-decode` macro accepts the OID and a symbol bound to the current
-`Decoder` instance:
+The `expand-decode` macro accepts an OID and a symbol bound to the current
+`Decoder` instance. Inside, you decode fields and compose an object:
 
 ~~~clojure
 (deed/expand-decode [MyOID decoder]
@@ -798,8 +811,8 @@ By default, records defined with the `defrecord` macro are read as Clojure
 maps. This because they're created at runtime and thus are not known to Deed. To
 preserve the origin type, either you extend a record with the `IEncode` protocol
 and extend the `-decode` multimethod as described above. Another way is to use
-the `handle-record` macro that does the same under the hood. It accepts just two
-arguments: a unique OID and the type:
+the `handle-record` macro that does the same. It accepts just two arguments: a
+unique OID and the type of a record:
 
 ~~~clojure
 (defrecord Bar [x y])
@@ -807,26 +820,24 @@ arguments: a unique OID and the type:
 (deed/handle-record 4321 Bar)
 ~~~
 
-The body of the macro is missing, as you don't need to pass anything
-else. Internally, a record is still encoded as a Clojure map but with a special
-OID. When decoding this map, before it gets returned to the user, it's wrapped
-into the `<YourType>/create` invocation which creates a record instance from a
-map.
+The body of the macro is missing as you don't need to pass anything
+else. Internally, a record is still encoded as a Clojure map but using the OID
+you passed. When decoding this map, before it gets returned to the user, it's
+wrapped into the `<YourType>/create` invocation which creates a record instance
+from a map.
 
 ## Contrib
 
-Deed comes with some minor packages tham make your life easier when it's come to
-dumping the data.
+Deed comes with some minor packages that will make your life bit easier.
 
 ### Base64
 
 The package `deed-base64` brings functions to encode values into a
 base64-encoded stream, and read them back. This is useful when passing encoded
-data throughout any text-only format, for example JSON. What is important, the
-package does the encoding and decoding logic on the fly. It relies on
-`Base64OutputStream` and `Base64InputStream` classes from the `TODO` library. As
-it leads to a third-party dependency, the functionalty is shipped as a
-sub-package.
+data throughout a text format, for example JSON. The package relies on
+`Base64OutputStream` and `Base64InputStream` classes from the Apacke Commons
+Codec library. As it's a third-party dependency, the functionalty is shipped in
+a sub-package.
 
 A quick example:
 
@@ -842,8 +853,7 @@ A quick example:
 ~~~
 
 The `base64-output-stream` function wraps any source and makes an instance of
-`Base64OutputStream`. As you write to it, the data becomes silently base64
-encoded:
+`Base64OutputStream`. As you write to it, the data gets silently base64-encoded:
 
 ~~~clojure
 (slurp "dump.deed.b64")
@@ -874,7 +884,7 @@ The `deed.base64` namespace provides a number of shortcuts, namely:
 | `decode-seq-from-base64-bytes`  | Decode a sequence of values from base64 byte array   |
 | `decode-seq-from-base64-string` | Decode a sequence of values from base64 string       |
 
-Their signatures are similar to what we've explained so far.
+Their signatures are similar to what we've covered so far.
 
 ### VectorZ
 
@@ -900,9 +910,9 @@ computations. A brief demo:
 ;; #object[mikera.vectorz.Vector3 0x5ecb1a9a "[1.1,2.2,3.3]"]
 ~~~
 
-The `Vectorz` class is a general factory for other vector classes like
-`Vector1`, `Vector2` and similar. Deed extends the `AVector` class which is
-common for all of these.
+The `Vectorz` class is a general factory for other classes like `Vector1`,
+`Vector2` and similar. Deed extends the `AVector` class which is common for all
+of these.
 
 ## Binary Format
 
@@ -916,31 +926,39 @@ pattern:
 At the beginning, there is always a `deed.Header` object with general
 information about how encoding was made. At the moment, it only tracks the
 version of the protocol and nothing else. The header has constant size of 30
-bytes where unused bytes are reserved. In there future, it might have more data.
+bytes where unused bytes are reserved. In there future, there might be more data
+in the header.
 
 The content depend on the nature of type. Say, if it's an integer, there are
-always four bytes. If it's a string, first we have four-byte length of the
-following byte array, and then the array by itself.
+always four bytes. If it's a string, than we have four-byte length of the
+upcoming byte array, and then the array by itself.
 
 Counted collections are encoded whis way too. First, there is a total length of
-a collection, and the items encoded one by one. As the items might be of a
-different type, they have their own OIDs:
+a collection, and the items encoded one by one. As the items might be of
+different types, they have their own OIDs:
 
 ~~~
 <2-byte-vector-id><4-byte-vector-length><oid-item-1><payload-item-1><oid-item-2><payload-item-2>
 ~~~
 
-This section, perhaps not too detailed at the moment, will be extended in the
+This section, perhaps is not too detailed at the moment, will be extended in the
 future. For now, check out the source code: see the
 [encoding](deed-core/src/java/deed/Encoder.java) and
 [decoding](deed-core/src/java/deed/Decoder.java) files.
 
 ## Benchmarks
 
-Encoding:
+Deed is a bit faster than Nippy as it's written mostly in Java. The time
+difference depends on the nature of data being processed, but in general Deed is
+about 1.5 times faster. Here are encoding metrics made on two various machines
+using the Criterium library:
 
 <img src="charts/encoding.svg" width=75% height=auto>
 
-Decoding:
+Decode measurements made for the same data:
 
 <img src="charts/decoding.svg" width=75% height=auto>
+
+---
+
+Ivan Grishaev, 2024

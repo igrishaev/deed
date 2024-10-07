@@ -3,10 +3,10 @@
 (def OIDS
   '[
     NULL                    "`null` (`nil`)"                           nil
-    HEADER                  "`deed.Header`"                            "A leading object with metadata about encoding"
+    HEADER                  "`deed.Header`"                            "A leading object with general info about encoding"
     UNSUPPORTED             "`deed.Unsupported`"                       "A wrapper for unsupported objects"
     META                    nil                                        "Specifies an object with metadata"
-    INT                     "int, java.lang.Integer"                   nil
+    INT                     "`int`, `java.lang.Integer`"               nil
     INT_ZERO                nil                                        "A special OID for 0 int"
     INT_ONE                 nil                                        "A special OID for 1 int"
     INT_MINUS_ONE           nil                                        "A special OID for -1 int"
@@ -22,33 +22,33 @@
     IO_READER               "-"                                        "Not implemented"
     IO_FILE                 "-"                                        "Not implemented"
     IO_BYTEBUFFER           "`java.nio.ByteBuffer`"                    nil
-    ARR_BYTE                "byte[]"                                   nil
-    ARR_INT                 "int[]"                                    nil
-    ARR_SHORT               "short[]"                                  nil
-    ARR_BOOL                "bool[]"                                   nil
-    ARR_FLOAT               "float[]"                                  nil
-    ARR_DOUBLE              "double[]"                                 nil
-    ARR_OBJ                 "Object[]"                                 nil
-    ARR_LONG                "long[]"                                   nil
-    ARR_CHAR                "char[]"                                   nil
-    REGEX                   "java.util.regex.Pattern"                  nil
-    CLJ_SORTED_SET          "clojure.lang.PersistentTreeSet"           "A sorted set usually created with `(sorted-set ...)`"
+    ARR_BYTE                "`byte[]`"                                 nil
+    ARR_INT                 "`int[]`"                                  nil
+    ARR_SHORT               "`short[]`"                                nil
+    ARR_BOOL                "`boolean[]`"                              nil
+    ARR_FLOAT               "`float[]`"                                nil
+    ARR_DOUBLE              "`double[]`"                               nil
+    ARR_OBJ                 "`Object[]`"                               nil
+    ARR_LONG                "`long[]`"                                 nil
+    ARR_CHAR                "`char[]`"                                 nil
+    REGEX                   "`java.util.regex.Pattern`"                nil
+    CLJ_SORTED_SET          "`clojure.lang.PersistentTreeSet`"         "A sorted set usually created with `(sorted-set ...)`"
     CLJ_SORTED_SET_EMPTY    nil                                        "A special OID for an empty sorted set"
-    CLJ_SORTED_MAP          "clojure.lang.PersistentTreeMap"           "A sorted map usually created with `(sorted-map ...)`"
+    CLJ_SORTED_MAP          "`clojure.lang.PersistentTreeMap`"         "A sorted map usually created with `(sorted-map ...)`"
     CLJ_SORTED_MAP_EMPTY    nil                                        "An empty sorted map"
-    URI                     "java.net.URI"                             nil
-    URL                     "java.net.URL"                             nil
-    EXCEPTION               "java.lang.Exception"                      "Keeps message, class name, stack trace, cause (recursively encoded), and all the suppressed exceptions"
+    URI                     "`java.net.URI`"                           nil
+    URL                     "`java.net.URL`"                           nil
+    EXCEPTION               "`java.lang.Exception`"                    "Keeps message, class name, stack trace, cause (recursively encoded), and all the suppressed exceptions"
     IO_EXCEPTION            nil                                        nil
     THROWABLE               nil                                        nil
     EX_INFO                 nil                                        nil
     EX_NPE                  nil                                        nil
-    BOOL_TRUE               "boolean, java.lang.Boolean"               "True value only"
-    BOOL_FALSE              "boolean, java.lang.Boolean"               "False value only"
-    STRING                  "java.lang.String"                         "Stored as a number of bytes + bytes"
+    BOOL_TRUE               "`boolean`, `java.lang.Boolean`"           "True value only"
+    BOOL_FALSE              "`boolean`, `java.lang.Boolean`"           "False value only"
+    STRING                  "`java.lang.String`"                       "Stored as a number of bytes + bytes"
     STRING_EMPTY            nil                                        "A special OID indicating an empty string"
-    CHAR                    "char, java.lang.Character"                nil
-    CLJ_VEC                 "clojure.lang.APersistentVector"           "A standard Clojure vector"
+    CHAR                    "`char`, `java.lang.Character`"            nil
+    CLJ_VEC                 "`clojure.lang.APersistentVector`"         "A standard Clojure vector"
     CLJ_VEC_EMPTY           nil                                        "A special OID indicating an empty vector"
     CLJ_ATOM                "`clojure.lang.Atom`"                      "Gets deref-ed when encoding"
     CLJ_REF                 "`clojure.lang.Ref`"                       "Gets deref-ed when encoding"
@@ -75,7 +75,7 @@
     JVM_VECTOR_EMPTY        nil                                        "An empty Java vector."
     JVM_ITERABLE            "`java.lang.Iterable`"                     "Encoded as uncounted chunked sequence of objects"
     JVM_ITERATOR            nil                                        "When decoding, becomes an instance of `ArrayList`."
-    JVM_STREAM              nil                                        nil
+    JVM_STREAM              "`java.util.stream.Stream`"                nil
     CLJ_KEYWORD             "`clojure.lang.Keyword`"                   nil
     CLJ_SYMBOL              "`clojure.lang.Symbol`"                    nil
     UTIL_DATE               "`java.util.Date`"                         nil
@@ -92,23 +92,23 @@
     SQL_TIMESTAMP           "`java.sql.Timestamp`"                     nil
     SQL_TIME                "`java.sql.Time`"                          nil
     SQL_DATE                "`java.sql.Date`"                          nil
-    BYTE                    nil                                        nil
-    BYTE_ZERO               nil                                        nil
-    BYTE_ONE                nil                                        nil
-    BYTE_MINUS_ONE          nil                                        nil
-    FLOAT                   nil                                        nil
-    FLOAT_ZERO              nil                                        nil
-    FLOAT_ONE               nil                                        nil
-    FLOAT_MINUS_ONE         nil                                        nil
-    DOUBLE                  nil                                        nil
-    DOUBLE_ZERO             nil                                        nil
-    DOUBLE_ONE              nil                                        nil
-    DOUBLE_MINUS_ONE        nil                                        nil
-    JVM_BIG_DEC             nil                                        nil
-    JVM_BIG_INT             nil                                        nil
-    CLJ_BIG_INT             nil                                        nil
-    CLJ_RATIO               nil                                        nil
-    VECTORZ_AVECTOR         nil                                        nil
+    BYTE                    "`byte`, `java.lang.Byte`"                 nil
+    BYTE_ZERO               nil                                        "A stub for byte 0"
+    BYTE_ONE                nil                                        "A stub for byte 1"
+    BYTE_MINUS_ONE          nil                                        "A stub for byte -1"
+    FLOAT                   "`float`, `java.lang.Float`"               nil
+    FLOAT_ZERO              nil                                        "A stub for float 0"
+    FLOAT_ONE               nil                                        "A stub for float 1"
+    FLOAT_MINUS_ONE         nil                                        "A stub for float -1"
+    DOUBLE                  "`double`, `java.lang.Double`"             nil
+    DOUBLE_ZERO             nil                                        "A stub for double 0"
+    DOUBLE_ONE              nil                                        "A stub for double 1"
+    DOUBLE_MINUS_ONE        nil                                        "A stub for double -1"
+    JVM_BIG_DEC             "`java.math.BigDecimal`"                   nil
+    JVM_BIG_INT             "`java.math.BigInteger`"                   nil
+    CLJ_BIG_INT             "`clojure.lang.BigInt`"                    nil
+    CLJ_RATIO               "`clojure.lang.Ratio`"                     nil
+    VECTORZ_AVECTOR         "`mikera.vectorz.AVector`"                 "See the `deed-vectorz` package"
     ])
 
 

@@ -390,6 +390,12 @@ public final class Encoder implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unused")
+    public void encodeFutureWrapper(final FutureWrapper fw) {
+        writeOID(OID.FUTURE);
+        encode(fw.x());
+    }
+
     public void writeCountable(final int len, final Iterable<?> iterable) {
         writeInt(len);
         for (final Object x : iterable) {

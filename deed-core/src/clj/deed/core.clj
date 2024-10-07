@@ -54,6 +54,7 @@
    (java.util.regex Pattern)
    (deed Encoder
          Decoder
+         FutureWrapper
          Err
          Header
          EOF
@@ -227,6 +228,10 @@
   Future
   (-encode [this ^Encoder encoder]
     (.encodeFuture encoder this))
+
+  FutureWrapper
+  (-encode [this ^Encoder encoder]
+    (.encodeFutureWrapper encoder this))
 
   ;;
   ;; Clojure collections

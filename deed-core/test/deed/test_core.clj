@@ -672,6 +672,14 @@
       (is (not (future-cancelled? f2)))
       (is (= 42 @f2))))
 
+  (testing "double"
+    (let [f1 (future 42)
+          f2 (enc-dec f1)
+          f3 (enc-dec f2)]
+      (is (future? f3))
+      (is (= "deed.FutureWrapper" (-> f3 class .getName)))
+      (is (= 42 @f3))))
+
   (testing "nested"
     (let [f1 (future (future (future :lol)))
           f2 (enc-dec f1 {:save-meta? false})]
