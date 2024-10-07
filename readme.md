@@ -941,10 +941,12 @@ different types, they have their own OIDs:
 <2-byte-vector-id><4-byte-vector-length><oid-item-1><payload-item-1><oid-item-2><payload-item-2>
 ~~~
 
+[encoder]: deed-core/src/java/deed/Encoder.java
+[decoder]: deed-core/src/java/deed/Decoder.java
+
 This section, perhaps is not too detailed at the moment, will be extended in the
-future. For now, check out the source code: see the
-[encoding](deed-core/src/java/deed/Encoder.java) and
-[decoding](deed-core/src/java/deed/Decoder.java) files.
+future. For now, check out the source code: see the [Encoder.java][encoder] and
+[Decoder.java][decoder] files.
 
 ## Benchmarks
 
