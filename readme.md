@@ -828,7 +828,7 @@ from a map.
 
 ## Contrib
 
-Deed comes with some minor packages that will make your life bit easier.
+Deed comes with some minor packages that will make your life a bit easier.
 
 ### Base64
 
