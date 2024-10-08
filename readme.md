@@ -17,6 +17,7 @@ A fast, zero-deps binary encoding and decoding library for Clojure.
   * [Low-Level API](#low-level-api)
   * [API Options](#api-options)
 - [GZipped Streams](#gzipped-streams)
+- [Versioning and Backward Compatibility](#versioning-and-backward-compatibility)
 - [Appending to a File](#appending-to-a-file)
 - [Handle Unsupported Types](#handle-unsupported-types)
 - [Supported Types](#supported-types)
@@ -472,6 +473,26 @@ And decompress:
 ~~~
 
 Keep in mind that compression saves disk space but consumes CPU usage.
+
+## Versioning and Backward Compatibility
+
+Deed has a built-in versioning system. Every time you encode something, the
+library emits a leading `Header` object with a version of the protocol. At the
+moment of writing this, the version is just 1. When decoding, this version
+number is read from the header before parsing any other objects.
+
+If any breaking changes appear in encode/decode logic, two things will take
+place in the next release:
+
+- the constant `HEADER_VERSION` will be bumped from 1 to 2 so any further
+  encoding will have protocol version 2 as well;
+
+- a corresponding encode/decode logic will be wrapped into a `switch...case`
+  branch depending on the current version of the protocol.
+
+At that very moment, Deed has protocol version 1 with no branching, yet there is
+a room for extending. Adding new OIDs and types won't change the protocol
+version.
 
 ## Appending to a File
 
