@@ -241,8 +241,8 @@ etc).
 
 The output is anything that can be coerced to the output stream using the
 `io/output-stream` function. It could be a file, another output stream, a byte
-array, or similar. If you pass a string, it's treated a file name which will be
-created.
+array, or similar. If you pass a string, it's treated as a file name which will
+be created.
 
 Examples:
 
@@ -308,7 +308,7 @@ write 10M of database rows into a file to find a broken row with a script.
 The functions above encode and decode a single value. That's OK for primitive
 types and maps but not good for vast collections. For example, if you encode a
 vector of 10M items into a file and read it back, you'll get the same vector of
-10M items back. Most likely you don't need all of these at once: you'd better to
+10M items. That's unlikely you need all of these at once: you'd better to
 iterate on them one by one.
 
 This is the case that `encode-seq-to` and `decode-seq-from` functions cover. The
@@ -430,8 +430,7 @@ the `eof?` preficate:
 ;; EOF
 ~~~
 
-The low-level might be useful when you need precise control on encoding and
-decoding.
+The low-level API is useful for precise control on encoding and decoding.
 
 ### API Options
 
@@ -498,8 +497,7 @@ version.
 
 In rare cases, you'd like to append data to an existing file. This might be done
 in two steps. First, you initiate the `FileOutputStream` object manually and
-pass the `true` boolean flag meaning put the content at the end of a file, not
-the beginning:
+pass the `true` boolean flag meaning the data is put at the end of a file:
 
 ~~~clojure
 (with-open [out (new FileOutputStream file true)]
@@ -773,7 +771,7 @@ Since `encode` is a general function, it handles any types. You don't bother if
 ### Decode
 
 Extend the decoding counterpart by adding implementation to the `-decode`
-multimethod:
+multimethod. The branching value is the OID you declared:
 
 ~~~clojure
 (defmethod deed/-decode SomeTypeOID
@@ -784,7 +782,7 @@ multimethod:
     (new SomeType x y z)))
 ~~~
 
-Here you retrieve `x`, `y`, and `z` fields back and componse a new instance of
+Here, we retrieve `x`, `y`, and `z` fields back and componse a new instance of
 `SomeType`. Let's check it quckly:
 
 ~~~clojure
@@ -795,7 +793,7 @@ Here you retrieve `x`, `y`, and `z` fields back and componse a new instance of
 ;; #object[demo.SomeType 0x47e19f78 "demo.SomeType@47e19f78"]
 ~~~
 
-The order of written and read fields does matter, of course. If you mix them,
+The order of writing and reading fields does matter, of course. If you mix them,
 you'll get a broken object back.
 
 ### Macros
@@ -829,11 +827,11 @@ The `expand-decode` macro accepts an OID and a symbol bound to the current
 ## Handling Defrecords
 
 By default, records defined with the `defrecord` macro are read as Clojure
-maps. This because they're created at runtime and thus are not known to Deed. To
-preserve the origin type, either you extend a record with the `IEncode` protocol
-and extend the `-decode` multimethod as described above. Another way is to use
-the `handle-record` macro that does the same. It accepts just two arguments: a
-unique OID and the type of a record:
+maps. This is because they're created at runtime and thus are not known to
+Deed. To preserve the origin type, either you extend a record with the `IEncode`
+protocol and extend the `-decode` multimethod as described above. Another way is
+to use the `handle-record` macro that does the same. It accepts just two
+arguments: a unique OID and the type of a record:
 
 ~~~clojure
 (defrecord Bar [x y])
@@ -973,8 +971,8 @@ future. For now, check out the source code: see the [Encoder.java][encoder] and
 
 Deed is a bit faster than Nippy as it's written mostly in Java. The time
 difference depends on the nature of data being processed, but in general Deed is
-about 1.5 times faster. Here are encoding metrics made on two various machines
-using the Criterium library:
+about 1.3-1.5 times faster. Here are encoding metrics made on two various
+machines using the Criterium library:
 
 <img src="charts/encoding.svg" width=75% height=auto>
 
