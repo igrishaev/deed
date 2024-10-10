@@ -25,6 +25,7 @@ A fast, zero-deps binary encoding and decoding library for Clojure.
   * [Encode](#encode)
   * [Decode](#decode)
   * [Macros](#macros)
+  * [Grouping Fields](#grouping-fields)
 - [Handling Defrecords](#handling-defrecords)
 - [Contrib](#contrib)
   * [Base64](#base64)
@@ -823,6 +824,96 @@ The `expand-decode` macro accepts an OID and a symbol bound to the current
         z (deed/decode decoder)]
     (new AnotherType x y z)))
 ~~~
+
+### Grouping Fields
+
+Above, we encoded and decoded fields `x`, `y` and `z` one by one. This is ok for
+a time being, but what if one day you need to add one more field? If you add it,
+you cannot read it from a decoder any longer because it will break the
+pipeline. Here is an example:
+
+~~~clojure
+;; before
+(deftype SomeType [x y z]
+  ...)
+
+;; after
+(deftype SomeType [x y z a]
+  ...)
+~~~
+
+Now you alter the `-decode` multimethod so it retrieves the `a` field as well:
+
+~~~clojure
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [x (deed/decode decoder)
+        y (deed/decode decoder)
+        z (deed/decode decoder)
+        a (deed/decode decoder)]
+    (new SomeType x y z a)))
+~~~
+
+When reading an old dump made **before** adding `a` to `SomeType`, it will lead
+to a mysterious bug. The `a` value belongs to another item that has been written
+after `SomeType`. It might not even trigger an exception but rather return a
+weird data.
+
+To solve this, collect fields into a single collection and emit it into the
+encoder. A map is the best candidate:
+
+~~~clojure
+(deftype SomeType [x y z]
+  deed/IEncode
+  (-encode [this encoder]
+    (let [fields {:x x :y y :z z}]
+      (deed/writeOID encoder SomeTypeOID)
+      (deed/encode encoder fields))))
+~~~
+
+When decoding, split that map on fields:
+
+~~~clojure
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [{:keys [x y z]}
+        (deed/decode decoder)]
+    (new SomeType x y z)))
+~~~
+
+Now that you have introduced a new `a` field into the type, just add it into the
+`:keys` vector and pass into the constructor:
+
+~~~clojure
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [{:keys [x y z a]}
+        (deed/decode decoder)]
+    (new SomeType x y z a)))
+~~~
+
+The `a` field, since missing in the origin map, will be `nil`. You can add any
+kind of default fallback, for example merge the decoded map with defaults:
+
+~~~clojure
+(def Defaults
+  {:x 1
+   :y "this"
+   :z true
+   :a {:some "map"}})
+
+(defmethod deed/-decode SomeTypeOID
+  [_ decoder]
+  (let [decoded
+        (deed/decode decoder)
+
+        {:keys [x y z a]}
+        (merge Defaults decoded)]
+
+    (new SomeType x y z a)))
+~~~
+
+With this approach, you'll be safe when extending types and reading old dumps.
 
 ## Handling Defrecords
 
