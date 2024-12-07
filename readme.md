@@ -55,7 +55,7 @@ Deed is written in pure Java and thus is pretty fast (see the
 It doesn't rely on the built-in Java `Serializable` interface for security
 reasons. Every type is processed manually.
 
-Deep provides convenient API for reading the frozen data lazily one by one.
+Deed provides convenient API for reading the frozen data lazily one by one.
 
 ## Motivation
 
@@ -71,7 +71,7 @@ had in mind while working on Deed:
    have precise control of what you use and what you don't
 
 3. Unlike Nippy, Deed never falls back to native Java serialization. There is no
-   such an option. Thus, your application cannot be attacked by someone how has
+   such an option. Thus, your application cannot be attacked by someone who has
    forged a binary dump.
 
 4. Deed is simple: it blindly works with input- and output byte streams having
@@ -79,7 +79,7 @@ had in mind while working on Deed:
    account -- yet there are utilities for streams.
 
 5. The library provides API which personally I consider more convenient than
-   Nippi's. Namely, Deed can lazily iterate on a series of encoded data instead
+   Nippy's. Namely, Deed can lazily iterate on a series of encoded data instead
    of reading the whole dump at once.
 
 6. Finally, why not using popular and cross-platform formats like JSON, Message
